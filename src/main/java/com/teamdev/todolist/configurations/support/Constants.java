@@ -13,6 +13,11 @@ public class Constants {
     public static final String API_USER_ID = "userId";
     public static final String API_USERS_USER_ID = "/{userId}";
 
+    //    API для работы с Role
+    public static final String API_ROLES = "/roles";
+    public static final String API_ROLE_ID = "roleId";
+    public static final String API_ROLES_ROLE_ID = "/{roleId}";
+
     //    App roles constants
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String ADMIN = "ADMIN";

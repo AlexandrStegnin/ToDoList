@@ -19,6 +19,8 @@ import static com.teamdev.todolist.configurations.support.Constants.ROLE_USER;
 @Service
 public class UserService {
 
+    // TODO: 07.03.2019 Выбрасывать исключения, если пользователь не найден
+
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final BCryptPasswordEncoder encoder;
