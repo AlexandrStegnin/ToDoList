@@ -6,6 +6,7 @@ package com.teamdev.todolist.configurations.support;
 public class Constants {
 
     public static final String API = "/api";
+    public static final String AUTHORITIES_KEY = "authorities";
 
     //    API для работы с User
     public static final String API_USERS = "/users";
