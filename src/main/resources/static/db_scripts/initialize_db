@@ -1,0 +1,58 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS app_users;
+
+CREATE TABLE app_users
+(
+  id       INT(8) AUTO_INCREMENT,
+  username VARCHAR(20)  NOT NULL,
+  password VARCHAR(100) NOT NULL,
+  CONSTRAINT app_users_pk
+    PRIMARY KEY (id)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8;
+
+CREATE UNIQUE INDEX app_users_username_uindex
+  ON app_users (username);
+
+DROP TABLE IF EXISTS roles;
+
+CREATE TABLE roles
+(
+  id    INT(8) AUTO_INCREMENT,
+  title VARCHAR(20) NOT NULL,
+  CONSTRAINT roles_pk
+    PRIMARY KEY (id)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8;
+
+CREATE UNIQUE INDEX roles_title_uindex
+  ON roles (title);
+
+DROP TABLE IF EXISTS users_roles;
+
+CREATE TABLE users_roles
+(
+  user_id INT(8) NOT NULL,
+  role_id INT(8) NULL,
+  CONSTRAINT roles_fk
+    FOREIGN KEY (user_id) REFERENCES roles (id),
+  CONSTRAINT users_fk
+    FOREIGN KEY (user_id) REFERENCES app_users (id)
+);
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT INTO `todo_list_db`.`app_users` (`username`, `password`)
+VALUES ('admin', '$2a$10$rFL0cavcGHC.7UZtclFtheeDAq4jKYJNKvzNq2dYcSpTohDSFrv/C');
+
+INSERT INTO `todo_list_db`.`roles` (`title`)
+VALUES ('ROLE_ADMIN');
+
+INSERT INTO `todo_list_db`.`roles` (`title`)
+VALUES ('ROLE_USER');
+
+INSERT INTO `todo_list_db`.`users_roles` (`user_id`, `role_id`)
+VALUES (1, 1);
