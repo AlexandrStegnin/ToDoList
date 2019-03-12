@@ -1,0 +1,1 @@
+ALTER TABLE todo_list_db.user_role DROP COLUMN id;

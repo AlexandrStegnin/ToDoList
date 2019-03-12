@@ -21,15 +21,22 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class User extends AbstractEntity {
 
-    @NotNull
+    @Id
+    @TableGenerator(name = "seqStore", table = "SEQ_STORE",
+            pkColumnName = "SEQ_NAME", pkColumnValue = "USER.ID.PK",
+            valueColumnName = "SEQ_VALUE", initialValue = 4, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "seqStore")
+    @Column(name = "id", updatable = false, nullable = false)
+    private Long id;
+
     @Column
+    @NotNull
     private String name;
 
-    @NotNull
     @Column
+    @NotNull
     private String surname;
 
-    @NotNull
     @Column
     private String middlename;
 

@@ -14,16 +14,13 @@ import java.time.LocalDateTime;
  */
 
 @Data
-@MappedSuperclass
 public abstract class AbstractEntity implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+    @Column
     @CreationTimestamp
     private LocalDateTime created;
 
+    @Column
     @UpdateTimestamp
     private LocalDateTime updated;
 

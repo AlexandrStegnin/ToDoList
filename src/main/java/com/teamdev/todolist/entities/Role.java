@@ -4,8 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import static com.teamdev.todolist.configurations.support.Constants.ROLE_PREFIX;
 
@@ -19,8 +18,18 @@ import static com.teamdev.todolist.configurations.support.Constants.ROLE_PREFIX;
 @EqualsAndHashCode(callSuper = true)
 public class Role extends AbstractEntity implements GrantedAuthority {
 
+    @Id
+    @TableGenerator(name = "seqStore", table = "SEQ_STORE",
+            pkColumnName = "SEQ_NAME", pkColumnValue = "ROLE.ID.PK",
+            valueColumnName = "SEQ_VALUE", initialValue = 4, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "seqStore")
+    @Column(name = "id", updatable = false, nullable = false)
+    private Long id;
+
+    @Column
     private String title;
 
+    @Column
     private String description;
 
     @Override
