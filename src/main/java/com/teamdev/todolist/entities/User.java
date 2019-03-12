@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -18,14 +19,15 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "user")
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class User extends AbstractEntity {
 
     @Id
-    @TableGenerator(name = "seqStore", table = "SEQ_STORE",
+    @TableGenerator(name = "userSeqStore", table = "SEQ_STORE",
             pkColumnName = "SEQ_NAME", pkColumnValue = "USER.ID.PK",
-            valueColumnName = "SEQ_VALUE", initialValue = 4, allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "seqStore")
+            valueColumnName = "SEQ_VALUE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "userSeqStore")
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 

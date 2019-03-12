@@ -19,10 +19,10 @@ import static com.teamdev.todolist.configurations.support.Constants.ROLE_PREFIX;
 public class Role extends AbstractEntity implements GrantedAuthority {
 
     @Id
-    @TableGenerator(name = "seqStore", table = "SEQ_STORE",
+    @TableGenerator(name = "roleSeqStore", table = "SEQ_STORE",
             pkColumnName = "SEQ_NAME", pkColumnValue = "ROLE.ID.PK",
-            valueColumnName = "SEQ_VALUE", initialValue = 4, allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "seqStore")
+            valueColumnName = "SEQ_VALUE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "roleSeqStore")
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 

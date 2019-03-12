@@ -1,12 +1,15 @@
 package com.teamdev.todolist.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * @author Alexandr Stegnin
@@ -14,24 +17,28 @@ import java.time.LocalDateTime;
  */
 
 @Data
+@MappedSuperclass
 public abstract class AbstractEntity implements Serializable {
 
     @Column
-    @CreationTimestamp
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime created;
 
     @Column
-    @UpdateTimestamp
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime updated;
 
     @PrePersist
     private void prePersist() {
-        if (created == null) created = LocalDateTime.now();
+        created = LocalDateTime.now();
         updated = LocalDateTime.now();
     }
 
     @PreUpdate
     private void preUpdate() {
+        if (Objects.equals(null, created)) created = LocalDateTime.now();
         updated = LocalDateTime.now();
     }
 
