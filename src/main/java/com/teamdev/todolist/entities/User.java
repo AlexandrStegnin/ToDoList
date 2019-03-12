@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -15,23 +17,44 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "app_users")
+@Table(name = "user")
 @EqualsAndHashCode(callSuper = true)
 public class User extends AbstractEntity {
 
+    @NotNull
     @Column
-    @Size(min = 3, max = 20, message = "Username must be greater than 3 and less than 20 characters")
-    private String username;
+    private String name;
+
+    @NotNull
+    @Column
+    private String surname;
+
+    @NotNull
+    @Column
+    private String middlename;
+
+    @Column
+    @Size(min = 3, max = 45, message = "Login must be greater than 3 and less than 45 characters")
+    private String login;
 
     @Column
     @Size(min = 3, message = "Password must be greater than 3 characters")
     private String password;
 
+    @Email
+    @Column
+    private String email;
+
+    @Column
+    private String avatar;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
-            name = "users_roles",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")}
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
+            foreignKey = @ForeignKey(name = "user_role_to_user"),
+            inverseForeignKey = @ForeignKey(name = "user_role_to_role")
     )
     private Set<Role> roles;
 

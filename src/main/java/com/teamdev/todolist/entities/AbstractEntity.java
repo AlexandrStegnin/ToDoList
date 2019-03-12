@@ -1,9 +1,12 @@
 package com.teamdev.todolist.entities;
 
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author Alexandr Stegnin
@@ -12,25 +15,27 @@ import java.time.LocalDate;
 
 @Data
 @MappedSuperclass
-public abstract class AbstractEntity {
+public abstract class AbstractEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private LocalDate created;
+    @CreationTimestamp
+    private LocalDateTime created;
 
-    private LocalDate updated;
+    @UpdateTimestamp
+    private LocalDateTime updated;
 
     @PrePersist
     private void prePersist() {
-        if (created == null) created = LocalDate.now();
-        updated = LocalDate.now();
+        if (created == null) created = LocalDateTime.now();
+        updated = LocalDateTime.now();
     }
 
     @PreUpdate
     private void preUpdate() {
-        updated = LocalDate.now();
+        updated = LocalDateTime.now();
     }
 
 }
