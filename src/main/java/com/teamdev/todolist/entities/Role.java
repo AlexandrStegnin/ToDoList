@@ -34,6 +34,12 @@ public class Role extends AbstractEntity implements GrantedAuthority {
 
     @Override
     public String getAuthority() {
-        return ROLE_PREFIX + title;
+        return title.startsWith(ROLE_PREFIX) ? title : ROLE_PREFIX + title;
+    }
+
+    @PrePersist
+    public void serRole() {
+        if (!title.trim().toUpperCase().startsWith(ROLE_PREFIX)) title = ROLE_PREFIX + title.trim().toUpperCase();
+        else title = title.trim().toUpperCase();
     }
 }
