@@ -1,5 +1,6 @@
 package com.teamdev.todolist.entities;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,15 +25,19 @@ public class Role extends AbstractEntity implements GrantedAuthority {
             valueColumnName = "SEQ_VALUE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "roleSeqStore")
     @Column(name = "id", updatable = false, nullable = false)
+    @ApiModelProperty(notes = "The database generated role ID")
     private Long id;
 
     @Column
+    @ApiModelProperty(notes = "The role title")
     private String title;
 
     @Column
+    @ApiModelProperty(notes = "The role description")
     private String description;
 
     @Override
+    @ApiModelProperty(notes = "Role with role prefix (ROLE_)")
     public String getAuthority() {
         return title.startsWith(ROLE_PREFIX) ? title : ROLE_PREFIX + title;
     }

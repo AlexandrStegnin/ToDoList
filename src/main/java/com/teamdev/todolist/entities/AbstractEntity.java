@@ -1,6 +1,7 @@
 package com.teamdev.todolist.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -23,11 +24,13 @@ public abstract class AbstractEntity implements Serializable {
     @Column
     @JsonFormat
             (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+    @ApiModelProperty(notes = "Date and time of creation")
     private LocalDateTime created;
 
     @Column
     @JsonFormat
             (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+    @ApiModelProperty(notes = "Date and time of creation")
     private LocalDateTime updated;
 
     @PrePersist
