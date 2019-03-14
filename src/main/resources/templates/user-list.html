@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List of users</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript">
+        jQuery(function send($) {
+
+            // api для примера
+            const API = 'http://localhost:8181/todo/api/users';
+
+            // точка входа
+            const $app = $('#app');
+
+            // создаем нужные элементы
+            const $ul = $('<ul class="list" />');
+            const $li = $('<li class="list-item" />');
+
+            $.getJSON(API, function (response) {
+                // метод [].map() - https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Array/map
+                const items = response.map(function (user) {
+                    // jQuery.fn.clone()
+                    const item = $li.clone();
+
+                    item.text(user.name);
+
+                    return item;
+                });
+
+                $ul.append(items);
+                $app.append($ul);
+            })
+        })
+    </script>
+</head>
+<body>
+
+<div id="app"></div>
+
+</body>
+</html>

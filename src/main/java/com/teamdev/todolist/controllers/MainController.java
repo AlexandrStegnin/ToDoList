@@ -21,4 +21,9 @@ public class MainController {
         return "redirect:/swagger-ui.html";
     }
 
+    @GetMapping("/ui/users")
+    @ApiOperation(value = "Go to user-list page for example", response = String.class)
+    public String getUsersList() {
+        return "user-list";
+    }
 }
