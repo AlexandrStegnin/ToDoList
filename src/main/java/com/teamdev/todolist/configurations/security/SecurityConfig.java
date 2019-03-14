@@ -14,6 +14,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.http.HttpServletResponse;
 
+import static com.teamdev.todolist.configurations.support.Constants.ALL_SWAGGER_MATCHERS;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -48,6 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // allow all POST requests
                 .antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
+                .antMatchers(HttpMethod.GET, "/").permitAll()
+                .antMatchers(ALL_SWAGGER_MATCHERS).permitAll()
                 // any other requests must be authenticated
                 .anyRequest().authenticated();
     }

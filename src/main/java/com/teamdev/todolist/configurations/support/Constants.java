@@ -25,5 +25,8 @@ public class Constants {
     public static final String ROLE_ADMIN = ROLE_PREFIX + ADMIN;
     public static final String ROLE_USER = USER;
 
+    //    SWAGGER Uri
+    public static final String[] ALL_SWAGGER_MATCHERS = {"/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**"};
+
 
 }
