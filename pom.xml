@@ -31,14 +31,6 @@
                 <role>Developer</role>
             </roles>
         </developer>
-        <developer>
-            <id>Suchkov</id>
-            <email>ny1828@yandex.ru</email>
-            <name>Denis Suchkov</name>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </developer>
     </developers>
     <properties>
         <java.version>1.8</java.version>
@@ -119,6 +111,14 @@
             <version>2.9.2</version>
         </dependency>
 
+        <!-- For use Flyway migration tools -->
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>5.2.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -127,6 +127,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>5.2.1</version>
+                <configuration>
+                    <configFile>src/main/resources/flyway.conf</configFile>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
