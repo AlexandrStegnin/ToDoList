@@ -30,7 +30,7 @@ public abstract class AbstractEntity implements Serializable {
     @Column
     @JsonFormat
             (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    @ApiModelProperty(notes = "Date and time of creation")
+    @ApiModelProperty(notes = "Date and time of update")
     private LocalDateTime updated;
 
     @PrePersist
