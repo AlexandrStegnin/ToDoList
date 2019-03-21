@@ -6,14 +6,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static com.teamdev.todolist.configurations.support.Constants.API_INFO_URL;
+
 /**
  * @author Alexandr Stegnin
  */
 
 @Controller
-@RequestMapping("/")
-@Api(value = "MainController", description = "Redirect to swagger-ui when open default app path (\"/\")")
-public class MainController {
+@RequestMapping(API_INFO_URL)
+@Api(value = "ApiInfoController", description = "Information page about this API")
+public class ApiInfoController {
 
     @GetMapping
     @ApiOperation(value = "Go to swagger ui page", response = String.class)
