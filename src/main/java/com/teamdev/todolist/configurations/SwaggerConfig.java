@@ -38,8 +38,6 @@ public class SwaggerConfig {
                 .license("Apache License Version 2.0")
                 .licenseUrl("https://www.apache.org/licenses/LICENSE-2.0")
                 .contact(new Contact("Alexandr Stegnin", "", "alexandr.stegnin@mail.ru"))
-                .contact(new Contact("Leonid Lebidko", "", "llebidko@gmail.com"))
-                .contact(new Contact("Denis Suchkov", "", "ny1828@yandex.ru"))
                 .build();
     }
 
