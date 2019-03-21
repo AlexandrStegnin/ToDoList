@@ -1,0 +1,1 @@
+RENAME TABLE todo_list_db.perfomer TO todo_list_db.performer;

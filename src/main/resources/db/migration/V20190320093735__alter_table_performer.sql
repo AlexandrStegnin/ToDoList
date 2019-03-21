@@ -1,0 +1,1 @@
+ALTER TABLE todo_list_db.performer CHANGE perfomer_id performer_id int(11) NULL COMMENT 'Ссылка на пользователя-исполнителя';
