@@ -61,10 +61,13 @@ public class VaadinViewUtils {
         Div contentDiv = new Div();
         if (user.getRoles() == null) user.setRoles(new HashSet<>());
         availableRoles.forEach(role -> {
+            // создаём checkbox'ы из доступных ролей и отмечаем те, которые есть у пользователя
             Checkbox checkbox = new Checkbox(
                     role.getTitle(),
                     user.getRoles().contains(role));
             checkbox.addValueChangeListener(e -> {
+
+                // вешаем обработчик добавить/удалить роль у пользователя
                 String roleName = e.getSource().getElement().getText();
                 Role userRole = availableRoles.stream()
                         .filter(r -> r.getTitle().equalsIgnoreCase(roleName))
@@ -81,6 +84,9 @@ public class VaadinViewUtils {
         return checkBoxDiv;
     }
 
+    // это использовалось в geek market для создания картинок в папках по vendor code
+    // в vaadin такая особенность, можно указать картинки, которые лежат в определённых папках (VAADIN/STATIC/IMAGES)
+    // точно не помню путь, но он задан довольно жёстко, или делать это как здесь динамически
     private static StreamResource createFileResource(File file) {
         StreamResource sr = new StreamResource("", (InputStreamFactory) () -> {
             try {
@@ -98,6 +104,7 @@ public class VaadinViewUtils {
         return sr;
     }
 
+    // тоже использовалось в geek market, чтобы назначить картинку по умолчанию
     private static File getDefaultImage() {
         try {
             return ResourceUtils.getFile("classpath:static/images/users-png.png");
@@ -149,6 +156,7 @@ public class VaadinViewUtils {
 //        return details;
 //    }
 
+    // использовалось для вывода сообщений, если к примеру корзина пустая
     public static Div createInfoDiv(String message) {
         Div div = new Div();
         div.setSizeFull();
