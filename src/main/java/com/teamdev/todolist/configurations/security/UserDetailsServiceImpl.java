@@ -47,4 +47,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return authorities;
     }
 
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
+    }
+
 }
