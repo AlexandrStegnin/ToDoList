@@ -5,6 +5,7 @@ import com.teamdev.todolist.configurations.support.Constants;
 import com.teamdev.todolist.repositories.AuthRepository;
 import com.teamdev.todolist.vaadin.ui.LoginView;
 import com.teamdev.todolist.vaadin.ui.ProfileView;
+import com.teamdev.todolist.vaadin.ui.TaskListView;
 import com.teamdev.todolist.vaadin.ui.admin.AdminView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -24,12 +25,13 @@ public class CustomAppLayout extends AppLayout {
 
     public CustomAppLayout() {
         AppLayoutMenu menu = createMenu();
-        Image img = new Image("https://i.imgur.com/GPpnszs.png", "Vaadin Logo");
+        Image img = new Image("https://i.imgur.com/GPpnszs.png", "ToDo List Logo");
         img.setHeight("44px");
         setBranding(img);
 
         this.getElement().getStyle().set("margin-top", "10px");
 
+        AppLayoutMenuItem taskListItem = new AppLayoutMenuItem(VaadinIcon.TASKS.create(), "Task List", e -> goToPage(TaskListView.class));
         AppLayoutMenuItem logoutItem = new AppLayoutMenuItem(VaadinIcon.SIGN_OUT.create(), "Logout", e -> logout());
         AppLayoutMenuItem loginItem = new AppLayoutMenuItem(VaadinIcon.SIGN_IN.create(), "Login", e -> goToPage(LoginView.class));
         AppLayoutMenuItem adminItem = new AppLayoutMenuItem(VaadinIcon.COGS.create(), "Admin", e -> goToPage(AdminView.class));
@@ -37,6 +39,7 @@ public class CustomAppLayout extends AppLayout {
 
         if (SecurityUtils.isUserInRole(ROLE_ADMIN)) menu.addMenuItems(adminItem);
         if (SecurityUtils.isUserLoggedIn()) {
+            menu.addMenuItem(taskListItem);
             menu.addMenuItem(profileItem);
             menu.addMenuItem(logoutItem);
         } else {

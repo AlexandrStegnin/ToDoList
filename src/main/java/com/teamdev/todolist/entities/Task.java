@@ -45,7 +45,7 @@ public class Task extends AbstractEntity {
     @ApiModelProperty(notes = "Task author")
     private User author;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "performer",
             joinColumns = @JoinColumn(name = "performer_id", referencedColumnName = "id"),
@@ -54,7 +54,7 @@ public class Task extends AbstractEntity {
             inverseForeignKey = @ForeignKey(name = "performer_to_user")
     )
     @ApiModelProperty(notes = "Task performers")
-    private List<User> performers;
+    private List<Performer> performers;
 
     @Column
     @JsonFormat
