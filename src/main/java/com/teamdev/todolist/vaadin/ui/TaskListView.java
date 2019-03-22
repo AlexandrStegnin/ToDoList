@@ -10,11 +10,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,19 +63,27 @@ public class TaskListView extends CustomAppLayout {
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(task -> task.getPerformers().stream().findFirst()) // todo: победить перформеров
-                //.map(performer -> performer.getName() + " " + performer.getSurname())
-                //.collect(Collectors.joining(", ")))
+        grid.addColumn(task -> task.getPerformers().stream()
+                .map(performer -> performer.getName() + " " + performer.getSurname())
+                .collect(Collectors.joining(", ")))
                 .setHeader("Performers")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(Task::getCreationDate)
+        grid.addColumn(new LocalDateTimeRenderer<>(
+                Task::getCreationDate,
+                DateTimeFormatter.ofLocalizedDateTime(
+                        FormatStyle.MEDIUM,
+                        FormatStyle.SHORT)))
                 .setHeader("Created at")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(Task::getExecutionDate)
+        grid.addColumn(new LocalDateTimeRenderer<>(
+                Task::getExecutionDate,
+                DateTimeFormatter.ofLocalizedDateTime(
+                        FormatStyle.MEDIUM,
+                        FormatStyle.SHORT)))
                 .setHeader("Executed at")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
