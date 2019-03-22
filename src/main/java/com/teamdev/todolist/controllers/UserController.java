@@ -77,7 +77,7 @@ public class UserController {
      *
      * @param userId - id пользователя
      * @param user   - данные пользователя для изменения в формате json
-     * @return - response с сообщением
+     * @return - User
      */
     @ApiOperation(value = "Update user by id", response = User.class)
     @PutMapping(value = API_USERS_USER_ID, produces = MediaType.APPLICATION_JSON_VALUE)
