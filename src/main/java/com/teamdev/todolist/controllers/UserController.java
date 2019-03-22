@@ -75,14 +75,12 @@ public class UserController {
     /**
      * Изменить пользователя
      *
-     * @param userId - id пользователя
      * @param user   - данные пользователя для изменения в формате json
      * @return - User
      */
-    @ApiOperation(value = "Update user by id", response = User.class)
-    @PutMapping(value = API_USERS_USER_ID, produces = MediaType.APPLICATION_JSON_VALUE)
-    public User update(@PathVariable(API_USER_ID) Long userId, @RequestBody User user) {
-        user.setId(userId);
+    @ApiOperation(value = "Update user", response = User.class)
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public User update(@RequestBody User user) {
         return userService.update(user);
     }
 

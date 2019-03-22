@@ -75,14 +75,12 @@ public class TaskStatusController {
     /**
      * Изменить статус задачи
      *
-     * @param taskStatusId - id статуса
      * @param taskStatus   - данные статуса для изменения в формате json
      * @return - TaskStatus
      */
-    @ApiOperation(value = "Update task status by id", response = TaskStatus.class)
-    @PutMapping(value = API_TASK_STATUSES_STATUS_ID, produces = MediaType.APPLICATION_JSON_VALUE)
-    public TaskStatus update(@PathVariable(API_TASK_STATUS_ID) Long taskStatusId, @RequestBody TaskStatus taskStatus) {
-        taskStatus.setId(taskStatusId);
+    @ApiOperation(value = "Update task status", response = TaskStatus.class)
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public TaskStatus update(@RequestBody TaskStatus taskStatus) {
         return taskStatusService.update(taskStatus);
     }
 

@@ -50,7 +50,7 @@ public class LoginView extends VerticalLayout {
 
         Button updateI18nButton = new Button("Switch to Russian",
                 event -> loginForm.setI18n(createRussianI18n()));
-        Anchor apiLink = new Anchor("./api/info", "See info about this API");
+        Anchor apiLink = new Anchor("." + API_INFO_URL, "API info");
         add(updateI18nButton);
         apiLink.getStyle().set("color", "green");
         add(apiLink);

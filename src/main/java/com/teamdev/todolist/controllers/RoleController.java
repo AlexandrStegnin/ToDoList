@@ -78,14 +78,12 @@ public class RoleController {
     /**
      * Изменить роль
      *
-     * @param roleId - id роли
      * @param role   - данные роли для изменения в формате json
      * @return - Role
      */
-    @ApiOperation(value = "Update role by id", response = Role.class)
-    @PutMapping(value = API_ROLES_ROLE_ID, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Role update(@PathVariable(API_ROLE_ID) Long roleId, @RequestBody Role role) {
-        role.setId(roleId);
+    @ApiOperation(value = "Update role", response = Role.class)
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Role update(@RequestBody Role role) {
         return roleService.update(role);
     }
 
