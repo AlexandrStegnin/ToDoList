@@ -1,0 +1,1 @@
+ALTER TABLE todo_list_db.performer DROP COLUMN id;
