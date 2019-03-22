@@ -21,10 +21,15 @@ public class Constants {
     public static final String API_ROLE_ID = "roleId";
     public static final String API_ROLES_ROLE_ID = "/{roleId}";
 
-    //    API для работы с Task
+    //    API для работы с Task statuses
     public static final String API_TASK_STATUSES = "/task-statuses";
     public static final String API_TASK_STATUS_ID = "taskStatusId";
     public static final String API_TASK_STATUSES_STATUS_ID = "/{taskStatusId}";
+
+    //    API для работы с Task
+    public static final String API_TASKS = "/tasks";
+    public static final String API_TASK_ID = "taskId";
+    public static final String API_TASKS_TASK_ID = "/{taskId}";
 
     //    App roles constants
     public static final String ROLE_PREFIX = "ROLE_";
