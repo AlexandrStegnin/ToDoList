@@ -4,6 +4,7 @@ package com.teamdev.todolist.vaadin.ui;
 import com.teamdev.todolist.configurations.security.SecurityUtils;
 import com.teamdev.todolist.repositories.AuthRepository;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -49,7 +50,10 @@ public class LoginView extends VerticalLayout {
 
         Button updateI18nButton = new Button("Switch to Russian",
                 event -> loginForm.setI18n(createRussianI18n()));
+        Anchor apiLink = new Anchor("./api/info", "See info about this API");
         add(updateI18nButton);
+        apiLink.getStyle().set("color", "green");
+        add(apiLink);
     }
 
     private boolean authenticated(String login, String password) {
