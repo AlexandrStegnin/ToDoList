@@ -95,4 +95,32 @@ public class TaskController {
         taskService.delete(taskId);
     }
 
+    /**
+     * Добавить исполнителя к задаче
+     *
+     * @param taskId - id задачи
+     * @param performerId - id исполнителя
+     * @return - Task
+     */
+    @ApiOperation(value = "Add performer to task")
+    @PutMapping(value = API_TASKS_ADD_PERFORMER)
+    public Task addPerformerToTask(@PathVariable(name = API_TASK_ID) Long taskId,
+                                   @PathVariable(name = API_TASK_PERFORMER_ID) Long performerId) {
+        return taskService.addPerformer(taskId, performerId);
+    }
+
+    /**
+     * Удалить исполнителя из задачи
+     *
+     * @param taskId - id задачи
+     * @param performerId - id исполнителя
+     * @return - Task
+     */
+    @ApiOperation(value = "Remove performer from task")
+    @PutMapping(value = API_TASKS_REMOVE_PERFORMER)
+    public Task removePerformerToTask(@PathVariable(name = API_TASK_ID) Long taskId,
+                                      @PathVariable(name = API_TASK_PERFORMER_ID) Long performerId) {
+        return taskService.removePerformer(taskId, performerId);
+    }
+
 }

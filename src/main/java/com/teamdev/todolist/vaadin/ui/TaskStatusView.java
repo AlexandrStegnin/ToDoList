@@ -26,14 +26,14 @@ import com.vaadin.flow.theme.material.Material;
 
 import java.util.List;
 
-import static com.teamdev.todolist.configurations.support.Constants.TASK_STATUSES_PAGE;
+import static com.teamdev.todolist.configurations.support.Constants.ADMIN_TASK_STATUSES_PAGE;
 
 /**
  * @author Alexandr Stegnin
  */
 
 
-@Route(TASK_STATUSES_PAGE)
+@Route(ADMIN_TASK_STATUSES_PAGE)
 @PageTitle("Task statuses")
 @Theme(value = Material.class, variant = Material.LIGHT)
 public class TaskStatusView extends CustomAppLayout {
