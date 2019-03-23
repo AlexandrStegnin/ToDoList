@@ -25,7 +25,7 @@ public class CustomAppLayout extends AppLayout {
 
     public CustomAppLayout() {
         AppLayoutMenu menu = createMenu();
-        Image img = new Image("https://i.imgur.com/GPpnszs.png", "ToDo List Logo");
+        Image img = new Image("images/todo-list-logo.png", "ToDo List Logo");
         img.setHeight("44px");
         setBranding(img);
 

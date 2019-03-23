@@ -3,10 +3,18 @@ package com.teamdev.todolist.vaadin.ui;
 import com.teamdev.todolist.entities.Task;
 import com.teamdev.todolist.services.TaskService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.accordion.AccordionPanel;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -33,64 +41,92 @@ import static com.teamdev.todolist.configurations.support.Constants.TASK_LIST_PA
 public class TaskListView extends CustomAppLayout {
 
     private final TaskService taskService;
-    private Grid<Task> grid;
+    private Grid<Task> authorGrid, performerGrid;
     private ListDataProvider<Task> dataProvider;
     private Binder<Task> binder; // отвечает за привязку данных с полей формы
 
     public TaskListView(TaskService taskService) {
         this.taskService = taskService;
-        this.grid = new Grid<>();
+        this.authorGrid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());
         this.binder = new BeanValidationBinder<>(Task.class);
         init(); // инициализируем форму
     }
 
     private void init() {
-        grid.setDataProvider(dataProvider);
+        authorGrid.setDataProvider(dataProvider);
         /* Создаём колонки */
-        grid.addColumn(Task::getTitle)
-                .setHeader("Title")
+        authorGrid.addColumn(Task::getTitle)
+                .setHeader("Название")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(Task::getDescription)
-                .setHeader("Description")
+        authorGrid.addColumn(Task::getDescription)
+                .setHeader("Описание")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(task -> task.getAuthor().getName() + " " + task.getAuthor().getSurname())
-                .setHeader("Author")
+        authorGrid.addColumn(task -> task.getAuthor().getName() + " " + task.getAuthor().getSurname())
+                .setHeader("Автор")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(task -> task.getPerformers().stream()
+        authorGrid.addColumn(task -> task.getPerformers().stream()
                 .map(performer -> performer.getName() + " " + performer.getSurname())
                 .collect(Collectors.joining(", ")))
-                .setHeader("Performers")
+                .setHeader("Исполнители")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(new LocalDateTimeRenderer<>(
+        authorGrid.addColumn(new LocalDateTimeRenderer<>(
                 Task::getCreationDate,
                 DateTimeFormatter.ofLocalizedDateTime(
                         FormatStyle.MEDIUM,
                         FormatStyle.SHORT)))
-                .setHeader("Created at")
+                .setHeader("Создана")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(new LocalDateTimeRenderer<>(
+        authorGrid.addColumn(new LocalDateTimeRenderer<>(
                 Task::getExecutionDate,
                 DateTimeFormatter.ofLocalizedDateTime(
                         FormatStyle.MEDIUM,
                         FormatStyle.SHORT)))
-                .setHeader("Executed at")
+                .setHeader("Решена")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        VerticalLayout verticalLayout = new VerticalLayout(grid);
-        verticalLayout.setAlignItems(FlexComponent.Alignment.END);
-        setContent(verticalLayout);
+        VerticalLayout authorLayout = new VerticalLayout();
+        authorLayout.add(new Span("Созданные мной"));
+        authorLayout.add(authorGrid);
+        authorLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        HorizontalLayout authorZoneLayout = new HorizontalLayout();
+        authorZoneLayout.add(authorLayout);
+        VerticalLayout authorRightPane = new VerticalLayout();
+        authorRightPane.setWidth("200px");
+        authorRightPane.add(new Button("Создать новую задачу"));
+        authorRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
+        authorZoneLayout.add(authorRightPane);
+        authorZoneLayout.setWidthFull();
+
+        VerticalLayout performerLayout = new VerticalLayout();
+        performerLayout.add(new Span("Назначенные мне"));
+        performerLayout.add(new Span("Not yet implemented"));
+        performerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        HorizontalLayout performerZoneLayout = new HorizontalLayout();
+        performerZoneLayout.add(performerLayout);
+        Component perfromerRightPane = new Span("Какие-то графики исполнения задач, горящие задачи");
+        ((Span) perfromerRightPane).setWidth("200px");
+        performerZoneLayout.add(perfromerRightPane);
+        performerZoneLayout.setWidthFull();
+
+        VerticalLayout mainLayout = new VerticalLayout();
+        mainLayout.add(authorZoneLayout);
+        mainLayout.add(performerZoneLayout);
+
+        setContent(mainLayout);
     }
 
     private List<Task> getAll() {
