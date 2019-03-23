@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Alexandr Stegnin
@@ -58,13 +60,13 @@ public class Task extends AbstractEntity {
 
     @Column
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of creation task")
     private LocalDateTime creationDate;
 
     @Column
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of execution task")
     private LocalDateTime executionDate;
 
@@ -75,5 +77,14 @@ public class Task extends AbstractEntity {
 
     @OneToOne
     private TaskStatus status;
+
+    public void addPerformer(User performer) {
+        if (Objects.equals(null, performers)) performers = new ArrayList<>();
+        performers.add(performer);
+    }
+
+    public void removePerformer(User performer) {
+        if (!Objects.equals(null, performers)) performers.remove(performer);
+    }
 
 }

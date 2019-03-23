@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * @author Alexandr Stegnin
@@ -29,7 +29,7 @@ public class TaskStatus extends AbstractEntity {
     private Long id;
 
     @Column
-    @NotNull
+    @Size(min = 4, message = "Task status must be greater than 3 characters")
     @ApiModelProperty(notes = "Task status title")
     private String title;
 

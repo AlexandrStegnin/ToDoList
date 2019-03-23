@@ -1,6 +1,7 @@
 package com.teamdev.todolist.vaadin.ui.admin;
 
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
+import com.teamdev.todolist.vaadin.ui.TaskStatusView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Image;
@@ -29,6 +30,7 @@ public class AdminView extends CustomAppLayout {
 
         Image usersImg = createImage("images/users-png.png", "Manage users");
         Image rolesImg = createImage("images/manage-roles.png", "Manage roles");
+        Image statusesImg = createImage("images/users-png.png", "Manage task statuses");
 
         HorizontalLayout btnLayout = new HorizontalLayout();
         btnLayout.setSizeFull();
@@ -38,8 +40,9 @@ public class AdminView extends CustomAppLayout {
 
         Button usersBtn = new Button(" Users", usersImg, e -> goToPage(UserView.class));
         Button rolesBtn = new Button("Roles", rolesImg, e -> goToPage(RoleView.class));
+        Button taskStatusesBtn = new Button("Task statuses", statusesImg, e -> goToPage(TaskStatusView.class));
 
-        btnLayout.add(usersBtn, rolesBtn);
+        btnLayout.add(usersBtn, rolesBtn, taskStatusesBtn);
         setContent(btnLayout);
     }
 

@@ -23,13 +23,13 @@ public abstract class AbstractEntity implements Serializable {
 
     @Column
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of creation")
     private LocalDateTime created;
 
     @Column
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of update")
     private LocalDateTime updated;
 

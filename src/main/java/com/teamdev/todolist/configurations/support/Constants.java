@@ -31,6 +31,11 @@ public class Constants {
     public static final String API_TASK_ID = "taskId";
     public static final String API_TASKS_TASK_ID = "/{taskId}";
 
+    public static final String API_TASK_PERFORMER_ID = "performerId";
+    public static final String API_TASKS_PERFORMER_ID = "/{performerId}";
+    public static final String API_TASKS_ADD_PERFORMER = "add-performer" + API_TASKS_TASK_ID + API_TASKS_PERFORMER_ID;
+    public static final String API_TASKS_REMOVE_PERFORMER = "remove-performer" + API_TASKS_TASK_ID + API_TASKS_PERFORMER_ID;
+
     //    App roles constants
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String ADMIN = "ADMIN";
@@ -42,6 +47,7 @@ public class Constants {
     public static final String[] ALL_SWAGGER_MATCHERS = {"/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**"};
 
     public static final String PATH_SEPARATOR = "/";
+
     /* Application pages constants */
     public static final String LOGIN_PAGE = "login";
     public static final String LOGOUT_PAGE = "logout";
@@ -57,10 +63,10 @@ public class Constants {
     public static final String ADMIN_USERS_PAGE = ADMIN_PAGE + PATH_SEPARATOR + USERS_PAGE;
     public static final String ROLES_PAGE = "roles";
     public static final String ADMIN_ROLES_PAGE = ADMIN_PAGE + PATH_SEPARATOR + ROLES_PAGE;
+    public static final String ADMIN_TASK_STATUSES_PAGE = ADMIN_PAGE + PATH_SEPARATOR + "task-statuses";
 
     public static final String PROFILE_PAGE = "profile";
-
-    public static final String TASK_LIST_PAGE = "task_list"; //todo: может лучше корчень task, а от него list, create, delete и т.п.?
+    public static final String TASK_LIST_PAGE = "task-list";
 
     public static final String[] ALL_HTTP_MATCHERS = {
             "/VAADIN/**", "/HEARTBEAT/**", "/UIDL/**", "/resources/**",
