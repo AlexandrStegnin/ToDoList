@@ -41,4 +41,8 @@ public class TaskStatusService {
         taskStatusRepository.deleteById(taskStatusId);
     }
 
+    public TaskStatus save(TaskStatus taskStatus) {
+        return taskStatusRepository.save(taskStatus);
+    }
+
 }

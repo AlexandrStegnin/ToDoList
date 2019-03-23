@@ -62,6 +62,8 @@ public class Constants {
 
     public static final String TASK_LIST_PAGE = "task_list"; //todo: может лучше корчень task, а от него list, create, delete и т.п.?
 
+    public static final String TASK_STATUSES_PAGE = "task-statuses";
+
     public static final String[] ALL_HTTP_MATCHERS = {
             "/VAADIN/**", "/HEARTBEAT/**", "/UIDL/**", "/resources/**",
             "/login", "/login**", "/login/**", "/manifest.json", "/icons/**", "/images/**",
