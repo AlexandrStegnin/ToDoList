@@ -54,7 +54,6 @@ public class SecurityConfig {
             http
                     .authorizeRequests()
                     .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll() // важный пункт, без него переход по url сбрасывал аутентификацию
-                    .antMatchers(PATH_SEPARATOR + ADMIN_PAGE).hasRole(ADMIN)
                     .anyRequest().authenticated()
                     .and()
                     .formLogin().loginPage(LOGIN_URL).permitAll()
@@ -130,6 +129,7 @@ public class SecurityConfig {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                     .and()
                     .authorizeRequests()
+                    .antMatchers(PATH_SEPARATOR + ADMIN_PAGE + "**").hasRole(ADMIN)
                     .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll() // важный пункт для VAADIN, без него переход по url сбрасывал аутентификацию
                     .antMatchers(PATH_SEPARATOR + PROFILE_PAGE).permitAll()
                     .antMatchers(API_INFO_URL).permitAll()
@@ -150,7 +150,6 @@ public class SecurityConfig {
                     .authorizeRequests()
                     // allow all POST requests
                     .antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
-                    .antMatchers(HttpMethod.GET, PATH_SEPARATOR).permitAll()
                     .antMatchers(ALL_SWAGGER_MATCHERS).permitAll()
                     // any other requests must be authenticated
                     .anyRequest().authenticated();
