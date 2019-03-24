@@ -1,9 +1,9 @@
 package com.teamdev.todolist.vaadin.ui;
 
-import com.teamdev.todolist.configurations.support.OperationEnum;
-import com.teamdev.todolist.entities.TaskStatus;
-import com.teamdev.todolist.entities.TaskStatus_;
-import com.teamdev.todolist.services.TaskStatusService;
+import com.teamdev.todolist.configuration.support.OperationEnum;
+import com.teamdev.todolist.entity.TaskStatus;
+import com.teamdev.todolist.entity.TaskStatus_;
+import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
@@ -26,7 +26,7 @@ import com.vaadin.flow.theme.material.Material;
 
 import java.util.List;
 
-import static com.teamdev.todolist.configurations.support.Constants.ADMIN_TASK_STATUSES_PAGE;
+import static com.teamdev.todolist.configuration.support.Constants.ADMIN_TASK_STATUSES_PAGE;
 
 /**
  * @author Alexandr Stegnin

@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
 
-import static com.teamdev.todolist.configurations.support.Constants.ADMIN_PAGE;
+import static com.teamdev.todolist.configuration.support.Constants.ADMIN_PAGE;
 
 @Route(ADMIN_PAGE)
 @PageTitle("Administration")

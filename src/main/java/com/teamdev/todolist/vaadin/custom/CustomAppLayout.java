@@ -1,8 +1,8 @@
 package com.teamdev.todolist.vaadin.custom;
 
-import com.teamdev.todolist.configurations.security.SecurityUtils;
-import com.teamdev.todolist.configurations.support.Constants;
-import com.teamdev.todolist.repositories.AuthRepository;
+import com.teamdev.todolist.configuration.security.SecurityUtils;
+import com.teamdev.todolist.configuration.support.Constants;
+import com.teamdev.todolist.repository.AuthRepository;
 import com.teamdev.todolist.vaadin.ui.LoginView;
 import com.teamdev.todolist.vaadin.ui.ProfileView;
 import com.teamdev.todolist.vaadin.ui.TaskListView;
@@ -16,7 +16,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.teamdev.todolist.configurations.support.Constants.ROLE_ADMIN;
+import static com.teamdev.todolist.configuration.support.Constants.ROLE_ADMIN;
 
 public class CustomAppLayout extends AppLayout {
 

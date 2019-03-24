@@ -1,7 +1,7 @@
 package com.teamdev.todolist.vaadin.support;
 
-import com.teamdev.todolist.entities.Role;
-import com.teamdev.todolist.entities.User;
+import com.teamdev.todolist.entity.Role;
+import com.teamdev.todolist.entity.User;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;

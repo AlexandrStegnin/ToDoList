@@ -1,7 +1,7 @@
 package com.teamdev.todolist.vaadin.ui;
 
-import com.teamdev.todolist.entities.Task;
-import com.teamdev.todolist.services.TaskService;
+import com.teamdev.todolist.entity.Task;
+import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -25,7 +25,7 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.teamdev.todolist.configurations.support.Constants.TASK_LIST_PAGE;
+import static com.teamdev.todolist.configuration.support.Constants.TASK_LIST_PAGE;
 
 /**
  * @author Leonid Lebidko

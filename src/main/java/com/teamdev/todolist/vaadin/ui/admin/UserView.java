@@ -1,9 +1,9 @@
 package com.teamdev.todolist.vaadin.ui.admin;
 
-import com.teamdev.todolist.configurations.support.OperationEnum;
-import com.teamdev.todolist.entities.*;
-import com.teamdev.todolist.services.RoleService;
-import com.teamdev.todolist.services.UserService;
+import com.teamdev.todolist.configuration.support.OperationEnum;
+import com.teamdev.todolist.entity.*;
+import com.teamdev.todolist.service.RoleService;
+import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
@@ -29,7 +29,7 @@ import com.vaadin.flow.theme.material.Material;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.teamdev.todolist.configurations.support.Constants.ADMIN_USERS_PAGE;
+import static com.teamdev.todolist.configuration.support.Constants.ADMIN_USERS_PAGE;
 
 @PageTitle("Users")
 @Route(ADMIN_USERS_PAGE) // Mapping - по типу RequestMapping в controller'e spring, только без переднего слэша

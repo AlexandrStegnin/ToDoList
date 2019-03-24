@@ -1,8 +1,8 @@
 package com.teamdev.todolist.vaadin.ui;
 
 
-import com.teamdev.todolist.configurations.security.SecurityUtils;
-import com.teamdev.todolist.repositories.AuthRepository;
+import com.teamdev.todolist.configuration.security.SecurityUtils;
+import com.teamdev.todolist.repository.AuthRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.login.LoginForm;
@@ -13,7 +13,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
 
-import static com.teamdev.todolist.configurations.support.Constants.*;
+import static com.teamdev.todolist.configuration.support.Constants.*;
 
 @PageTitle("Login page")
 @Route(LOGIN_PAGE)
