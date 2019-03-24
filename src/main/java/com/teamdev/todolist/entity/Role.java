@@ -3,6 +3,7 @@ package com.teamdev.todolist.entity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ import static com.teamdev.todolist.configuration.support.Constants.ROLE_PREFIX;
 @Data
 @Entity
 @Table(name = "role")
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Role extends AbstractEntity implements GrantedAuthority {
 
@@ -46,5 +48,9 @@ public class Role extends AbstractEntity implements GrantedAuthority {
     public void serRole() {
         if (!title.trim().toUpperCase().startsWith(ROLE_PREFIX)) title = ROLE_PREFIX + title.trim().toUpperCase();
         else title = title.trim().toUpperCase();
+    }
+
+    public Role(GrantedAuthority authority) {
+        this.title = authority.getAuthority();
     }
 }

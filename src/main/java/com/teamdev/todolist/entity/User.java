@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexandr Stegnin
@@ -65,6 +66,9 @@ public class User implements UserDetails {
     @Column
     private boolean credentialsNonExpired = true;
 
+    @Transient
+    private boolean enabled;
+
     //необходимо при создании нового пользователя, что бы задать пароль 
     private transient String password;
 
@@ -115,5 +119,25 @@ public class User implements UserDetails {
     public User() {
         this.profile = new UserProfile();
         this.profile.setUser(this);
+    }
+
+    public User(String login, String passwordHash, boolean enabled, boolean accountNonExpired,
+                boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> roles) {
+        this.login = login;
+        this.passwordHash = passwordHash;
+        this.enabled = enabled;
+        this.accountNonExpired = accountNonExpired;
+        this.credentialsNonExpired = credentialsNonExpired;
+        this.accountNonLocked = accountNonLocked;
+        this.roles = roles.stream().map(Role::new).collect(Collectors.toSet());
+    }
+
+    public User(UserDetails userDetails) {
+        this.login = userDetails.getUsername();
+        this.enabled = userDetails.isEnabled();
+        this.accountNonExpired = userDetails.isAccountNonExpired();
+        this.credentialsNonExpired = userDetails.isCredentialsNonExpired();
+        this.accountNonLocked = userDetails.isAccountNonLocked();
+        this.roles = userDetails.getAuthorities().stream().map(Role::new).collect(Collectors.toSet());
     }
 }

@@ -1,6 +1,5 @@
 package com.teamdev.todolist.configuration.security;
 
-import com.teamdev.todolist.entity.User;
 import com.vaadin.flow.server.ServletHelper.RequestType;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.shared.ApplicationConstants;
@@ -105,11 +104,11 @@ public final class SecurityUtils {
         return VaadinService.getCurrentRequest().isUserInRole(role);
     }
 
-    public static User getCurrentUser() {
+    public static com.teamdev.todolist.entity.User getCurrentUser() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    Object principal = authentication.getPrincipal();
-	    if (principal instanceof User) {
-	        return (User) principal;
+	    if (principal instanceof UserDetails) {
+	        return new com.teamdev.todolist.entity.User((UserDetails) principal);
         }
 	    return null;
     }
