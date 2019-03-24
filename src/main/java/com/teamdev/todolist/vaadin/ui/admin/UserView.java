@@ -1,14 +1,13 @@
 package com.teamdev.todolist.vaadin.ui.admin;
 
-import com.teamdev.todolist.configurations.security.UserDetailsServiceImpl;
 import com.teamdev.todolist.configurations.support.OperationEnum;
-import com.teamdev.todolist.entities.Role;
-import com.teamdev.todolist.entities.User;
-import com.teamdev.todolist.entities.User_;
+import com.teamdev.todolist.entities.*;
 import com.teamdev.todolist.services.RoleService;
+import com.teamdev.todolist.services.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -37,20 +36,22 @@ import static com.teamdev.todolist.configurations.support.Constants.ADMIN_USERS_
 @Theme(value = Material.class, variant = Material.LIGHT) // используемая тема для оформления
 public class UserView extends CustomAppLayout {
 
-    private final UserDetailsServiceImpl userService;
+    private final UserService userService;
     private final RoleService roleService;
     private Grid<User> grid; // сетка (таблица), основной элемент, в котором будут отображаться данные
     private final Button addNewBtn; // кнопка добавить нового пользователя
     private ListDataProvider<User> dataProvider; // провайдер для Grid, он управляет данными
     private List<Role> roles;
     private Binder<User> binder; // отвечает за привязку данных с полей формы
+    private Binder<UserProfile> profileBinder;
 
-    public UserView(UserDetailsServiceImpl userService, RoleService roleService) {
+    public UserView(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
         this.grid = new Grid<>(); // инициализация Grid'a
         this.dataProvider = new ListDataProvider<>(getAll()); // инициализация провайдера с вставкой в него данных
         this.binder = new BeanValidationBinder<>(User.class); // в нашем случае используем валидацию полей на основе аннотаций в классе
+        this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
         this.addNewBtn = new Button(
                 "New user", // текст на кнопке
                 VaadinIcon.PLUS.create(), // иконка кнопки
@@ -71,22 +72,22 @@ public class UserView extends CustomAppLayout {
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(User::getName)
+        grid.addColumn(user -> user.getProfile().getName())
                 .setHeader("First name")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(User::getSurname)
+        grid.addColumn(user -> user.getProfile().getSurname())
                 .setHeader("Surname")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(User::getMiddlename)
+        grid.addColumn(user -> user.getProfile().getMiddlename())
                 .setHeader("Middlename")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        grid.addColumn(User::getEmail)
+        grid.addColumn(user -> user.getProfile().getEmail())
                 .setHeader("Email")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
@@ -152,29 +153,35 @@ public class UserView extends CustomAppLayout {
 
         TextField pwdField = new TextField("Password");
         pwdField.setValue("");
-        binder.forField(pwdField)
-                .bind(User_.PASSWORD);
 
         TextField surnameField = new TextField("Surname");
-        surnameField.setValue(user.getSurname() == null ? "" : user.getSurname());
-        binder.forField(surnameField)
-                .bind(User_.SURNAME);
+        surnameField.setValue(user.getProfile().getSurname() == null ? "" : user.getProfile().getSurname());
+        profileBinder.forField(surnameField)
+                .bind(UserProfile_.SURNAME);
 
         TextField nameField = new TextField("Name");
-        nameField.setValue(user.getName() == null ? "" : user.getName());
-        binder.forField(nameField)
-                .bind(User_.NAME);
+        nameField.setValue(user.getProfile().getName() == null ? "" : user.getProfile().getName());
+        profileBinder.forField(nameField)
+                .bind(UserProfile_.NAME);
 
         TextField email = new TextField("Email");
-        email.setValue(user.getEmail() == null ? "" : user.getEmail());
-        binder.forField(email)
-                .bind(User_.EMAIL);
+        email.setValue(user.getProfile().getEmail() == null ? "" : user.getProfile().getEmail());
+        profileBinder.forField(email)
+                .bind(UserProfile_.EMAIL);
 
         // создаём div с ролями пользователя
         Div checkBoxDiv = VaadinViewUtils.makeUserRolesDiv(user, roles);
+        formLayout.add(loginField);
+        if (!operation.equals(OperationEnum.UPDATE)) {
+            binder.forField(pwdField)
+                    .bind("password");
+            formLayout.add(pwdField);
+        }
 
+        Checkbox accountNonLocked = new Checkbox("Account enabled", user.isAccountNonExpired());
+        accountNonLocked.addValueChangeListener(e -> user.setAccountNonLocked(e.getValue()));
         // добавляем на форму элементы
-        formLayout.add(loginField, pwdField, surnameField, nameField, email, checkBoxDiv);
+        formLayout.add(surnameField, nameField, email, checkBoxDiv, accountNonLocked);
 
         // создаём диалоговое окно и размещаем на нём недостающие компоненты
         Dialog dialog = VaadinViewUtils.initDialog();
@@ -189,7 +196,9 @@ public class UserView extends CustomAppLayout {
             case UPDATE:
                 content.add(formLayout, actions);
                 save.addClickListener(e -> {
-                    if (binder.writeBeanIfValid(user)) { // тут binder проверяет, всё ли пользователь заполнил верно
+                    // тут binder проверяет, всё ли пользователь заполнил верно
+                    if (binder.writeBeanIfValid(user) &&
+                            profileBinder.writeBeanIfValid(user.getProfile())) {
                         saveUser(user);
                         dialog.close();
                     }
@@ -198,9 +207,12 @@ public class UserView extends CustomAppLayout {
             case CREATE:
                 content.add(formLayout, actions);
                 save.addClickListener(e -> {
-                    dataProvider.getItems().add(user); // добавляем в провайдер, а он сам добавляет в Grid
-                    saveUser(user);
-                    dialog.close();
+                    if (binder.writeBeanIfValid(user) &&
+                            profileBinder.writeBeanIfValid(user.getProfile())) {
+                        dataProvider.getItems().add(user); // добавляем в провайдер, а он сам добавляет в Grid
+                        saveUser(user);
+                        dialog.close();
+                    }
                 });
                 break;
             case DELETE:

@@ -4,17 +4,13 @@ import com.teamdev.todolist.entities.Task;
 import com.teamdev.todolist.services.TaskService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.accordion.Accordion;
-import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -66,13 +62,13 @@ public class TaskListView extends CustomAppLayout {
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
-        authorGrid.addColumn(task -> task.getAuthor().getName() + " " + task.getAuthor().getSurname())
+        authorGrid.addColumn(task -> task.getAuthor().getProfile().getName() + " " + task.getAuthor().getProfile().getSurname())
                 .setHeader("Автор")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
         authorGrid.addColumn(task -> task.getPerformers().stream()
-                .map(performer -> performer.getName() + " " + performer.getSurname())
+                .map(performer -> performer.getProfile().getName() + " " + performer.getProfile().getSurname())
                 .collect(Collectors.joining(", ")))
                 .setHeader("Исполнители")
                 .setTextAlign(ColumnTextAlign.CENTER)
