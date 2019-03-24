@@ -95,4 +95,18 @@ public class UserController {
         userService.delete(userId);
     }
 
+    /**
+     * Изменить пароль пользователя
+     *
+     * @param userId   - id пользователя для изменения
+     * @param newPassword - новый пароль пользователя
+     * @return - String
+     */
+    @ApiOperation(value = "Change user password", response = String.class)
+    @PutMapping(path = API_USERS_CHANGE_PASSWORD, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String changePassword(@RequestParam(name = "userId") Long userId, @RequestParam(name = "password") String newPassword) {
+        userService.changePassword(userId, newPassword);
+        return "Password have been changed successfully";
+    }
+
 }

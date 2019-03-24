@@ -15,6 +15,7 @@ public class Constants {
     public static final String API_USERS = "/users";
     public static final String API_USER_ID = "userId";
     public static final String API_USERS_USER_ID = "/{userId}";
+    public static final String API_USERS_CHANGE_PASSWORD = "/change-password";
 
     //    API для работы с Role
     public static final String API_ROLES = "/roles";
