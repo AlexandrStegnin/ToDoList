@@ -1,0 +1,1 @@
+ALTER TABLE todo_list_db.user CHANGE password password_hash varchar(60) NULL;

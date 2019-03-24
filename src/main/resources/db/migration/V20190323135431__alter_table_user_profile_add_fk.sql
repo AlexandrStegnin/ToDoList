@@ -1,0 +1,1 @@
+ALTER TABLE todo_list_db.user_profile ADD CONSTRAINT user_profile_user_FK FOREIGN KEY (id) REFERENCES todo_list_db.`user`(id) ON DELETE CASCADE ON UPDATE CASCADE;
