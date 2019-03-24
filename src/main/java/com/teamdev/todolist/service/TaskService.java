@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Leonid Lebidko
@@ -27,6 +28,17 @@ public class TaskService {
 
     public List<Task> findAll() {
         return taskRepository.findAll();
+    }
+
+    public List<Task> findAllByAuthor(Long userId) {
+        return taskRepository.findAllByAuthor(userService.getById(userId));
+    }
+
+    public List<Task> findAllByPerformer(final Long userId) {
+        // todo: refactoring изменить выборку по всем на нормальный репозиторий
+        return findAll().stream()
+                .filter(x -> x.getPerformers().stream().anyMatch(performer -> performer.getId() == userId))
+                .collect(Collectors.toList());
     }
 
     public Task create(Task task) {

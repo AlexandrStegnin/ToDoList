@@ -1,8 +1,11 @@
 package com.teamdev.todolist.repository;
 
 import com.teamdev.todolist.entity.Task;
+import com.teamdev.todolist.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author Leonid Lebidko
@@ -11,8 +14,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-//    List<Task> findAllByAuthorId(User author);
-//
-//    List<Task> findAllByPerfomerId(User perfomer);
-
+    List<Task> findAllByAuthor(User author);
 }
