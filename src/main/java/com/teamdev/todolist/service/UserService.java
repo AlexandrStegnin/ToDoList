@@ -25,11 +25,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final BCryptPasswordEncoder encoder;
+    private final UserProfileService userProfileService;
 
     @Autowired
-    public UserService(UserRepository userRepository,
-                       BCryptPasswordEncoder encoder,
-                       RoleService roleService) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder encoder,
+                       RoleService roleService, UserProfileService userProfileService) {
+        this.userProfileService = userProfileService;
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.roleService = roleService;
@@ -95,7 +96,6 @@ public class UserService {
         }
         if (Objects.equals(null, secUser.getRoles())) secUser.setRoles(dbUser.getRoles());
         if (Objects.equals(null, secUser.getProfile())) secUser.setProfile(dbUser.getProfile());
-
         return userRepository.save(secUser);
     }
 
@@ -108,6 +108,18 @@ public class UserService {
         User userDb = getById(userId);
         userDb.setPasswordHash(passwordToHash(passwordNew));
         userRepository.save(userDb);
+    }
+
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
+
+    public boolean isLoginFree(String login) {
+        return Objects.equals(null, findByLogin(login));
+    }
+
+    public boolean emailIsBusy(String email) {
+        return userProfileService.emailIsBusy(email);
     }
 
 }
