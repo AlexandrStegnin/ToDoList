@@ -11,20 +11,26 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
+import org.apache.commons.lang3.StringUtils;
 
+import java.text.DateFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
@@ -43,20 +49,20 @@ import static com.teamdev.todolist.configuration.support.Constants.TASK_LIST_PAG
 public class TaskListView extends CustomAppLayout {
 
     private final TaskService taskService;
-    private final UserService userService;
     private Grid<Task> authorGrid, performerGrid;
-    private ListDataProvider<Task> authorDataProvider, performerDataProvider;
     private Long currentUserId;
-    private Binder<Task> binder; // отвечает за привязку данных с полей формы
+    private Binder<Task> binder;
+    private DateTimeFormatter formatter;
+    private ListDataProvider<Task> authorDataProvider, performerDataProvider;
 
     public TaskListView(TaskService taskService, UserService userService) {
         this.taskService = taskService;
-        this.userService = userService;
         this.currentUserId = userService.getIdByLogin(SecurityUtils.getCurrentUser().getLogin());
+        this.binder = new BeanValidationBinder<>(Task.class);
+        this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
         this.authorDataProvider = new ListDataProvider<>(getByAuthor());
         this.performerDataProvider = new ListDataProvider<>(getByPerformer());
-        this.binder = new BeanValidationBinder<>(Task.class);
-        init(); // инициализируем форму
+        init();
     }
 
     private void init() {
@@ -67,11 +73,12 @@ public class TaskListView extends CustomAppLayout {
         authorLayout.add(new Span("Созданные мной"));
         authorLayout.add(authorGrid);
         authorLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        authorLayout.setWidth("85%");
 
         HorizontalLayout authorZoneLayout = new HorizontalLayout();
         authorZoneLayout.add(authorLayout);
         VerticalLayout authorRightPane = new VerticalLayout();
-        authorRightPane.setWidth("200px");
+        authorRightPane.setWidth("15%");
         authorRightPane.add(new Button("Создать новую задачу"));
         authorRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
         authorZoneLayout.add(authorRightPane);
@@ -81,11 +88,13 @@ public class TaskListView extends CustomAppLayout {
         performerLayout.add(new Span("Назначенные мне"));
         performerLayout.add(performerGrid);
         performerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        performerLayout.setWidth("85%");
 
         HorizontalLayout performerZoneLayout = new HorizontalLayout();
         performerZoneLayout.add(performerLayout);
-        Component perfromerRightPane = new Span("Какие-то графики исполнения задач, горящие задачи");
-        ((Span) perfromerRightPane).setWidth("200px");
+        VerticalLayout perfromerRightPane = new VerticalLayout();
+        perfromerRightPane.setWidth("15%");
+        perfromerRightPane.add(new Span("Какие-то графики исполнения задач, горящие задачи"));
         performerZoneLayout.add(perfromerRightPane);
         performerZoneLayout.setWidthFull();
 
@@ -107,69 +116,164 @@ public class TaskListView extends CustomAppLayout {
     private void createAuthorGrid() {
         authorGrid = new Grid<>();
         authorGrid.setDataProvider(authorDataProvider);
-        authorGrid.addColumn(Task::getTitle)
+        Grid.Column<Task> titleColumn = authorGrid.addColumn(Task::getTitle)
                 .setHeader("Название")
+                .setFooter("Всего задач: " + authorDataProvider.getItems().size())
                 .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
-        authorGrid.addColumn(Task::getDescription)
+                .setFlexGrow(1)
+                .setSortable(true);
+        Grid.Column<Task> descriptionColumn = authorGrid.addColumn(Task::getDescription)
                 .setHeader("Описание")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
-        authorGrid.addColumn(task -> task.getPerformers().stream()
-                .map(performer -> performer.getProfile().getName() + " " + performer.getProfile().getSurname())
-                .collect(Collectors.joining(", ")))
+        Grid.Column<Task> performerColumn = authorGrid.addColumn(task -> getAllPerformers(task))
                 .setHeader("Исполнители")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
-        authorGrid.addColumn(new LocalDateTimeRenderer<>(
-                Task::getCreationDate,
-                DateTimeFormatter.ofLocalizedDateTime(
-                        FormatStyle.MEDIUM,
-                        FormatStyle.SHORT)))
+        Grid.Column<Task> creationDateColumn = authorGrid.addColumn(task -> getFormattedDate(task.getCreationDate()))
                 .setHeader("Создана")
                 .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
-        authorGrid.addColumn(new LocalDateTimeRenderer<>(
-                Task::getExecutionDate,
-                DateTimeFormatter.ofLocalizedDateTime(
-                        FormatStyle.MEDIUM,
-                        FormatStyle.SHORT)))
+                .setFlexGrow(1)
+                .setSortable(true);
+        Grid.Column<Task> expiredDateColumn = authorGrid.addColumn(task -> getFormattedDate(task.getExecutionDate()))
                 .setHeader("Должна быть решена")
                 .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
+                .setFlexGrow(1)
+                .setSortable(true);
+        authorGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
+        authorGrid.setMultiSort(true);
+
+        HeaderRow filterRow = authorGrid.appendHeaderRow();
+
+        TextField titleField = new TextField();
+        TextField descriptionField = new TextField();
+        TextField performerField = new TextField();
+        TextField creationDateField = new TextField();
+        TextField expiredDateField = new TextField();
+
+        titleField.addValueChangeListener(event -> authorDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(task.getTitle(), titleField.getValue())));
+        titleField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(titleColumn).setComponent(titleField);
+        titleField.setSizeFull();
+        titleField.setPlaceholder("Фильтр");
+
+        descriptionField.addValueChangeListener(event -> authorDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(task.getDescription(), descriptionField.getValue())));
+        descriptionField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(descriptionColumn).setComponent(descriptionField);
+        descriptionField.setSizeFull();
+        descriptionField.setPlaceholder("Фильтр");
+
+        performerField.addValueChangeListener(event -> authorDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(getAllPerformers(task), performerField.getValue())));
+        performerField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(performerColumn).setComponent(performerField);
+        performerField.setSizeFull();
+        performerField.setPlaceholder("Фильтр");
+
+        creationDateField.addValueChangeListener(event -> authorDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(getFormattedDate(task.getCreationDate()), creationDateField.getValue())));
+        creationDateField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(creationDateColumn).setComponent(creationDateField);
+        creationDateField.setSizeFull();
+        creationDateField.setPlaceholder("Фильтр");
+
+        expiredDateField.addValueChangeListener(event -> authorDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(getFormattedDate(task.getExecutionDate()), expiredDateField.getValue())));
+        expiredDateField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(expiredDateColumn).setComponent(expiredDateField);
+        expiredDateField.setSizeFull();
+        expiredDateField.setPlaceholder("Фильтр");
     }
 
     private void createPerformerGrid() {
         performerGrid = new Grid<>();
         performerGrid.setDataProvider(performerDataProvider);
-        performerGrid.addColumn(Task::getTitle)
+        Grid.Column<Task> titleColumn = performerGrid.addColumn(Task::getTitle)
                 .setHeader("Название")
+                .setFooter("Всего задач: " + performerDataProvider.getItems().size())
                 .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
-        performerGrid.addColumn(Task::getDescription)
+                .setFlexGrow(1)
+                .setSortable(true);
+        Grid.Column<Task> descriptionColumn = performerGrid.addColumn(Task::getDescription)
                 .setHeader("Описание")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
-        performerGrid.addColumn(task -> task.getAuthor().getProfile().getName() + " " + task.getAuthor().getProfile().getSurname())
+        Grid.Column<Task> authorColumn = performerGrid.addColumn(task -> getAuthorFullName(task))
                 .setHeader("Автор")
                 .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
-        performerGrid.addColumn(new LocalDateTimeRenderer<>(
-                Task::getCreationDate,
-                DateTimeFormatter.ofLocalizedDateTime(
-                        FormatStyle.MEDIUM,
-                        FormatStyle.SHORT)))
+                .setFlexGrow(1)
+                .setSortable(true);
+        Grid.Column<Task> creationDateColumn = performerGrid.addColumn(task -> getFormattedDate(task.getCreationDate()))
                 .setHeader("Создана")
                 .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
-        performerGrid.addColumn(new LocalDateTimeRenderer<>(
-                Task::getExecutionDate,
-                DateTimeFormatter.ofLocalizedDateTime(
-                        FormatStyle.MEDIUM,
-                        FormatStyle.SHORT)))
+                .setFlexGrow(1)
+                .setSortable(true);
+        Grid.Column<Task> expiredDateColumn = performerGrid.addColumn(task -> getFormattedDate(task.getExecutionDate()))
                 .setHeader("Должна быть решена")
                 .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
+                .setFlexGrow(1)
+                .setSortable(true);
+        performerGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
+        performerGrid.setMultiSort(true);
+
+        HeaderRow filterRow = performerGrid.appendHeaderRow();
+
+        TextField titleField = new TextField();
+        TextField descriptionField = new TextField();
+        TextField authorField = new TextField();
+        TextField creationDateField = new TextField();
+        TextField expiredDateField = new TextField();
+
+        titleField.addValueChangeListener(event -> performerDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(task.getTitle(), titleField.getValue())));
+        titleField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(titleColumn).setComponent(titleField);
+        titleField.setSizeFull();
+        titleField.setPlaceholder("Фильтр");
+
+        descriptionField.addValueChangeListener(event -> performerDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(task.getDescription(), descriptionField.getValue())));
+        descriptionField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(descriptionColumn).setComponent(descriptionField);
+        descriptionField.setSizeFull();
+        descriptionField.setPlaceholder("Фильтр");
+
+        authorField.addValueChangeListener(event -> performerDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(getAuthorFullName(task), authorField.getValue())));
+        authorField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(authorColumn).setComponent(authorField);
+        authorField.setSizeFull();
+        authorField.setPlaceholder("Фильтр");
+
+        creationDateField.addValueChangeListener(event -> performerDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(getFormattedDate(task.getCreationDate()), creationDateField.getValue())));
+        creationDateField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(creationDateColumn).setComponent(creationDateField);
+        creationDateField.setSizeFull();
+        creationDateField.setPlaceholder("Фильтр");
+
+        expiredDateField.addValueChangeListener(event -> performerDataProvider
+                .addFilter(task -> StringUtils.containsIgnoreCase(getFormattedDate(task.getExecutionDate()), expiredDateField.getValue())));
+        expiredDateField.setValueChangeMode(ValueChangeMode.EAGER);
+        filterRow.getCell(expiredDateColumn).setComponent(expiredDateField);
+        expiredDateField.setSizeFull();
+        expiredDateField.setPlaceholder("Фильтр");
+    }
+
+    private String getFormattedDate(LocalDateTime localDateTime) {
+        return localDateTime.format(formatter);
+    }
+
+    private String getAuthorFullName(Task task) {
+        return task.getAuthor().getProfile().getName() + " " + task.getAuthor().getProfile().getSurname();
+    }
+
+    private String getAllPerformers(Task task) {
+        return task.getPerformers().stream()
+                .map(performer -> performer.getProfile().getName() + " " + performer.getProfile().getSurname())
+                .collect(Collectors.joining(", "));
     }
 }
 
