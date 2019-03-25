@@ -131,7 +131,7 @@ public class SecurityConfig {
                     .authorizeRequests()
                     .antMatchers(PATH_SEPARATOR + ADMIN_PAGE + "**").hasRole(ADMIN)
                     .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll() // важный пункт для VAADIN, без него переход по url сбрасывал аутентификацию
-                    .antMatchers(PATH_SEPARATOR + PROFILE_PAGE).permitAll()
+                    .antMatchers(PATH_SEPARATOR + PROFILE_PAGE).fullyAuthenticated()
                     .antMatchers(API_INFO_URL).permitAll()
                     .antMatchers(PATH_SEPARATOR).permitAll()
                     .antMatchers(ALL_HTTP_MATCHERS).permitAll()
