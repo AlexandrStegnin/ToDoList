@@ -7,6 +7,7 @@ import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -42,7 +43,7 @@ import static com.teamdev.todolist.configuration.support.Constants.TASK_LIST_PAG
  * @author Leonid Lebidko
  */
 
-// @StyleSheet("task.css") todo: разобраться с импортом css в ваадин. пока не работает из разных путей
+//@StyleSheet("css/task.css") // todo: разобраться с импортом css в ваадин. пока не работает из разных путей
 @Route(TASK_LIST_PAGE)
 @PageTitle("Task List")
 @Theme(value = Material.class, variant = Material.LIGHT)
@@ -66,6 +67,9 @@ public class TaskListView extends CustomAppLayout {
     }
 
     private void init() {
+
+        UI.getCurrent().getPage().addStyleSheet("css/task.css");
+
         createAuthorGrid();
         createPerformerGrid();
 
@@ -185,6 +189,12 @@ public class TaskListView extends CustomAppLayout {
         filterRow.getCell(expiredDateColumn).setComponent(expiredDateField);
         expiredDateField.setSizeFull();
         expiredDateField.setPlaceholder("Фильтр");
+
+        authorGrid.setClassNameGenerator(task -> {
+            if (getFormattedDate(task.getExecutionDate()).compareTo(getFormattedDate(LocalDateTime.now())) < 0)
+                return "expired_row";
+            return null;
+        });
     }
 
     private void createPerformerGrid() {
