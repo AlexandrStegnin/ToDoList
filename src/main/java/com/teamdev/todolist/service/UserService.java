@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -97,6 +98,12 @@ public class UserService {
         if (Objects.equals(null, secUser.getRoles())) secUser.setRoles(dbUser.getRoles());
         if (Objects.equals(null, secUser.getProfile())) secUser.setProfile(dbUser.getProfile());
         return userRepository.save(secUser);
+    }
+
+    public void registerNewUser(User newUser) {
+        newUser.setPasswordHash(passwordToHash(newUser.getPassword()));
+        newUser.setRoles(new HashSet<>(Collections.singletonList(roleService.getDefaultUserRole())));
+        userRepository.save(newUser);
     }
 
     public User getById(Long useId) {

@@ -48,6 +48,9 @@ public class LoginView extends VerticalLayout {
         setSizeFull();
         add(loginForm);
 
+        Button registration = new Button("Registration", e -> getUI().ifPresent(ui -> ui.navigate(RegistrationView.class)));
+        add(registration);
+
         Button updateI18nButton = new Button("Switch to Russian",
                 event -> loginForm.setI18n(createRussianI18n()));
         Anchor apiLink = new Anchor("." + API_INFO_URL, "API info");

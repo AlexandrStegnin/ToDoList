@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.teamdev.todolist.configuration.support.Constants.ROLE_USER;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -45,5 +47,9 @@ public class RoleService {
 
     public void delete(Long roleId) {
         roleRepository.deleteById(roleId);
+    }
+
+    public Role getDefaultUserRole() {
+        return findByTitle(ROLE_USER);
     }
 }

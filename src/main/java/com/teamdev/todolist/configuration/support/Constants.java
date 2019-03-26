@@ -57,6 +57,8 @@ public class Constants {
 
     public static final String LOGOUT_URL = PATH_SEPARATOR + LOGOUT_PAGE;
     public static final String LOGIN_URL = PATH_SEPARATOR + LOGIN_PAGE;
+    public static final String REGISTRATION_PAGE = "registration";
+    public static final String REGISTRATION_URL = PATH_SEPARATOR + "registration";
 
     /* ADMINS PAGES */
     public static final String ADMIN_PAGE = "admin";

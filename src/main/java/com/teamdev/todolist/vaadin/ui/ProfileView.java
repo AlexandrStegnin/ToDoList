@@ -30,7 +30,7 @@ import static com.teamdev.todolist.configuration.support.Constants.PROFILE_PAGE;
 
 @Route(PROFILE_PAGE)
 @PageTitle("Profile")
-@Theme(value = Material.class)
+@Theme(value = Material.class, variant = Material.LIGHT)
 public class ProfileView extends CustomAppLayout {
 
     private final UserService userService;

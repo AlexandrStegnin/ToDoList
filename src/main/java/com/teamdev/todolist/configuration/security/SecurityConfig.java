@@ -136,6 +136,7 @@ public class SecurityConfig {
                     .antMatchers(PATH_SEPARATOR).permitAll()
                     .antMatchers(ALL_HTTP_MATCHERS).permitAll()
                     .regexMatchers(HttpMethod.POST, "/\\?v-r=.*").permitAll() // VAADIN шлёт сюда запросы, нужно открыть
+                    .antMatchers(REGISTRATION_URL).permitAll()
                     .and()
                     // handle an authorized attempts
                     .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
