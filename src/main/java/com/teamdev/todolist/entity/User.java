@@ -55,21 +55,27 @@ public class User implements UserDetails {
     private Set<Role> roles;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @ApiModelProperty(notes = "User profile info")
     private UserProfile profile;
 
     @Column
+    @ApiModelProperty(notes = "Account expiration attribute")
     private boolean accountNonExpired = true;
 
     @Column
+    @ApiModelProperty(notes = "Account locked attribute")
     private boolean accountNonLocked = true;
 
     @Column
+    @ApiModelProperty(notes = "Credentials expiration attribute")
     private boolean credentialsNonExpired = true;
 
     @Transient
+    @ApiModelProperty(notes = "Account enabled attribute")
     private boolean enabled;
 
     //необходимо при создании нового пользователя, что бы задать пароль 
+    @ApiModelProperty(notes = "User password")
     private transient String password;
 
     @JsonIgnore
