@@ -4,6 +4,10 @@ import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.*;
 import com.teamdev.todolist.service.RoleService;
 import com.teamdev.todolist.service.UserService;
+import com.teamdev.todolist.command.user.CreateUserCommand;
+import com.teamdev.todolist.command.user.DeleteUserCommand;
+import com.teamdev.todolist.command.user.UpdateUserCommand;
+import com.teamdev.todolist.command.Command;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
@@ -199,7 +203,8 @@ public class UserView extends CustomAppLayout {
                     // тут binder проверяет, всё ли пользователь заполнил верно
                     if (binder.writeBeanIfValid(user) &&
                             profileBinder.writeBeanIfValid(user.getProfile())) {
-                        saveUser(user);
+                        executeOperation(new UpdateUserCommand(userService, user));
+//                        saveUser(user);
                         dialog.close();
                     }
                 });
@@ -210,7 +215,8 @@ public class UserView extends CustomAppLayout {
                     if (binder.writeBeanIfValid(user) &&
                             profileBinder.writeBeanIfValid(user.getProfile())) {
                         dataProvider.getItems().add(user); // добавляем в провайдер, а он сам добавляет в Grid
-                        saveUser(user);
+                        executeOperation(new CreateUserCommand(userService, user));
+//                        saveUser(user);
                         dialog.close();
                     }
                 });
@@ -221,7 +227,8 @@ public class UserView extends CustomAppLayout {
                 content.add(contentText, actions);
                 save.setText("Yes");
                 save.addClickListener(e -> {
-                    deleteUser(user);
+                    executeOperation(new DeleteUserCommand(userService, user));
+//                    deleteUser(user);
                     dialog.close();
                 });
                 break;
@@ -235,6 +242,10 @@ public class UserView extends CustomAppLayout {
         //ставим фокус на поле login
         loginField.getElement().callFunction("focus");
 
+    }
+
+    private void executeOperation(Command operation) {
+        operation.execute();
     }
 
 }
