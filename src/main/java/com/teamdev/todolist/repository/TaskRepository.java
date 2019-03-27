@@ -15,4 +15,7 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findAllByAuthor(User author);
+
+    List<Task> findAllByPerformers(List<User> performers);
+
 }

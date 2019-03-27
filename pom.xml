@@ -139,6 +139,12 @@
             <version>RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>de.wathoserver.vaadin</groupId>
+            <artifactId>multiselect-combo-box</artifactId>
+            <version>0.0.3.1</version>
+        </dependency>
+
         <!-- For create metamodel with Hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>

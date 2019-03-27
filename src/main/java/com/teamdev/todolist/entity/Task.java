@@ -62,13 +62,13 @@ public class Task extends AbstractEntity {
     @JsonFormat
             (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of creation task")
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate = LocalDateTime.now();
 
     @Column
     @JsonFormat
             (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of execution task")
-    private LocalDateTime executionDate;
+    private LocalDateTime executionDate = creationDate.plusDays(1);
 
     @ManyToOne
     @JoinColumn(name = "parent_task_id")

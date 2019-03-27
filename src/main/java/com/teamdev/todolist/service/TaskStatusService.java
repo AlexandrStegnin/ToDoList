@@ -14,6 +14,7 @@ import java.util.List;
 @Service
 public class TaskStatusService {
 
+    private static final String DEFAULT_TASK_STATUS = "Новая";
     private final TaskStatusRepository taskStatusRepository;
 
     @Autowired
@@ -43,6 +44,10 @@ public class TaskStatusService {
 
     public TaskStatus save(TaskStatus taskStatus) {
         return taskStatusRepository.save(taskStatus);
+    }
+
+    public TaskStatus getDefaultStatus() {
+        return taskStatusRepository.findByTitle(DEFAULT_TASK_STATUS);
     }
 
 }

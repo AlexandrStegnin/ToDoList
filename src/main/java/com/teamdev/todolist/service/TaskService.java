@@ -5,15 +5,17 @@ import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Leonid Lebidko
  */
 
 @Service
+@Transactional(readOnly = true)
 public class TaskService {
 
     private TaskRepository taskRepository;
@@ -30,17 +32,15 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-    public List<Task> findAllByAuthor(Long userId) {
-        return taskRepository.findAllByAuthor(userService.getById(userId));
+    public List<Task> findAllByAuthor(User author) {
+        return taskRepository.findAllByAuthor(author);
     }
 
-    public List<Task> findAllByPerformer(final Long userId) {
-        // todo: refactoring изменить выборку по всем на нормальный репозиторий
-        return findAll().stream()
-                .filter(x -> x.getPerformers().stream().anyMatch(performer -> performer.getId() == userId))
-                .collect(Collectors.toList());
+    public List<Task> findAllByPerformer(User performer) {
+        return taskRepository.findAllByPerformers(Collections.singletonList(performer));
     }
 
+    @Transactional
     public Task create(Task task) {
         return taskRepository.save(task);
     }
@@ -49,14 +49,17 @@ public class TaskService {
         return taskRepository.getOne(taskId);
     }
 
+    @Transactional
     public Task update(Task task) {
         return taskRepository.save(task);
     }
 
+    @Transactional
     public void delete(Long taskId) {
         taskRepository.deleteById(taskId);
     }
 
+    @Transactional
     public Task addPerformer(Long taskId, Long performerId) {
         Task task = taskRepository.getOne(taskId);
         User performer = userService.findOne(performerId);
@@ -64,6 +67,7 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    @Transactional
     public Task removePerformer(Long taskId, Long performerId) {
         Task task = taskRepository.getOne(taskId);
         User performer = userService.findOne(performerId);

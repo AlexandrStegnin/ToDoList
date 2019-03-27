@@ -1,19 +1,19 @@
 package com.teamdev.todolist.vaadin.ui;
 
 import com.teamdev.todolist.configuration.security.SecurityUtils;
+import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
-import com.vaadin.flow.component.Component;
+import com.teamdev.todolist.vaadin.form.TaskForm;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -22,7 +22,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -30,10 +29,8 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,27 +40,39 @@ import static com.teamdev.todolist.configuration.support.Constants.TASK_LIST_PAG
  * @author Leonid Lebidko
  */
 
-//@StyleSheet("css/task.css") // todo: разобраться с импортом css в ваадин. пока не работает из разных путей
+// @StyleSheet("task.css") todo: разобраться с импортом css в ваадин. пока не работает из разных путей
 @Route(TASK_LIST_PAGE)
 @PageTitle("Task List")
 @Theme(value = Material.class, variant = Material.LIGHT)
 public class TaskListView extends CustomAppLayout {
 
     private final TaskService taskService;
+    private final UserService userService;
     private Grid<Task> authorGrid, performerGrid;
-    private Long currentUserId;
+    private User currentUser;
     private Binder<Task> binder;
     private DateTimeFormatter formatter;
     private ListDataProvider<Task> authorDataProvider, performerDataProvider;
+    private TaskForm taskForm;
 
-    public TaskListView(TaskService taskService, UserService userService) {
+    public TaskListView(TaskService taskService, UserService userService, TaskForm taskForm) {
+        this.userService = userService;
         this.taskService = taskService;
-        this.currentUserId = userService.getIdByLogin(SecurityUtils.getCurrentUser().getLogin());
+        this.currentUser = this.userService.findByLogin(SecurityUtils.getUsername());
         this.binder = new BeanValidationBinder<>(Task.class);
         this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
         this.authorDataProvider = new ListDataProvider<>(getByAuthor());
         this.performerDataProvider = new ListDataProvider<>(getByPerformer());
+        this.taskForm = taskForm;
         init();
+    }
+
+    private void showTaskForm(OperationEnum operation, Task task) {
+        Dialog dialog = new Dialog();
+        taskForm.prepareForm(operation, dialog, task);
+        dialog.add(taskForm);
+        dialog.open();
+        dialog.setCloseOnEsc(true);
     }
 
     private void init() {
@@ -83,7 +92,7 @@ public class TaskListView extends CustomAppLayout {
         authorZoneLayout.add(authorLayout);
         VerticalLayout authorRightPane = new VerticalLayout();
         authorRightPane.setWidth("15%");
-        authorRightPane.add(new Button("Создать новую задачу"));
+        authorRightPane.add(new Button("Создать новую задачу", e -> showTaskForm(OperationEnum.CREATE, new Task())));
         authorRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
         authorZoneLayout.add(authorRightPane);
         authorZoneLayout.setWidthFull();
@@ -110,11 +119,11 @@ public class TaskListView extends CustomAppLayout {
     }
 
     private List<Task> getByAuthor() {
-        return taskService.findAllByAuthor(currentUserId);
+        return taskService.findAllByAuthor(currentUser);
     }
 
     private List<Task> getByPerformer() {
-        return taskService.findAllByPerformer(currentUserId);
+        return taskService.findAllByPerformer(currentUser);
     }
 
     private void createAuthorGrid() {
@@ -130,7 +139,7 @@ public class TaskListView extends CustomAppLayout {
                 .setHeader("Описание")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
-        Grid.Column<Task> performerColumn = authorGrid.addColumn(task -> getAllPerformers(task))
+        Grid.Column<Task> performerColumn = authorGrid.addColumn(this::getAllPerformers)
                 .setHeader("Исполнители")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
@@ -210,7 +219,7 @@ public class TaskListView extends CustomAppLayout {
                 .setHeader("Описание")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
-        Grid.Column<Task> authorColumn = performerGrid.addColumn(task -> getAuthorFullName(task))
+        Grid.Column<Task> authorColumn = performerGrid.addColumn(this::getAuthorFullName)
                 .setHeader("Автор")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1)
@@ -286,6 +295,3 @@ public class TaskListView extends CustomAppLayout {
                 .collect(Collectors.joining(", "));
     }
 }
-
-
-
