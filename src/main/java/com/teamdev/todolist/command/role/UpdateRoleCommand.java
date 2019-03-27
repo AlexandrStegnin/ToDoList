@@ -12,17 +12,11 @@ public class UpdateRoleCommand implements Command {
 
     private RoleService roleService;
     private Role role;
-    private static final String COMMAND_NAME = "Update";
 
 
     public UpdateRoleCommand(RoleService roleService, Role role) {
         this.roleService = roleService;
         this.role = role;
-    }
-
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
     }
 
     @Override

@@ -139,7 +139,8 @@ public class TaskForm extends VerticalLayout {
 
         currentUser = userService.findByLogin(SecurityUtils.getUsername());
         task.setAuthor(currentUser);
-
+        author.setItems(currentUser);
+        author.setValue(currentUser);
         this.operation = operation;
         this.parent = parent;
         this.task = task;

@@ -12,16 +12,10 @@ public class CreateUserCommand implements Command {
 
     private User user;
     private UserService userService;
-    private static final String COMMAND_NAME = "Create";
 
     public CreateUserCommand(UserService userService, User user) {
         this.userService = userService;
         this.user = user;
-    }
-
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
     }
 
     @Override

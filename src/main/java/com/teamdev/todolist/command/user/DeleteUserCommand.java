@@ -12,16 +12,10 @@ public class DeleteUserCommand implements Command {
 
     private User user;
     private UserService userService;
-    private static final String COMMAND_NAME = "Delete";
 
     public DeleteUserCommand(UserService userService, User user) {
         this.userService = userService;
         this.user = user;
-    }
-
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
     }
 
     @Override

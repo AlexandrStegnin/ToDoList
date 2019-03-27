@@ -12,17 +12,10 @@ public class UpdateTaskCommand implements Command {
 
     private TaskService taskService;
     private Task task;
-    private static final String COMMAND_NAME = "Update";
-
 
     public UpdateTaskCommand(TaskService taskService, Task task) {
         this.taskService = taskService;
         this.task = task;
-    }
-
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
     }
 
     @Override
