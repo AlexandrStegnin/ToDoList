@@ -1,9 +1,6 @@
 package com.teamdev.todolist.vaadin.ui.admin;
 
-import com.teamdev.todolist.command.Command;
-import com.teamdev.todolist.command.role.CreateRoleCommand;
-import com.teamdev.todolist.command.role.DeleteRoleCommand;
-import com.teamdev.todolist.command.role.UpdateRoleCommand;
+import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Role;
 import com.teamdev.todolist.service.RoleService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
@@ -17,8 +14,6 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -38,16 +33,13 @@ public class RoleView extends CustomAppLayout {
     private Grid<Role> grid;
     private final Button addNewBtn;
     private ListDataProvider<Role> dataProvider;
-    private Binder<Role> binder;
-    private Role role;
 
     public RoleView(RoleService roleService) {
         this.roleService = roleService;
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());
         this.addNewBtn = new Button("New role", VaadinIcon.PLUS.create(),
-                e -> showDialog(new CreateRoleCommand(roleService, new Role()), new Role()));
-        this.binder = new BeanValidationBinder<>(Role.class);
+                e -> showDialog(OperationEnum.CREATE, new Role()));
         init();
     }
 
@@ -67,8 +59,8 @@ public class RoleView extends CustomAppLayout {
                 .setFlexGrow(1);
 
         grid.addComponentColumn(role -> VaadinViewUtils.makeEditorColumnActions(
-                e -> showDialog(new UpdateRoleCommand(roleService, role), role),
-                e -> showDialog(new DeleteRoleCommand(roleService, role), role)))
+                e -> showDialog(OperationEnum.UPDATE, role),
+                e -> showDialog(OperationEnum.DELETE, role)))
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setEditorComponent(new Div())
                 .setFlexGrow(2)
@@ -85,76 +77,19 @@ public class RoleView extends CustomAppLayout {
         return roleService.findAll();
     }
 
-    private void showDialog(Command command, Role role) {
-//        FormLayout roleForm = new FormLayout();
-//        TextField nameField = new TextField("Role name");
-//        nameField.setValue(role.getTitle() == null ? "" : role.getTitle());
-//        binder.forField(nameField)
-//                .bind(Role_.TITLE);
-//
-//        TextField humanized = new TextField("Description");
-//        humanized.setValue(role.getDescription() == null ? "" : role.getDescription());
-//        binder.forField(humanized)
-//                .bind(Role_.DESCRIPTION);
-//
-//        roleForm.add(nameField, humanized);
-//
+    private void showDialog(OperationEnum operation, Role role) {
         Dialog dialog = VaadinViewUtils.initDialog();
-//        Button save = new Button("Save");
-//        Button cancel = new Button("Cancel", e -> dialog.close());
-//
-//        HorizontalLayout actions = new HorizontalLayout();
-//        actions.add(save, cancel);
-//
-//        VerticalLayout content = new VerticalLayout();
-//
-//        switch (operation) {
-//            case UPDATE:
-//                content.add(roleForm, actions);
-//                save.addClickListener(e -> {
-//                    if (binder.writeBeanIfValid(role)) {
-//                        saveRole(role);
-//                        dialog.close();
-//                    }
-//                });
-//                break;
-//            case CREATE:
-//                content.add(roleForm, actions);
-//                save.addClickListener(e -> {
-//                    if (binder.writeBeanIfValid(role)) {
-//                        dataProvider.getItems().add(role);
-//                        saveRole(role);
-//                        dialog.close();
-//                    }
-//                });
-//                break;
-//            case DELETE:
-//                Div contentText = new Div();
-//                contentText.setText("Confirm delete role: " + role.getTitle() + "?");
-//                content.add(contentText, actions);
-//                save.setText("Yes");
-//                save.addClickListener(e -> {
-//                    deleteRole(role);
-//                    dialog.close();
-//                });
-//                break;
-//        }
-//
-//        dialog.add(content);
-        dialog.add(new RoleForm(command, dialog, role));
+        dialog.addOpenedChangeListener(e -> refreshDataProvider(e.isOpened(), operation, role));
+        dialog.add(new RoleForm(operation, dialog, role, roleService));
         dialog.open();
-//        nameField.getElement().callFunction("focus");
     }
 
-    private void saveRole(Role role) {
-        roleService.create(role);
-        dataProvider.refreshAll();
-    }
-
-    private void deleteRole(Role role) {
-        dataProvider.getItems().remove(role);
-        roleService.delete(role.getId());
-        dataProvider.refreshAll();
+    private void refreshDataProvider(boolean isOpened, final OperationEnum operation, final Role role) {
+        if (!isOpened) {
+            if (operation.compareTo(OperationEnum.CREATE) == 0) dataProvider.getItems().add(role);
+            else if (operation.compareTo(OperationEnum.DELETE) == 0) dataProvider.getItems().remove(role);
+            dataProvider.refreshAll();
+        }
     }
 
 }

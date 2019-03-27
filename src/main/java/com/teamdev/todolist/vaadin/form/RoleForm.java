@@ -1,7 +1,12 @@
 package com.teamdev.todolist.vaadin.form;
 
+import com.teamdev.todolist.command.role.CreateRoleCommand;
+import com.teamdev.todolist.command.role.DeleteRoleCommand;
+import com.teamdev.todolist.command.role.UpdateRoleCommand;
+import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Role;
 import com.teamdev.todolist.command.Command;
+import com.teamdev.todolist.service.RoleService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -23,28 +28,40 @@ public class RoleForm extends VerticalLayout {
     private final TextField title;
     private final TextField description;
     private final Binder<Role> roleBinder;
-    private final Command command;
+    private final OperationEnum operation;
     private final Component parent;
+    private Button submit;
+    private final RoleService roleService;
     private final Role role;
 
-    public RoleForm(Command command, Component parent, Role role) {
+    public RoleForm(OperationEnum operation, Component parent, Role role, RoleService roleService) {
         this.title = new TextField("Title");
         this.description = new TextField("Description");
         this.roleBinder = new BeanValidationBinder<>(Role.class);
-        this.command = command;
+        this.roleService = roleService;
+        this.operation = operation;
+        this.submit = new Button(operation.name());
         this.parent = parent;
         this.role = role;
         init();
     }
 
     private void init() {
+        roleBinder.setBean(role);
         roleBinder.bindInstanceFields(this);
         add(title, description);
-        Button submit = new Button(command.getCommandName(), e -> {
-            if (roleBinder.writeBeanIfValid(role)) {
-                executeCommand(command);
-            }
-        });
+
+        switch (operation) {
+            case CREATE:
+                submit.addClickListener(e -> executeCommand(new CreateRoleCommand(roleService, role)));
+                break;
+            case UPDATE:
+                submit.addClickListener(e -> executeCommand(new UpdateRoleCommand(roleService, role)));
+                break;
+            case DELETE:
+                submit.addClickListener(e -> executeCommand(new DeleteRoleCommand(roleService, role)));
+                break;
+        }
 
         HorizontalLayout buttons = new HorizontalLayout();
 
@@ -59,7 +76,10 @@ public class RoleForm extends VerticalLayout {
     }
 
     private void executeCommand(Command command) {
-        command.execute();
+        if (roleBinder.writeBeanIfValid(role)) {
+            command.execute();
+            ((Dialog) parent).close();
+        }
     }
 
 }
