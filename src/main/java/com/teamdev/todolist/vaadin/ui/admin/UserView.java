@@ -39,7 +39,7 @@ import static com.teamdev.todolist.configuration.support.Constants.ADMIN_USERS_P
 @Route(ADMIN_USERS_PAGE) // Mapping - по типу RequestMapping в controller'e spring, только без переднего слэша
 @Theme(value = Material.class, variant = Material.LIGHT) // используемая тема для оформления
 public class UserView extends CustomAppLayout {
-
+    //todo обновление dataProvider'a при закрытии диалогового окна @see TaskForm
     private final UserService userService;
     private final RoleService roleService;
     private Grid<User> grid; // сетка (таблица), основной элемент, в котором будут отображаться данные
@@ -47,7 +47,6 @@ public class UserView extends CustomAppLayout {
     private ListDataProvider<User> dataProvider; // провайдер для Grid, он управляет данными
     private List<Role> roles;
     private Binder<User> binder; // отвечает за привязку данных с полей формы
-    private Binder<UserProfile> profileBinder;
 
     public UserView(UserService userService, RoleService roleService) {
         this.userService = userService;
@@ -55,7 +54,6 @@ public class UserView extends CustomAppLayout {
         this.grid = new Grid<>(); // инициализация Grid'a
         this.dataProvider = new ListDataProvider<>(getAll()); // инициализация провайдера с вставкой в него данных
         this.binder = new BeanValidationBinder<>(User.class); // в нашем случае используем валидацию полей на основе аннотаций в классе
-        this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
         this.addNewBtn = new Button(
                 "New user", // текст на кнопке
                 VaadinIcon.PLUS.create(), // иконка кнопки
@@ -127,19 +125,8 @@ public class UserView extends CustomAppLayout {
         setContent(verticalLayout);
     }
 
-    private void saveUser(User user) {
-        userService.save(user);
-        dataProvider.refreshAll();
-    }
-
     private List<User> getAll() {
         return userService.findAll();
-    }
-
-    private void deleteUser(User user) {
-        dataProvider.getItems().remove(user);
-        userService.delete(user);
-        dataProvider.refreshAll();
     }
 
     private List<Role> getRoles() {
@@ -160,18 +147,18 @@ public class UserView extends CustomAppLayout {
 
         TextField surnameField = new TextField("Surname");
         surnameField.setValue(user.getProfile().getSurname() == null ? "" : user.getProfile().getSurname());
-        profileBinder.forField(surnameField)
-                .bind(UserProfile_.SURNAME);
+        binder.forField(surnameField)
+                .bind(u -> u.getProfile().getSurname(), (u, surname) -> u.getProfile().setSurname(surname));
 
         TextField nameField = new TextField("Name");
         nameField.setValue(user.getProfile().getName() == null ? "" : user.getProfile().getName());
-        profileBinder.forField(nameField)
-                .bind(UserProfile_.NAME);
+        binder.forField(nameField)
+                .bind(u -> u.getProfile().getName(), (u, name) -> u.getProfile().setName(name));
 
         TextField email = new TextField("Email");
         email.setValue(user.getProfile().getEmail() == null ? "" : user.getProfile().getEmail());
-        profileBinder.forField(email)
-                .bind(UserProfile_.EMAIL);
+        binder.forField(email)
+                .bind(u -> u.getProfile().getEmail(), (u, e_mail) -> u.getProfile().setEmail(e_mail));
 
         // создаём div с ролями пользователя
         Div checkBoxDiv = VaadinViewUtils.makeUserRolesDiv(user, roles);
@@ -183,7 +170,9 @@ public class UserView extends CustomAppLayout {
         }
 
         Checkbox accountNonLocked = new Checkbox("Account enabled", user.isAccountNonExpired());
-        accountNonLocked.addValueChangeListener(e -> user.setAccountNonLocked(e.getValue()));
+        binder.forField(accountNonLocked)
+                .bind(User::isAccountNonLocked, User::setAccountNonLocked);
+
         // добавляем на форму элементы
         formLayout.add(surnameField, nameField, email, checkBoxDiv, accountNonLocked);
 
@@ -194,15 +183,13 @@ public class UserView extends CustomAppLayout {
         Button cancel = new Button("Cancel", e -> dialog.close());
         HorizontalLayout actions = new HorizontalLayout();
         actions.add(save, cancel);
-
         VerticalLayout content = new VerticalLayout();
         switch (operation) {
             case UPDATE:
                 content.add(formLayout, actions);
                 save.addClickListener(e -> {
                     // тут binder проверяет, всё ли пользователь заполнил верно
-                    if (binder.writeBeanIfValid(user) &&
-                            profileBinder.writeBeanIfValid(user.getProfile())) {
+                    if (binder.writeBeanIfValid(user)) {
                         executeOperation(new UpdateUserCommand(userService, user));
 //                        saveUser(user);
                         dialog.close();
@@ -212,8 +199,7 @@ public class UserView extends CustomAppLayout {
             case CREATE:
                 content.add(formLayout, actions);
                 save.addClickListener(e -> {
-                    if (binder.writeBeanIfValid(user) &&
-                            profileBinder.writeBeanIfValid(user.getProfile())) {
+                    if (binder.writeBeanIfValid(user)) {
                         dataProvider.getItems().add(user); // добавляем в провайдер, а он сам добавляет в Grid
                         executeOperation(new CreateUserCommand(userService, user));
 //                        saveUser(user);

@@ -38,7 +38,7 @@ public class UserService {
     }
 
     public User create(User user) {
-        user.setPassword(encoder.encode(user.getPassword()));
+        user.setPasswordHash(encoder.encode(user.getPassword()));
         if (Objects.equals(null, user.getRoles()) || user.getRoles().isEmpty())
             user.setRoles(Collections.singleton(roleService.findByTitle(ROLE_USER)));
         return userRepository.save(user);
