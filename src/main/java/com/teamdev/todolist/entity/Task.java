@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Alexandr Stegnin
@@ -56,7 +54,7 @@ public class Task extends AbstractEntity {
             inverseForeignKey = @ForeignKey(name = "performer_to_user")
     )
     @ApiModelProperty(notes = "Task performers")
-    private List<User> performers;
+    private Set<User> performers;
 
     @Column
     @JsonFormat
@@ -79,7 +77,7 @@ public class Task extends AbstractEntity {
     private TaskStatus status;
 
     public void addPerformer(User performer) {
-        if (Objects.equals(null, performers)) performers = new ArrayList<>();
+        if (Objects.equals(null, performers)) performers = new HashSet<>();
         performers.add(performer);
     }
 

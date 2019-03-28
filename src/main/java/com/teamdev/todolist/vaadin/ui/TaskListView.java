@@ -69,6 +69,7 @@ public class TaskListView extends CustomAppLayout {
 
     private void showTaskForm(OperationEnum operation, Task task) {
         Dialog dialog = new Dialog();
+        dialog.addOpenedChangeListener(e -> refreshDataProvider(e.isOpened(), operation, task));
         taskForm.prepareForm(operation, dialog, task);
         dialog.add(taskForm);
         dialog.open();
@@ -293,5 +294,25 @@ public class TaskListView extends CustomAppLayout {
         return task.getPerformers().stream()
                 .map(performer -> performer.getProfile().getName() + " " + performer.getProfile().getSurname())
                 .collect(Collectors.joining(", "));
+    }
+
+    private void refreshDataProvider(boolean isOpened, final OperationEnum operation, final Task task) {
+        if (!isOpened) {
+            if (operation.compareTo(OperationEnum.CREATE) == 0) {
+                if (task.getAuthor().equals(currentUser)) {
+                    authorDataProvider.getItems().add(task);
+                } else {
+                    performerDataProvider.getItems().add(task);
+                }
+            } else if (operation.compareTo(OperationEnum.DELETE) == 0) {
+                if (task.getAuthor().equals(currentUser)) {
+                    authorDataProvider.getItems().remove(task);
+                } else {
+                    performerDataProvider.getItems().add(task);
+                }
+            }
+            authorDataProvider.refreshAll();
+            performerDataProvider.refreshAll();
+        }
     }
 }

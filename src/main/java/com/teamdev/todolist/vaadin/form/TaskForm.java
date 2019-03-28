@@ -32,10 +32,7 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -47,22 +44,19 @@ import java.util.Set;
 public class TaskForm extends VerticalLayout {
 
     private UserService userService;
-
     private TaskService taskService;
-
     private TaskStatusService taskStatusService;
-    private TextField title = new TextField("Title");
-    private TextField description = new TextField("Description");
+
+    private TextField title = new TextField("Название");
+    private TextField description = new TextField("Описание");
     private Select<User> author;
     private User currentUser;
     private MultiselectComboBox<User> performers;
     private DatePicker creationDate;
     private DatePicker expirationDate;
     private Select<TaskStatus> status;
-    private TaskStatus defaultStatus;
 
     private Binder<Task> taskBinder;
-    private OperationEnum operation;
     private Component parent;
     private Button submit;
     private Button cancel;
@@ -79,25 +73,27 @@ public class TaskForm extends VerticalLayout {
     @PostConstruct
     private void init() {
         setMinWidth("300px");
-        setMaxWidth("300px");
+        setMaxWidth("400px");
         author = new Select<>();
         author.setTextRenderer(User::getLogin);
         author.setReadOnly(true);
 
-        submit = new Button();
-        cancel = new Button("Cancel");
-        performers = new MultiselectComboBox<>(this::getUserName);
-        creationDate = new DatePicker("Creation date");
-        expirationDate = new DatePicker("Expiration date");
-        taskBinder = new BeanValidationBinder<>(Task.class);
-        performers.setItems(getAllPerformers());
-        defaultStatus = taskStatusService.getDefaultStatus();
         status = new Select<>();
         status.setItems(getAllTaskStatuses());
-        status.setItemLabelGenerator(TaskStatus::getTitle);
-        status.setValue(defaultStatus);
+        status.setTextRenderer(TaskStatus::getTitle);
+        status.setEmptySelectionAllowed(false);
+        status.setValue(taskStatusService.getDefaultStatus());
+
+        submit = new Button();
+        cancel = new Button("Отменить");
+        performers = new MultiselectComboBox<>(this::getUserName);
+        performers.setItems(getAllPerformers());
+        creationDate = new DatePicker("Дата создания");
+        expirationDate = new DatePicker("Дата окончания");
         addCreationDateValueChangeListener();
         addExpirationDateValueChangeListener();
+
+        taskBinder = new BeanValidationBinder<>(Task.class);
         add(title, description, creationDate, expirationDate, performers, status);
     }
 
@@ -136,17 +132,15 @@ public class TaskForm extends VerticalLayout {
     }
 
     public void prepareForm(OperationEnum operation, Component parent, Task task) {
-
         currentUser = userService.findByLogin(SecurityUtils.getUsername());
         task.setAuthor(currentUser);
         author.setItems(currentUser);
         author.setValue(currentUser);
-        this.operation = operation;
         this.parent = parent;
         this.task = task;
         this.taskBinder.setBean(task);
         taskBinder.forField(performers)
-                .bind(Task_.PERFORMERS);
+                .bind(Task::getPerformers, Task::setPerformers);
         taskBinder.forField(creationDate)
                 .withConverter(localDate -> LocalDateTime.of(localDate, LocalTime.now()), LocalDateTime::toLocalDate)
                 .bind(Task_.CREATION_DATE);
