@@ -39,7 +39,6 @@ import static com.teamdev.todolist.configuration.support.Constants.ADMIN_USERS_P
 @Route(ADMIN_USERS_PAGE) // Mapping - по типу RequestMapping в controller'e spring, только без переднего слэша
 @Theme(value = Material.class, variant = Material.LIGHT) // используемая тема для оформления
 public class UserView extends CustomAppLayout {
-    //todo обновление dataProvider'a при закрытии диалогового окна @see TaskForm
     private final UserService userService;
     private final RoleService roleService;
     private Grid<User> grid; // сетка (таблица), основной элемент, в котором будут отображаться данные
@@ -191,7 +190,6 @@ public class UserView extends CustomAppLayout {
                     // тут binder проверяет, всё ли пользователь заполнил верно
                     if (binder.writeBeanIfValid(user)) {
                         executeOperation(new UpdateUserCommand(userService, user));
-//                        saveUser(user);
                         dialog.close();
                     }
                 });
@@ -202,7 +200,6 @@ public class UserView extends CustomAppLayout {
                     if (binder.writeBeanIfValid(user)) {
                         dataProvider.getItems().add(user); // добавляем в провайдер, а он сам добавляет в Grid
                         executeOperation(new CreateUserCommand(userService, user));
-//                        saveUser(user);
                         dialog.close();
                     }
                 });
@@ -232,6 +229,7 @@ public class UserView extends CustomAppLayout {
 
     private void executeOperation(Command operation) {
         operation.execute();
+        dataProvider.refreshAll();
     }
 
 }

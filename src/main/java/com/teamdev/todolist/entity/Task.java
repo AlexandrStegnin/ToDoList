@@ -19,7 +19,7 @@ import java.util.*;
 @Entity
 @Table(name = "task")
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, of = "id")
 public class Task extends AbstractEntity {
 
     @Id

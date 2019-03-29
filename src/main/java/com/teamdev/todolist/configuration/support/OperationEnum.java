@@ -5,9 +5,9 @@ package com.teamdev.todolist.configuration.support;
  */
 public enum OperationEnum {
 
-    CREATE("Create"),
-    UPDATE("Update"),
-    DELETE("Delete");
+    CREATE("Создать"),
+    UPDATE("Обновить"),
+    DELETE("Удалить");
 
     public String name;
 

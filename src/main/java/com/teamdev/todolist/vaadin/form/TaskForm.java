@@ -8,7 +8,6 @@ import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.TaskStatus;
-import com.teamdev.todolist.entity.Task_;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.TaskStatusService;
@@ -32,7 +31,10 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -42,7 +44,7 @@ import java.util.*;
 @UIScope
 @SpringComponent
 public class TaskForm extends VerticalLayout {
-
+//todo после добавления задачи и попытке открыть форму обновления/удаления не подтягиваются исполнители
     private UserService userService;
     private TaskService taskService;
     private TaskStatusService taskStatusService;
@@ -75,6 +77,7 @@ public class TaskForm extends VerticalLayout {
         setMinWidth("300px");
         setMaxWidth("400px");
         author = new Select<>();
+        author.setItems(getAllUsers());
         author.setTextRenderer(User::getLogin);
         author.setReadOnly(true);
 
@@ -133,21 +136,30 @@ public class TaskForm extends VerticalLayout {
 
     public void prepareForm(OperationEnum operation, Component parent, Task task) {
         currentUser = userService.findByLogin(SecurityUtils.getUsername());
-        task.setAuthor(currentUser);
-        author.setItems(currentUser);
-        author.setValue(currentUser);
-        this.parent = parent;
         this.task = task;
-        this.taskBinder.setBean(task);
+        this.parent = parent;
+        this.taskBinder.setBean(this.task);
+        if (Objects.equals(null, this.task.getAuthor())) {
+            task.setAuthor(currentUser);
+            author.setValue(currentUser);
+        }
+        taskBinder.forField(author)
+                .bind(Task::getAuthor, Task::setAuthor);
+
         taskBinder.forField(performers)
                 .bind(Task::getPerformers, Task::setPerformers);
+
         taskBinder.forField(creationDate)
                 .withConverter(localDate -> LocalDateTime.of(localDate, LocalTime.now()), LocalDateTime::toLocalDate)
-                .bind(Task_.CREATION_DATE);
+                .bind(Task::getCreationDate, Task::setCreationDate);
+
+        taskBinder.forField(expirationDate)
+                .withConverter(localDate -> LocalDateTime.of(localDate, LocalTime.now()), LocalDateTime::toLocalDate)
+                .bind(Task::getExecutionDate, Task::setExecutionDate);
 
         taskBinder.bindInstanceFields(this);
 
-        submit.setText(operation.name());
+        submit.setText(operation.name);
         switch (operation) {
             case CREATE:
                 submit.addClickListener(e -> executeCommand(new CreateTaskCommand(taskService, task)));
@@ -163,7 +175,10 @@ public class TaskForm extends VerticalLayout {
         HorizontalLayout buttons = new HorizontalLayout();
 
         if (!Objects.equals(null, parent) && parent instanceof Dialog) {
-            cancel.addClickListener(e -> ((Dialog) parent).close());
+            cancel.addClickListener(e -> {
+                parent.setId("canceled");
+                ((Dialog) parent).close();
+            });
             buttons.add(submit, cancel);
         } else {
             buttons.add(submit);
@@ -177,5 +192,9 @@ public class TaskForm extends VerticalLayout {
             command.execute();
             ((Dialog) parent).close();
         }
+    }
+
+    private List<User> getAllUsers() {
+        return userService.findAll();
     }
 }
