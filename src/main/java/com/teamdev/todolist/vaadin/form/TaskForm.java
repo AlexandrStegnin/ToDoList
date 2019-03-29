@@ -12,12 +12,10 @@ import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -43,14 +41,14 @@ import java.util.Set;
 
 @UIScope
 @SpringComponent
-public class TaskForm extends VerticalLayout {
-//todo после добавления задачи и попытке открыть форму обновления/удаления не подтягиваются исполнители
+public class TaskForm extends Dialog {
+    //todo после добавления задачи и попытке открыть форму обновления/удаления не подтягиваются исполнители
     private UserService userService;
     private TaskService taskService;
     private TaskStatusService taskStatusService;
 
-    private TextField title = new TextField("Название");
-    private TextField description = new TextField("Описание");
+    private TextField title;
+    private TextField description;
     private Select<User> author;
     private User currentUser;
     private MultiselectComboBox<User> performers;
@@ -59,7 +57,6 @@ public class TaskForm extends VerticalLayout {
     private Select<TaskStatus> status;
 
     private Binder<Task> taskBinder;
-    private Component parent;
     private Button submit;
     private Button cancel;
     private Task task;
@@ -76,6 +73,8 @@ public class TaskForm extends VerticalLayout {
     private void init() {
         setMinWidth("300px");
         setMaxWidth("400px");
+        title = new TextField("Название");
+        description = new TextField("Описание");
         author = new Select<>();
         author.setItems(getAllUsers());
         author.setTextRenderer(User::getLogin);
@@ -134,10 +133,9 @@ public class TaskForm extends VerticalLayout {
         return user.getProfile().getName() + " " + user.getProfile().getSurname();
     }
 
-    public void prepareForm(OperationEnum operation, Component parent, Task task) {
+    public void prepareForm(OperationEnum operation, Task task) {
         currentUser = userService.findByLogin(SecurityUtils.getUsername());
         this.task = task;
-        this.parent = parent;
         this.taskBinder.setBean(this.task);
         if (Objects.equals(null, this.task.getAuthor())) {
             task.setAuthor(currentUser);
@@ -174,15 +172,8 @@ public class TaskForm extends VerticalLayout {
 
         HorizontalLayout buttons = new HorizontalLayout();
 
-        if (!Objects.equals(null, parent) && parent instanceof Dialog) {
-            cancel.addClickListener(e -> {
-                parent.setId("canceled");
-                ((Dialog) parent).close();
-            });
-            buttons.add(submit, cancel);
-        } else {
-            buttons.add(submit);
-        }
+        cancel.addClickListener(e -> this.close());
+        buttons.add(submit, cancel);
         addComponentAsFirst(author);
         addComponentAtIndex(7, buttons);
     }
@@ -190,7 +181,7 @@ public class TaskForm extends VerticalLayout {
     private void executeCommand(Command command) {
         if (taskBinder.writeBeanIfValid(task)) {
             command.execute();
-            ((Dialog) parent).close();
+            this.close();
         }
     }
 

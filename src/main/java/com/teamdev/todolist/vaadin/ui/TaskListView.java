@@ -66,27 +66,20 @@ public class TaskListView extends CustomAppLayout {
     public TaskListView(TaskService taskService, UserService userService, TaskForm taskForm) {
         this.userService = userService;
         this.taskService = taskService;
+        this.taskForm = taskForm;
         this.currentUser = this.userService.findByLogin(SecurityUtils.getUsername());
         this.binder = new BeanValidationBinder<>(Task.class);
         this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
         this.authorDataProvider = new ListDataProvider<>(getByAuthor());
         this.performerDataProvider = new ListDataProvider<>(getByPerformer());
-        this.taskForm = taskForm;
         this.update = new Button("Обновить");
         this.delete = new Button("Удалить");
         init();
     }
 
     private void showTaskForm(OperationEnum operation, Task task) {
-        Dialog dialog = VaadinViewUtils.initDialog();
-        dialog.addOpenedChangeListener(e -> {
-            if (!dialog.getId().isPresent()) {
-                refreshDataProvider(e.isOpened(), operation, task);
-            }
-        });
-        taskForm.prepareForm(operation, dialog, task);
-        dialog.add(taskForm);
-        dialog.open();
+        taskForm.prepareForm(operation, task);
+        taskForm.open();
     }
 
     private void init() {
@@ -372,8 +365,6 @@ public class TaskListView extends CustomAppLayout {
         delete.setVisible(true);
         delete.addClickListener(event -> {
             confirmDelete(e.getItem());
-//            showTaskForm(OperationEnum.DELETE, e.getItem());
-//            e.getSource().getDataProvider().refreshAll();
         });
     }
 
