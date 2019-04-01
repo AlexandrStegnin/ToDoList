@@ -14,7 +14,10 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -80,8 +83,6 @@ public class TaskListView extends CustomAppLayout {
         delete.setEnabled(false);
         update.setEnabled(false);
 
-        UI.getCurrent().getPage().addStyleSheet("css/task.css");
-
         createAuthorGrid();
         createPerformerGrid();
 
@@ -138,31 +139,24 @@ public class TaskListView extends CustomAppLayout {
         Grid.Column<Task> titleColumn = authorGrid.addColumn(Task::getTitle)
                 .setHeader("Название")
                 .setFooter("Всего задач: " + authorDataProvider.getItems().size())
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1)
                 .setSortable(true);
         Grid.Column<Task> descriptionColumn = authorGrid.addColumn(Task::getDescription)
-                .setHeader("Описание")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
+                .setHeader("Описание");
         Grid.Column<Task> performerColumn = authorGrid.addColumn(this::getAllPerformers)
-                .setHeader("Исполнители")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
+                .setHeader("Исполнители");
         Grid.Column<Task> creationDateColumn = authorGrid.addColumn(task -> getFormattedDate(task.getCreationDate()))
                 .setHeader("Создана")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1)
                 .setSortable(true);
+        Grid.Column<Task> expiredFlag = authorGrid.addComponentColumn(task -> {
+            String date = getFormattedDate(task.getExecutionDate());
+            if (date.compareTo(getFormattedDate(LocalDateTime.now()))>0) return new Span();
+            return new Icon(VaadinIcon.ALARM);
+        }).setFlexGrow(0).setWidth("56px");
         Grid.Column<Task> expiredDateColumn = authorGrid.addColumn(task -> getFormattedDate(task.getExecutionDate()))
                 .setHeader("Должна быть решена")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1)
                 .setSortable(true);
         authorGrid.addColumn(Task::getComment)
-                .setHeader("Комментарий")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
+                .setHeader("Комментарий");
 
         authorGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
         authorGrid.setMultiSort(true);
@@ -210,12 +204,6 @@ public class TaskListView extends CustomAppLayout {
         expiredDateField.setSizeFull();
         expiredDateField.setPlaceholder("Фильтр");
 
-        authorGrid.setClassNameGenerator(task -> {
-            if (getFormattedDate(task.getExecutionDate()).compareTo(getFormattedDate(LocalDateTime.now())) < 0)
-                return "expired_row";
-            return null;
-        });
-
         authorGrid.addItemClickListener(e -> {
             enableButtons(e.getItem().getAuthor().getId().equals(currentUser.getId()));
             performerGrid.deselectAll();
@@ -230,32 +218,25 @@ public class TaskListView extends CustomAppLayout {
         Grid.Column<Task> titleColumn = performerGrid.addColumn(Task::getTitle)
                 .setHeader("Название")
                 .setFooter("Всего задач: " + performerDataProvider.getItems().size())
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1)
                 .setSortable(true);
         Grid.Column<Task> descriptionColumn = performerGrid.addColumn(Task::getDescription)
-                .setHeader("Описание")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
+                .setHeader("Описание");
         Grid.Column<Task> authorColumn = performerGrid.addColumn(this::getAuthorFullName)
                 .setHeader("Автор")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1)
                 .setSortable(true);
         Grid.Column<Task> creationDateColumn = performerGrid.addColumn(task -> getFormattedDate(task.getCreationDate()))
                 .setHeader("Создана")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1)
                 .setSortable(true);
+        Grid.Column<Task> expiredFlag = performerGrid.addComponentColumn(task -> {
+            String date = getFormattedDate(task.getExecutionDate());
+            if (date.compareTo(getFormattedDate(LocalDateTime.now()))>0) return new Span();
+            return new Icon(VaadinIcon.ALARM);
+        }).setFlexGrow(0).setWidth("56px");
         Grid.Column<Task> expiredDateColumn = performerGrid.addColumn(task -> getFormattedDate(task.getExecutionDate()))
                 .setHeader("Должна быть решена")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1)
                 .setSortable(true);
         performerGrid.addColumn(Task::getComment)
-                .setHeader("Комментарий")
-                .setTextAlign(ColumnTextAlign.CENTER)
-                .setFlexGrow(1);
+                .setHeader("Комментарий");
         performerGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
         performerGrid.setMultiSort(true);
 
