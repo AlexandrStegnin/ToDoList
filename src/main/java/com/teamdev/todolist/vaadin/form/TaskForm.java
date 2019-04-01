@@ -8,6 +8,7 @@ import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.TaskStatus;
+import com.teamdev.todolist.entity.Task_;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.TaskStatusService;
@@ -36,72 +37,79 @@ import java.util.Set;
  * @author Alexandr Stegnin
  */
 
-public class TaskForm extends VerticalLayout {
-    // todo после добавления задачи и попытке открыть форму обновления/удаления не подтягиваются исполнители
-    // todo multiSelectCombobox, не отображается сообщение о не пройденной валидации
-    private UserService userService;
-    private TaskStatusService taskStatusService;
-    private TaskService taskService;
-    private Task task;
-    private OperationEnum operation;
+public class TaskForm extends Dialog {
+    // todo multiSelectCombobox не отображает сообщение о не пройденной валидации
+    // todo multiSelectCombobox не устанавливается в readOnly или enabled
+    private final UserService userService;
+    private final TaskStatusService taskStatusService;
+    private final TaskService taskService;
+    private final Task task;
+    private final OperationEnum operation;
 
-    private TextField title;
-    private TextField description;
-    private Select<User> author;
-    private MultiselectComboBox<User> performers;
-    private DatePicker creationDate;
-    private DatePicker expirationDate;
-    private Select<TaskStatus> status;
-    private Dialog dialog;
-
-    private Binder<Task> taskBinder;
-    private Button cancel;
+    private final TextField title;
+    private final TextField description;
+    private final Select<User> author;
+    private final MultiselectComboBox<User> performers;
+    private final DatePicker creationDate;
+    private final DatePicker expirationDate;
+    private final Select<TaskStatus> status;
+    private final TextField comment;
+    private final User currentUser;
+    private final Binder<Task> taskBinder;
+    private final Button cancel;
     private Button submit;
 
     public TaskForm(UserService userService, TaskService taskService,
                     TaskStatusService taskStatusService, OperationEnum operation,
-                    Task task, Dialog dialog) {
+                    Task task) {
         this.userService = userService;
         this.taskService = taskService;
         this.taskStatusService = taskStatusService;
         this.taskBinder = new BeanValidationBinder<>(Task.class);
         this.operation = operation;
         this.task = task;
-        this.dialog = dialog;
-        this.submit = new Button();
+        this.title = new TextField("Название");
+        this.description = new TextField("Описание");
+        this.author = new Select<>();
+        this.status = new Select<>();
+        this.creationDate = new DatePicker("Дата создания");
+        this.expirationDate = new DatePicker("Дата окончания");
+        this.performers = new MultiselectComboBox<>(this::getUserName);
+        this.comment = new TextField("Комментарий");
+        this.cancel = new Button("Отменить", e -> this.close());
+        this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
         init();
     }
 
     private void init() {
         setMinWidth("300px");
         setMaxWidth("400px");
-        title = new TextField("Название");
-        description = new TextField("Описание");
-        author = new Select<>();
+
         author.setItems(getAllUsers());
         author.setTextRenderer(User::getLogin);
         author.setReadOnly(true);
+        author.setValue(currentUser);
 
-        status = new Select<>();
         status.setItems(getAllTaskStatuses());
         status.setTextRenderer(TaskStatus::getTitle);
         status.setEmptySelectionAllowed(false);
         status.setValue(taskStatusService.getDefaultStatus());
         status.setRequiredIndicatorVisible(true);
 
-        cancel = new Button("Отменить");
-        performers = new MultiselectComboBox<>(this::getUserName);
         performers.setItems(getAllPerformers());
         performers.setRequired(true);
         performers.setRequiredIndicatorVisible(true);
-        creationDate = new DatePicker("Дата создания");
-        expirationDate = new DatePicker("Дата окончания");
+
         addCreationDateValueChangeListener();
         addExpirationDateValueChangeListener();
-        add(title, description, creationDate, expirationDate, performers, status);
+
+        VerticalLayout content = new VerticalLayout(title, description, creationDate, expirationDate,
+                performers, comment, status);
+        add(content);
 
         prepareForm(task);
         prepareSubmitButton();
+        setReadOnlyFields(task.getAuthor().getId().equals(currentUser.getId()));
     }
 
     private void addCreationDateValueChangeListener() {
@@ -139,44 +147,42 @@ public class TaskForm extends VerticalLayout {
     }
 
     private void prepareForm(Task task) {
-        this.task = task;
-        User currentUser = userService.findByLogin(SecurityUtils.getUsername());
-        this.taskBinder.setBean(task);
         if (Objects.equals(null, task.getAuthor())) {
             task.setAuthor(currentUser);
-            author.setValue(currentUser);
         }
+        if (Objects.equals(null, task.getStatus())) {
+            task.setStatus(taskStatusService.getDefaultStatus());
+        }
+        taskBinder.setBean(task);
+
         taskBinder.forField(author)
-                .bind(Task::getAuthor, Task::setAuthor);
+                .bind(Task_.AUTHOR);
 
         taskBinder.forField(performers)
                 .withValidator(users -> !Objects.equals(null, users) && !users.isEmpty(), "Add 1 or more performers")
-                .bind(Task::getPerformers, Task::setPerformers);
+                .bind(Task_.PERFORMERS);
 
         taskBinder.forField(creationDate)
                 .withConverter(localDate -> LocalDateTime.of(localDate, LocalTime.now()), LocalDateTime::toLocalDate)
-                .bind(Task::getCreationDate, Task::setCreationDate);
+                .bind(Task_.CREATION_DATE);
 
         taskBinder.forField(expirationDate)
                 .withConverter(localDate -> LocalDateTime.of(localDate, LocalTime.now()), LocalDateTime::toLocalDate)
-                .bind(Task::getExecutionDate, Task::setExecutionDate);
+                .bind(Task_.EXECUTION_DATE);
 
         taskBinder.forField(status)
                 .withValidator(stat -> !status.isEmpty(), "Choose task status")
-                .bind(Task::getStatus, Task::setStatus);
+                .bind(Task_.STATUS);
 
         taskBinder.bindInstanceFields(this);
 
         HorizontalLayout buttons = new HorizontalLayout();
 
-        cancel.addClickListener(e -> {
-            dialog.removeAll();
-            dialog.close();
-        });
         prepareSubmitButton();
         buttons.add(submit, cancel);
+
         addComponentAsFirst(author);
-        addComponentAtIndex(7, buttons);
+        addComponentAtIndex(2, buttons);
     }
 
     private List<User> getAllUsers() {
@@ -184,7 +190,7 @@ public class TaskForm extends VerticalLayout {
     }
 
     private void prepareSubmitButton() {
-        submit.setText(operation.name);
+        this.submit = new Button(operation.name);
         switch (operation) {
             case CREATE:
                 submit.addClickListener(e -> executeCommand(new CreateTaskCommand(taskService, task), task));
@@ -201,13 +207,18 @@ public class TaskForm extends VerticalLayout {
     private void executeCommand(Command command, Task task) {
         if (command instanceof DeleteTaskCommand) {
             command.execute();
-            dialog.removeAll();
-            dialog.close();
+            this.close();
         } else if (taskBinder.writeBeanIfValid(task)) {
             command.execute();
-            dialog.removeAll();
-            dialog.close();
+            this.close();
         }
+    }
+
+    private void setReadOnlyFields(final boolean isAuthor) {
+        title.setReadOnly(!isAuthor);
+        description.setReadOnly(!isAuthor);
+        creationDate.setReadOnly(!isAuthor);
+        expirationDate.setReadOnly(!isAuthor);
     }
 
 }

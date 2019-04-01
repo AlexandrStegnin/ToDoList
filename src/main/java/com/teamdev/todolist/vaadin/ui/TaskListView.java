@@ -9,14 +9,11 @@ import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TaskForm;
-import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -50,13 +47,13 @@ public class TaskListView extends CustomAppLayout {
     private final TaskService taskService;
     private final UserService userService;
     private final TaskStatusService taskStatusService;
-    private Dialog dialog;
+    private final User currentUser;
+    private final DateTimeFormatter formatter;
+    private final Button update;
+    private final Button delete;
+    private final Button addNewBtn;
     private Grid<Task> authorGrid, performerGrid;
-    private User currentUser;
-    private DateTimeFormatter formatter;
     private ListDataProvider<Task> authorDataProvider, performerDataProvider;
-    private Button update;
-    private Button delete;
 
     public TaskListView(TaskService taskService, UserService userService,
                         TaskStatusService taskStatusService) {
@@ -67,24 +64,21 @@ public class TaskListView extends CustomAppLayout {
         this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
         this.authorDataProvider = new ListDataProvider<>(getByAuthor());
         this.performerDataProvider = new ListDataProvider<>(getByPerformer());
-        this.update = new Button("Обновить");
-        this.delete = new Button("Удалить");
-        this.dialog = VaadinViewUtils.initDialog();
+        this.update = new Button("Обновить", e -> buttonsListener(OperationEnum.UPDATE));
+        this.delete = new Button("Удалить", e -> buttonsListener(OperationEnum.DELETE));
+        this.addNewBtn = new Button("Создать задачу", e -> showTaskForm(OperationEnum.CREATE, new Task()));
         init();
     }
 
-    private void showTaskForm(OperationEnum operation, Task task) {
-        TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, operation, task, dialog);
-        dialog.add(taskForm);
-        dialog.open();
-        dialog.addOpenedChangeListener(event -> {
-            if (!event.isOpened()) {
-                refreshDataProviders(operation, task);
-            }
-        });
+    private void showTaskForm(final OperationEnum operation, final Task task) {
+        TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, operation, task);
+        taskForm.addOpenedChangeListener(event -> refreshDataProviders(event.isOpened(), operation, task));
+        taskForm.open();
     }
 
     private void init() {
+        delete.setEnabled(false);
+        update.setEnabled(false);
 
         UI.getCurrent().getPage().addStyleSheet("css/task.css");
 
@@ -101,9 +95,7 @@ public class TaskListView extends CustomAppLayout {
         authorZoneLayout.add(authorLayout);
         VerticalLayout authorRightPane = new VerticalLayout();
         authorRightPane.setWidth("15%");
-        authorRightPane.add(new Button("Создать новую задачу", e -> showTaskForm(OperationEnum.CREATE, new Task())));
-        update.setVisible(false);
-        delete.setVisible(false);
+        authorRightPane.add(addNewBtn);
         authorRightPane.add(update);
         authorRightPane.add(delete);
 
@@ -167,6 +159,11 @@ public class TaskListView extends CustomAppLayout {
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1)
                 .setSortable(true);
+        authorGrid.addColumn(Task::getComment)
+                .setHeader("Комментарий")
+                .setTextAlign(ColumnTextAlign.CENTER)
+                .setFlexGrow(1);
+
         authorGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
         authorGrid.setMultiSort(true);
 
@@ -220,7 +217,7 @@ public class TaskListView extends CustomAppLayout {
         });
 
         authorGrid.addItemClickListener(e -> {
-            showButtons(e);
+            enableButtons(e.getItem().getAuthor().getId().equals(currentUser.getId()));
             performerGrid.deselectAll();
         });
 
@@ -255,6 +252,10 @@ public class TaskListView extends CustomAppLayout {
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1)
                 .setSortable(true);
+        performerGrid.addColumn(Task::getComment)
+                .setHeader("Комментарий")
+                .setTextAlign(ColumnTextAlign.CENTER)
+                .setFlexGrow(1);
         performerGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
         performerGrid.setMultiSort(true);
 
@@ -302,7 +303,7 @@ public class TaskListView extends CustomAppLayout {
         expiredDateField.setPlaceholder("Фильтр");
 
         performerGrid.addItemClickListener(e -> {
-            showButtons(e);
+            enableButtons(e.getItem().getAuthor().getId().equals(currentUser.getId()));
             authorGrid.deselectAll();
         });
 
@@ -323,37 +324,46 @@ public class TaskListView extends CustomAppLayout {
                 .collect(Collectors.joining(", "));
     }
 
-    private void showButtons(ItemClickEvent<Task> e) {
-        update.setVisible(true);
-        update.addClickListener(event -> {
-            showTaskForm(OperationEnum.UPDATE, e.getItem());
-            e.getSource().getDataProvider().refreshAll();
-        });
-        delete.setVisible(true);
-        delete.addClickListener(event -> {
-            showTaskForm(OperationEnum.DELETE, e.getItem());
-        });
+    private void refreshDataProviders(final boolean isOpened, final OperationEnum operation, final Task task) {
+        if (task.getId() != null) {
+            if (!isOpened) {
+                if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
+                    authorDataProvider.getItems().add(task);
+//                authorDataProvider.refreshAll();
+                } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
+                    authorDataProvider.getItems().remove(task);
+//                authorDataProvider.refreshAll();
+                }/* else {
+                authorDataProvider.refreshItem(task);
+            }*/
+                if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getPerformers().contains(currentUser)) {
+                    performerDataProvider.getItems().add(task);
+//                performerDataProvider.refreshAll();
+                } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getPerformers().contains(currentUser)) {
+                    performerDataProvider.getItems().remove(task);
+//                performerDataProvider.refreshAll();
+                }/* else {
+                performerDataProvider.refreshItem(task);
+            }*/
+                authorDataProvider.refreshAll();
+                performerDataProvider.refreshAll();
+            }
+        }
     }
 
-    private void refreshDataProviders(OperationEnum operation, Task task) {
-        if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
-            authorDataProvider.getItems().add(task);
-            authorDataProvider.refreshAll();
-        } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
-            authorDataProvider.getItems().remove(task);
-            authorDataProvider.refreshAll();
-        } else {
-            authorDataProvider.refreshItem(task);
+    private void buttonsListener(OperationEnum operation) {
+        Task authorGridTask = authorGrid.getSelectedItems().stream().findFirst().orElse(null);
+        Task performerGridTask = performerGrid.getSelectedItems().stream().findFirst().orElse(null);
+        if (authorGridTask != null) {
+            showTaskForm(operation, authorGridTask);
+        } else if (performerGridTask != null) {
+            showTaskForm(operation, performerGridTask);
         }
-        if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getPerformers().contains(currentUser)) {
-            performerDataProvider.getItems().add(task);
-            performerDataProvider.refreshAll();
-        } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getPerformers().contains(currentUser)) {
-            performerDataProvider.getItems().remove(task);
-            performerDataProvider.refreshAll();
-        } else {
-            performerDataProvider.refreshItem(task);
-        }
+    }
+
+    private void enableButtons(final boolean isAuthor) {
+        update.setEnabled(true);
+        delete.setEnabled(isAuthor);
     }
 
 }
