@@ -60,14 +60,12 @@ public class Task extends AbstractEntity {
     private Set<User> performers;
 
     @Column
-    @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of creation task")
     private LocalDateTime creationDate = LocalDateTime.now();
 
     @Column
-    @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of execution task")
     private LocalDateTime executionDate = creationDate.plusDays(1);
 
@@ -78,6 +76,9 @@ public class Task extends AbstractEntity {
 
     @OneToOne
     private TaskStatus status;
+
+    @Column
+    private String comment;
 
     public void addPerformer(User performer) {
         if (Objects.equals(null, performers)) performers = new HashSet<>();

@@ -1,0 +1,1 @@
+ALTER TABLE todo_list_db.task ADD comment varchar(4000) NULL;
