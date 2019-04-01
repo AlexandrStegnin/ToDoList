@@ -32,7 +32,7 @@ public class Role extends AbstractEntity implements GrantedAuthority {
     private Long id;
 
     @Column
-    @Size(min = 3, max = 10, message = "Role title must be greater than 2 and less than 10 characters")
+    @Size(min = 3, max = 20, message = "Role title must be greater than 2 and less than 20 characters")
     @ApiModelProperty(notes = "The role title")
     private String title;
 

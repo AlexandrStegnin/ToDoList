@@ -84,7 +84,7 @@ public class RoleView extends CustomAppLayout {
         dialog.open();
     }
 
-    private void refreshDataProvider(boolean isOpened, final OperationEnum operation, final Role role) {
+    private void refreshDataProvider(final boolean isOpened, final OperationEnum operation, final Role role) {
         if (!isOpened) {
             if (operation.compareTo(OperationEnum.CREATE) == 0) dataProvider.getItems().add(role);
             else if (operation.compareTo(OperationEnum.DELETE) == 0) dataProvider.getItems().remove(role);

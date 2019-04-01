@@ -40,7 +40,7 @@ public class RoleForm extends VerticalLayout {
         this.roleBinder = new BeanValidationBinder<>(Role.class);
         this.roleService = roleService;
         this.operation = operation;
-        this.submit = new Button(operation.name());
+        this.submit = new Button(operation.name);
         this.parent = parent;
         this.role = role;
         init();
