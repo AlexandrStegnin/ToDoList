@@ -72,7 +72,7 @@ public class TaskListView extends CustomAppLayout {
 
     private void showTaskForm(final OperationEnum operation, final Task task) {
         TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, operation, task);
-        taskForm.addOpenedChangeListener(event -> refreshDataProviders(event.isOpened(), operation, task));
+        taskForm.addOpenedChangeListener(event -> refreshDataProviders(event.isOpened(), taskForm.getOperation(), taskForm.getTask()));
         taskForm.open();
     }
 
@@ -329,22 +329,14 @@ public class TaskListView extends CustomAppLayout {
             if (!isOpened) {
                 if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
                     authorDataProvider.getItems().add(task);
-//                authorDataProvider.refreshAll();
                 } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
                     authorDataProvider.getItems().remove(task);
-//                authorDataProvider.refreshAll();
-                }/* else {
-                authorDataProvider.refreshItem(task);
-            }*/
+                }
                 if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getPerformers().contains(currentUser)) {
                     performerDataProvider.getItems().add(task);
-//                performerDataProvider.refreshAll();
                 } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getPerformers().contains(currentUser)) {
                     performerDataProvider.getItems().remove(task);
-//                performerDataProvider.refreshAll();
-                }/* else {
-                performerDataProvider.refreshItem(task);
-            }*/
+                }
                 authorDataProvider.refreshAll();
                 performerDataProvider.refreshAll();
             }

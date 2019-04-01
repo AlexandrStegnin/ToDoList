@@ -34,12 +34,12 @@ public class Task extends AbstractEntity {
     private Long id;
 
     @Column
-    @Size(min = 5, message = "Task title must be greater than 4 characters")
+    @Size(min = 5, message = "Название задачи должно быть более 4 символов")
     @ApiModelProperty(notes = "Task title")
     private String title;
 
     @Column
-    @Size(min = 5, message = "Task description must be greater than 4 characters")
+    @Size(min = 5, message = "Описание задачи должно быть более 4 символов")
     @ApiModelProperty(notes = "Task description")
     private String description;
 
@@ -57,7 +57,7 @@ public class Task extends AbstractEntity {
             inverseForeignKey = @ForeignKey(name = "performer_to_user")
     )
     @ApiModelProperty(notes = "Task performers")
-    private Set<User> performers;
+    private Set<User> performers = new HashSet<>();
 
     @Column
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")

@@ -43,8 +43,9 @@ public class TaskForm extends Dialog {
     private final UserService userService;
     private final TaskStatusService taskStatusService;
     private final TaskService taskService;
-    private final Task task;
-    private final OperationEnum operation;
+    private Task task;
+    private OperationEnum operation;
+    private HorizontalLayout buttons;
 
     private final TextField title;
     private final TextField description;
@@ -55,8 +56,10 @@ public class TaskForm extends Dialog {
     private final Select<TaskStatus> status;
     private final TextField comment;
     private final User currentUser;
-    private final Binder<Task> taskBinder;
+    private Binder<Task> taskBinder;
     private final Button cancel;
+    private final Button delegateTask;
+    private final TaskStatus defaultStatus;
     private Button submit;
 
     public TaskForm(UserService userService, TaskService taskService,
@@ -77,7 +80,10 @@ public class TaskForm extends Dialog {
         this.performers = new MultiselectComboBox<>(this::getUserName);
         this.comment = new TextField("Комментарий");
         this.cancel = new Button("Отменить", e -> this.close());
+        this.delegateTask = new Button("Делегировать задачу");
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
+        this.defaultStatus = taskStatusService.getDefaultStatus();
+        this.buttons = new HorizontalLayout();
         init();
     }
 
@@ -93,7 +99,7 @@ public class TaskForm extends Dialog {
         status.setItems(getAllTaskStatuses());
         status.setTextRenderer(TaskStatus::getTitle);
         status.setEmptySelectionAllowed(false);
-        status.setValue(taskStatusService.getDefaultStatus());
+        status.setValue(defaultStatus);
         status.setRequiredIndicatorVisible(true);
 
         performers.setItems(getAllPerformers());
@@ -108,8 +114,7 @@ public class TaskForm extends Dialog {
         add(content);
 
         prepareForm(task);
-        prepareSubmitButton();
-        setReadOnlyFields(task.getAuthor().getId().equals(currentUser.getId()));
+//        prepareSubmitButton();
     }
 
     private void addCreationDateValueChangeListener() {
@@ -151,7 +156,7 @@ public class TaskForm extends Dialog {
             task.setAuthor(currentUser);
         }
         if (Objects.equals(null, task.getStatus())) {
-            task.setStatus(taskStatusService.getDefaultStatus());
+            task.setStatus(defaultStatus);
         }
         taskBinder.setBean(task);
 
@@ -159,7 +164,7 @@ public class TaskForm extends Dialog {
                 .bind(Task_.AUTHOR);
 
         taskBinder.forField(performers)
-                .withValidator(users -> !Objects.equals(null, users) && !users.isEmpty(), "Add 1 or more performers")
+                .withValidator(users -> !Objects.equals(null, users) && !users.isEmpty(), "Добавьте минимум 1 исполнителя")
                 .bind(Task_.PERFORMERS);
 
         taskBinder.forField(creationDate)
@@ -171,18 +176,22 @@ public class TaskForm extends Dialog {
                 .bind(Task_.EXECUTION_DATE);
 
         taskBinder.forField(status)
-                .withValidator(stat -> !status.isEmpty(), "Choose task status")
+                .withValidator(stat -> !status.isEmpty(), "Выберите статус задачи")
                 .bind(Task_.STATUS);
 
         taskBinder.bindInstanceFields(this);
-
-        HorizontalLayout buttons = new HorizontalLayout();
-
+        addComponentAsFirst(author);
+        buttons.removeAll();
         prepareSubmitButton();
         buttons.add(submit, cancel);
 
-        addComponentAsFirst(author);
-        addComponentAtIndex(2, buttons);
+        if (task.getId() != null && operation.compareTo(OperationEnum.DELETE) != 0) {
+            delegateTask.addClickListener(e -> delegateTask(task));
+            buttons.add(delegateTask);
+        }
+        addComponentAtIndex(Integer.valueOf(String.valueOf(getChildren().count())), buttons);
+
+        setReadOnlyFields(task.getAuthor().getId().equals(currentUser.getId()));
     }
 
     private List<User> getAllUsers() {
@@ -219,6 +228,26 @@ public class TaskForm extends Dialog {
         description.setReadOnly(!isAuthor);
         creationDate.setReadOnly(!isAuthor);
         expirationDate.setReadOnly(!isAuthor);
+    }
+
+    private void delegateTask(Task task) {
+        Task newTask = new Task();
+        newTask.setTitle(task.getTitle());
+        newTask.setDescription(task.getDescription());
+        newTask.setStatus(defaultStatus);
+        newTask.setAuthor(currentUser);
+        newTask.setParentTask(task);
+        this.operation = OperationEnum.CREATE;
+        this.task = newTask;
+        init();
+    }
+
+    public OperationEnum getOperation() {
+        return operation;
+    }
+
+    public Task getTask() {
+        return task;
     }
 
 }
