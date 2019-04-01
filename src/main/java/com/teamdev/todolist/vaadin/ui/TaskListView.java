@@ -1,12 +1,11 @@
 package com.teamdev.todolist.vaadin.ui;
 
-import com.teamdev.todolist.command.Command;
-import com.teamdev.todolist.command.task.DeleteTaskCommand;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.service.TaskService;
+import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TaskForm;
@@ -18,14 +17,11 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.ItemClickEvent;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -53,33 +49,39 @@ public class TaskListView extends CustomAppLayout {
 
     private final TaskService taskService;
     private final UserService userService;
+    private final TaskStatusService taskStatusService;
+    private Dialog dialog;
     private Grid<Task> authorGrid, performerGrid;
     private User currentUser;
-    private Binder<Task> binder;
     private DateTimeFormatter formatter;
     private ListDataProvider<Task> authorDataProvider, performerDataProvider;
-    private TaskForm taskForm;
     private Button update;
     private Button delete;
 
-
-    public TaskListView(TaskService taskService, UserService userService, TaskForm taskForm) {
+    public TaskListView(TaskService taskService, UserService userService,
+                        TaskStatusService taskStatusService) {
         this.userService = userService;
         this.taskService = taskService;
-        this.taskForm = taskForm;
+        this.taskStatusService = taskStatusService;
         this.currentUser = this.userService.findByLogin(SecurityUtils.getUsername());
-        this.binder = new BeanValidationBinder<>(Task.class);
         this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
         this.authorDataProvider = new ListDataProvider<>(getByAuthor());
         this.performerDataProvider = new ListDataProvider<>(getByPerformer());
         this.update = new Button("Обновить");
         this.delete = new Button("Удалить");
+        this.dialog = VaadinViewUtils.initDialog();
         init();
     }
 
     private void showTaskForm(OperationEnum operation, Task task) {
-        taskForm.prepareForm(operation, task);
-        taskForm.open();
+        TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, operation, task, dialog);
+        dialog.add(taskForm);
+        dialog.open();
+        dialog.addOpenedChangeListener(event -> {
+            if (!event.isOpened()) {
+                refreshDataProviders(operation, task);
+            }
+        });
     }
 
     private void init() {
@@ -321,41 +323,6 @@ public class TaskListView extends CustomAppLayout {
                 .collect(Collectors.joining(", "));
     }
 
-    private void refreshDataProvider(boolean isOpened, final OperationEnum operation, final Task task) {
-        if (!isOpened) {
-            if (operation.compareTo(OperationEnum.CREATE) == 0) {
-                if (task.getAuthor().equals(currentUser) && task.getPerformers().contains(currentUser)) {
-                    authorDataProvider.getItems().add(task);
-                    authorDataProvider.refreshAll();
-                    performerDataProvider.getItems().add(task);
-                    performerDataProvider.refreshAll();
-                } else if (task.getAuthor().equals(currentUser)) {
-                    authorDataProvider.getItems().add(task);
-                    authorDataProvider.refreshAll();
-                } else {
-                    performerDataProvider.getItems().add(task);
-                    performerDataProvider.refreshAll();
-                }
-            } else if (operation.compareTo(OperationEnum.DELETE) == 0) {
-                if (task.getAuthor().equals(currentUser) && task.getPerformers().contains(currentUser)) {
-                    authorDataProvider.getItems().remove(task);
-                    authorDataProvider.refreshAll();
-                    performerDataProvider.getItems().remove(task);
-                    performerDataProvider.refreshAll();
-                } else if (task.getAuthor().equals(currentUser)) {
-                    authorDataProvider.getItems().remove(task);
-                    authorDataProvider.refreshAll();
-                } else {
-                    performerDataProvider.getItems().remove(task);
-                    performerDataProvider.refreshAll();
-                }
-            } else {
-                authorDataProvider.refreshItem(task);
-                performerDataProvider.refreshItem(task);
-            }
-        }
-    }
-
     private void showButtons(ItemClickEvent<Task> e) {
         update.setVisible(true);
         update.addClickListener(event -> {
@@ -364,35 +331,29 @@ public class TaskListView extends CustomAppLayout {
         });
         delete.setVisible(true);
         delete.addClickListener(event -> {
-            confirmDelete(e.getItem());
+            showTaskForm(OperationEnum.DELETE, e.getItem());
         });
     }
 
-    private void confirmDelete(Task task) {
-        Dialog dialog = VaadinViewUtils.initDialog();
-        Button confirm = new Button("Confirm");
-
-        Button cancel = new Button("Cancel", e -> dialog.close());
-        HorizontalLayout actions = new HorizontalLayout();
-        actions.add(confirm, cancel);
-        Div contentText = new Div();
-        contentText.setText("Confirm delete task: " + task.getId() + "?");
-        VerticalLayout content = new VerticalLayout();
-        content.add(contentText, actions);
-        confirm.addClickListener(e -> {
+    private void refreshDataProviders(OperationEnum operation, Task task) {
+        if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
+            authorDataProvider.getItems().add(task);
+            authorDataProvider.refreshAll();
+        } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
             authorDataProvider.getItems().remove(task);
+            authorDataProvider.refreshAll();
+        } else {
+            authorDataProvider.refreshItem(task);
+        }
+        if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getPerformers().contains(currentUser)) {
+            performerDataProvider.getItems().add(task);
+            performerDataProvider.refreshAll();
+        } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getPerformers().contains(currentUser)) {
             performerDataProvider.getItems().remove(task);
-            executeOperation(new DeleteTaskCommand(taskService, task));
-            dialog.close();
-        });
-        dialog.add(content);
-        dialog.open();
-    }
-
-    private void executeOperation(Command operation) {
-        operation.execute();
-        authorDataProvider.refreshAll();
-        performerDataProvider.refreshAll();
+            performerDataProvider.refreshAll();
+        } else {
+            performerDataProvider.refreshItem(task);
+        }
     }
 
 }

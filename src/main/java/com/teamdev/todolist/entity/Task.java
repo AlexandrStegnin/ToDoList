@@ -7,9 +7,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Alexandr Stegnin
@@ -32,11 +34,12 @@ public class Task extends AbstractEntity {
     private Long id;
 
     @Column
-    @NotNull
+    @Size(min = 5, message = "Task title must be greater than 4 characters")
     @ApiModelProperty(notes = "Task title")
     private String title;
 
     @Column
+    @Size(min = 5, message = "Task description must be greater than 4 characters")
     @ApiModelProperty(notes = "Task description")
     private String description;
 

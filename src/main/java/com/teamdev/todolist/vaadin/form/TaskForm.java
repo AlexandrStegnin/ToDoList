@@ -16,16 +16,13 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import de.wathoserver.vaadin.MultiselectComboBox;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -39,37 +36,42 @@ import java.util.Set;
  * @author Alexandr Stegnin
  */
 
-@UIScope
-@SpringComponent
-public class TaskForm extends Dialog {
-    //todo после добавления задачи и попытке открыть форму обновления/удаления не подтягиваются исполнители
+public class TaskForm extends VerticalLayout {
+    // todo после добавления задачи и попытке открыть форму обновления/удаления не подтягиваются исполнители
+    // todo multiSelectCombobox, не отображается сообщение о не пройденной валидации
     private UserService userService;
-    private TaskService taskService;
     private TaskStatusService taskStatusService;
+    private TaskService taskService;
+    private Task task;
+    private OperationEnum operation;
 
     private TextField title;
     private TextField description;
     private Select<User> author;
-    private User currentUser;
     private MultiselectComboBox<User> performers;
     private DatePicker creationDate;
     private DatePicker expirationDate;
     private Select<TaskStatus> status;
+    private Dialog dialog;
 
     private Binder<Task> taskBinder;
-    private Button submit;
     private Button cancel;
-    private Task task;
+    private Button submit;
 
-    public TaskForm(@Autowired UserService userService,
-                    @Autowired TaskService taskService,
-                    @Autowired TaskStatusService taskStatusService) {
+    public TaskForm(UserService userService, TaskService taskService,
+                    TaskStatusService taskStatusService, OperationEnum operation,
+                    Task task, Dialog dialog) {
         this.userService = userService;
         this.taskService = taskService;
         this.taskStatusService = taskStatusService;
+        this.taskBinder = new BeanValidationBinder<>(Task.class);
+        this.operation = operation;
+        this.task = task;
+        this.dialog = dialog;
+        this.submit = new Button();
+        init();
     }
 
-    @PostConstruct
     private void init() {
         setMinWidth("300px");
         setMaxWidth("400px");
@@ -85,18 +87,21 @@ public class TaskForm extends Dialog {
         status.setTextRenderer(TaskStatus::getTitle);
         status.setEmptySelectionAllowed(false);
         status.setValue(taskStatusService.getDefaultStatus());
+        status.setRequiredIndicatorVisible(true);
 
-        submit = new Button();
         cancel = new Button("Отменить");
         performers = new MultiselectComboBox<>(this::getUserName);
         performers.setItems(getAllPerformers());
+        performers.setRequired(true);
+        performers.setRequiredIndicatorVisible(true);
         creationDate = new DatePicker("Дата создания");
         expirationDate = new DatePicker("Дата окончания");
         addCreationDateValueChangeListener();
         addExpirationDateValueChangeListener();
-
-        taskBinder = new BeanValidationBinder<>(Task.class);
         add(title, description, creationDate, expirationDate, performers, status);
+
+        prepareForm(task);
+        prepareSubmitButton();
     }
 
     private void addCreationDateValueChangeListener() {
@@ -133,11 +138,11 @@ public class TaskForm extends Dialog {
         return user.getProfile().getName() + " " + user.getProfile().getSurname();
     }
 
-    public void prepareForm(OperationEnum operation, Task task) {
-        currentUser = userService.findByLogin(SecurityUtils.getUsername());
+    private void prepareForm(Task task) {
         this.task = task;
-        this.taskBinder.setBean(this.task);
-        if (Objects.equals(null, this.task.getAuthor())) {
+        User currentUser = userService.findByLogin(SecurityUtils.getUsername());
+        this.taskBinder.setBean(task);
+        if (Objects.equals(null, task.getAuthor())) {
             task.setAuthor(currentUser);
             author.setValue(currentUser);
         }
@@ -145,6 +150,7 @@ public class TaskForm extends Dialog {
                 .bind(Task::getAuthor, Task::setAuthor);
 
         taskBinder.forField(performers)
+                .withValidator(users -> !Objects.equals(null, users) && !users.isEmpty(), "Add 1 or more performers")
                 .bind(Task::getPerformers, Task::setPerformers);
 
         taskBinder.forField(creationDate)
@@ -155,37 +161,53 @@ public class TaskForm extends Dialog {
                 .withConverter(localDate -> LocalDateTime.of(localDate, LocalTime.now()), LocalDateTime::toLocalDate)
                 .bind(Task::getExecutionDate, Task::setExecutionDate);
 
-        taskBinder.bindInstanceFields(this);
+        taskBinder.forField(status)
+                .withValidator(stat -> !status.isEmpty(), "Choose task status")
+                .bind(Task::getStatus, Task::setStatus);
 
-        submit.setText(operation.name);
-        switch (operation) {
-            case CREATE:
-                submit.addClickListener(e -> executeCommand(new CreateTaskCommand(taskService, task)));
-                break;
-            case UPDATE:
-                submit.addClickListener(e -> executeCommand(new UpdateTaskCommand(taskService, task)));
-                break;
-            case DELETE:
-                submit.addClickListener(e -> executeCommand(new DeleteTaskCommand(taskService, task)));
-                break;
-        }
+        taskBinder.bindInstanceFields(this);
 
         HorizontalLayout buttons = new HorizontalLayout();
 
-        cancel.addClickListener(e -> this.close());
+        cancel.addClickListener(e -> {
+            dialog.removeAll();
+            dialog.close();
+        });
+        prepareSubmitButton();
         buttons.add(submit, cancel);
         addComponentAsFirst(author);
         addComponentAtIndex(7, buttons);
     }
 
-    private void executeCommand(Command command) {
-        if (taskBinder.writeBeanIfValid(task)) {
-            command.execute();
-            this.close();
-        }
-    }
-
     private List<User> getAllUsers() {
         return userService.findAll();
     }
+
+    private void prepareSubmitButton() {
+        submit.setText(operation.name);
+        switch (operation) {
+            case CREATE:
+                submit.addClickListener(e -> executeCommand(new CreateTaskCommand(taskService, task), task));
+                break;
+            case UPDATE:
+                submit.addClickListener(e -> executeCommand(new UpdateTaskCommand(taskService, task), task));
+                break;
+            case DELETE:
+                submit.addClickListener(e -> executeCommand(new DeleteTaskCommand(taskService, task), task));
+                break;
+        }
+    }
+
+    private void executeCommand(Command command, Task task) {
+        if (command instanceof DeleteTaskCommand) {
+            command.execute();
+            dialog.removeAll();
+            dialog.close();
+        } else if (taskBinder.writeBeanIfValid(task)) {
+            command.execute();
+            dialog.removeAll();
+            dialog.close();
+        }
+    }
+
 }
