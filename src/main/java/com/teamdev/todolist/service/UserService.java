@@ -2,16 +2,22 @@ package com.teamdev.todolist.service;
 
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.repository.UserRepository;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 
+import static com.teamdev.todolist.configuration.support.Constants.PATH_SEPARATOR;
 import static com.teamdev.todolist.configuration.support.Constants.ROLE_USER;
 
 /**
@@ -20,6 +26,9 @@ import static com.teamdev.todolist.configuration.support.Constants.ROLE_USER;
 
 @Service
 public class UserService {
+
+    @Value("${spring.config.file-upload-directory}")
+    private String FILE_UPLOAD_DIRECTORY;
 
     // TODO: 07.03.2019 Выбрасывать исключения, если пользователь не найден
 
@@ -48,7 +57,9 @@ public class UserService {
         return userRepository.getOne(id);
     }
 
-    public Long getIdByLogin(String login) {return userRepository.findByLogin(login).getId(); }
+    public Long getIdByLogin(String login) {
+        return userRepository.findByLogin(login).getId();
+    }
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -106,7 +117,7 @@ public class UserService {
         userRepository.save(newUser);
     }
 
-    public User getById(Long useId) {
+    private User getById(Long useId) {
         return userRepository.getOne(useId);
     }
 
@@ -128,5 +139,47 @@ public class UserService {
     public boolean emailIsBusy(String email) {
         return userProfileService.emailIsBusy(email);
     }
+
+    public void saveUserAvatar(User user, MemoryBuffer buffer) {
+        if (!"".equals(buffer.getFileName())) {
+            final File[] targetFile = {null};
+            dropUserDir(user); // todo проверять наличие файла аватара в папке и удалять
+            createUserDir(user);
+            String fileName = buffer.getFileName();
+            targetFile[0] = new File(FILE_UPLOAD_DIRECTORY + user.getLogin() + PATH_SEPARATOR + fileName);
+            try {
+                Files.copy(buffer.getInputStream(), targetFile[0].toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException("Ошибка копирования файла", e);
+            }
+            user.getProfile().setAvatar(fileName);
+        }
+    }
+
+    private void createUserDir(User user) {
+        Path userDir = Paths.get(FILE_UPLOAD_DIRECTORY + user.getLogin());
+        if (!Files.exists(userDir)) {
+            try {
+                Files.createDirectories(userDir);
+            } catch (IOException e) {
+                throw new RuntimeException("Ошибка при создании директории: " + userDir.getFileName().toString(), e);
+            }
+        }
+    }
+
+    private void dropUserDir(User user) {
+        Path userDir = Paths.get(FILE_UPLOAD_DIRECTORY + user.getLogin());
+        if (Files.exists(userDir)) {
+            try {
+                Files.walk(userDir)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } catch (IOException e) {
+                throw new RuntimeException("Ошибка при удалении папки с изображениями пользователя", e);
+            }
+        }
+    }
+
 
 }

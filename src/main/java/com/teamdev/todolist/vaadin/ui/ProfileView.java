@@ -17,12 +17,18 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.UploadI18N;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.teamdev.todolist.configuration.support.Constants.PROFILE_PAGE;
 
@@ -40,8 +46,11 @@ public class ProfileView extends CustomAppLayout {
     private final Binder<User> binder; // отвечает за привязку данных с полей формы
     private final Binder<UserProfile> profileBinder;
     private final Button saveChanges;
+    private MemoryBuffer buffer;
+    private Upload uploadAvatar;
 
     public ProfileView(UserService userService) {
+        this.buffer = new MemoryBuffer();
         this.userService = userService;
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
         this.binder = new BeanValidationBinder<>(User.class);
@@ -51,19 +60,13 @@ public class ProfileView extends CustomAppLayout {
     }
 
     private void init() {
+        VerticalLayout content = new VerticalLayout();
         saveChanges.setEnabled(false);
         Span message = new Span("Привет, " + currentUser.getProfile().getName() + "!");
         message.getStyle()
                 .set("font-size", "30px");
         Div welcome = new Div(message);
-
-        Div avatar = new Div();
-        avatar.setWidth("150px");
-        avatar.setHeight("150px");
-        avatar.getStyle().set("text-align", "center");
-        Image userAvatar = VaadinViewUtils.getUserAvatar(currentUser);
-        avatar.add(userAvatar);
-
+        Div avatar = createAvatarDiv();
         FormLayout formLayout = new FormLayout();
 
         TextField nameField = new TextField("Name");
@@ -99,6 +102,8 @@ public class ProfileView extends CustomAppLayout {
 
         saveChanges.addClickListener(e -> {
             updateUserProfile();
+            content.remove(avatar);
+            content.addComponentAtIndex(1, createAvatarDiv());
             pwdField.setValue("");
         });
 
@@ -116,7 +121,7 @@ public class ProfileView extends CustomAppLayout {
 
         HorizontalLayout buttons = new HorizontalLayout(saveChanges, cancel);
 
-        VerticalLayout content = new VerticalLayout(welcome, avatar, formLayout, buttons);
+        content.add(welcome, avatar, formLayout, buttons);
         content.setAlignItems(FlexComponent.Alignment.CENTER);
         content.setSpacing(true);
         setContent(content);
@@ -125,6 +130,7 @@ public class ProfileView extends CustomAppLayout {
     private void updateUserProfile() {
         if (binder.writeBeanIfValid(currentUser) &&
                 profileBinder.writeBeanIfValid(currentUser.getProfile())) {
+            userService.saveUserAvatar(currentUser, buffer);
             userService.save(currentUser);
             Notification.show("Changes have been saved successfully", 3000, Notification.Position.TOP_STRETCH);
         }
@@ -140,6 +146,73 @@ public class ProfileView extends CustomAppLayout {
         } else {
             return userService.emailIsBusy(email);
         }
+    }
+
+    private Upload initUpload() {
+        Upload upload = new Upload(buffer);
+        upload.setId("i18n-upload");
+        UploadI18N i18n = new UploadI18N();
+        i18n.setDropFiles(
+                new UploadI18N.DropFiles()
+                        .setOne("Или перетащи его сюда...")
+                        .setMany("Или перетащи их сюда..."))
+                .setAddFiles(new UploadI18N.AddFiles()
+                        .setOne("Выбрать файл")
+                        .setMany("Добавить файлы"))
+                .setCancel("Отменить")
+                .setError(new UploadI18N.Error()
+                        .setTooManyFiles("Слишком много файлов.")
+                        .setFileIsTooBig("Слишком большой файл.")
+                        .setIncorrectFileType("Некорректный тип файла."))
+                .setUploading(new UploadI18N.Uploading()
+                        .setStatus(new UploadI18N.Uploading.Status()
+                                .setConnecting("Соединение...")
+                                .setStalled("Загрузка застопорилась.")
+                                .setProcessing("Обработка файла..."))
+                        .setRemainingTime(
+                                new UploadI18N.Uploading.RemainingTime()
+                                        .setPrefix("оставшееся время: ")
+                                        .setUnknown(
+                                                "оставшееся время неизвестно"))
+                        .setError(new UploadI18N.Uploading.Error()
+                                .setServerUnavailable("Сервер недоступен")
+                                .setUnexpectedServerError(
+                                        "Неожиданная ошибка сервера")
+                                .setForbidden("Загрузка запрещена")))
+                .setUnits(Stream
+                        .of("Б", "Кбайт", "Мбайт", "Гбайт", "Тбайт", "Пбайт",
+                                "Эбайт", "Збайт", "Ибайт")
+                        .collect(Collectors.toList()));
+
+        upload.setI18n(i18n);
+        return upload;
+    }
+
+    private Div createAvatarDiv() {
+        Div content = new Div();
+        content.getStyle()
+                .set("display", "flex")
+                .set("justify-content", "center")
+                .set("align-items", "center")
+                .set("flex-direction", "column");
+        content.setWidth("300px");
+        content.setHeight("300px");
+        Div avatar = new Div();
+        avatar.setWidth("150px");
+        avatar.setHeight("150px");
+        avatar.getStyle().set("text-align", "center");
+        Image userAvatar = VaadinViewUtils.getUserAvatar(currentUser);
+        avatar.add(userAvatar);
+
+        Div uploadDiv = new Div();
+        uploadDiv.setWidth("300px");
+        uploadDiv.setHeight("150px");
+        uploadDiv.getStyle().set("text-align", "center");
+        uploadAvatar = initUpload();
+        uploadAvatar.addSucceededListener(e -> enabledSaveButton(true));
+        uploadDiv.add(uploadAvatar);
+        content.add(avatar, uploadDiv);
+        return content;
     }
 
 }
