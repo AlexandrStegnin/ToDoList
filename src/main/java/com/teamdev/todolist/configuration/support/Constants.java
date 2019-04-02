@@ -72,6 +72,8 @@ public class Constants {
     public static final String PROFILE_PAGE = "profile";
     public static final String TASK_LIST_PAGE = "task-list";
 
+    public static final String DEFAULT_SRC = "images/users-png.png";
+
     public static final String[] ALL_HTTP_MATCHERS = {
             "/VAADIN/**", "/HEARTBEAT/**", "/UIDL/**", "/resources/**",
             "/login", "/login**", "/login/**", "/manifest.json", "/icons/**", "/images/**",

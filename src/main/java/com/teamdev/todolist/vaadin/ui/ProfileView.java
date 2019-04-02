@@ -6,9 +6,11 @@ import com.teamdev.todolist.entity.UserProfile;
 import com.teamdev.todolist.entity.UserProfile_;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
+import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -55,10 +57,12 @@ public class ProfileView extends CustomAppLayout {
                 .set("font-size", "30px");
         Div welcome = new Div(message);
 
-        Div avatar = new Div(new Span("Your avatar"));
+        Div avatar = new Div();
         avatar.setWidth("150px");
         avatar.setHeight("150px");
         avatar.getStyle().set("text-align", "center");
+        Image userAvatar = VaadinViewUtils.getUserAvatar(currentUser);
+        avatar.add(userAvatar);
 
         FormLayout formLayout = new FormLayout();
 
