@@ -6,10 +6,8 @@ import com.teamdev.todolist.command.task.DeleteTaskCommand;
 import com.teamdev.todolist.command.task.UpdateTaskCommand;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
-import com.teamdev.todolist.entity.Task;
-import com.teamdev.todolist.entity.TaskStatus;
-import com.teamdev.todolist.entity.Task_;
-import com.teamdev.todolist.entity.User;
+import com.teamdev.todolist.entity.*;
+import com.teamdev.todolist.service.TagService;
 import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
@@ -43,6 +41,7 @@ public class TaskForm extends Dialog {
     private final UserService userService;
     private final TaskStatusService taskStatusService;
     private final TaskService taskService;
+    private final TagService tagService;
     private Task task;
     private OperationEnum operation;
     private HorizontalLayout buttons;
@@ -51,6 +50,7 @@ public class TaskForm extends Dialog {
     private final TextField description;
     private final Select<User> author;
     private final MultiselectComboBox<User> performers;
+    private final MultiselectComboBox<Tag> tags;
     private final DatePicker creationDate;
     private final DatePicker expirationDate;
     private final Select<TaskStatus> status;
@@ -63,11 +63,12 @@ public class TaskForm extends Dialog {
     private Button submit;
 
     public TaskForm(UserService userService, TaskService taskService,
-                    TaskStatusService taskStatusService, OperationEnum operation,
-                    Task task) {
+                    TaskStatusService taskStatusService, TagService tagService,
+                    OperationEnum operation, Task task) {
         this.userService = userService;
         this.taskService = taskService;
         this.taskStatusService = taskStatusService;
+        this.tagService = tagService;
         this.taskBinder = new BeanValidationBinder<>(Task.class);
         this.operation = operation;
         this.task = task;
@@ -78,6 +79,7 @@ public class TaskForm extends Dialog {
         this.creationDate = new DatePicker("Дата создания");
         this.expirationDate = new DatePicker("Дата окончания");
         this.performers = new MultiselectComboBox<>(this::getUserName);
+        this.tags = new MultiselectComboBox<>(Tag::getTitle);
         this.comment = new TextField("Комментарий");
         this.cancel = new Button("Отменить", e -> this.close());
         this.delegateTask = new Button("Делегировать задачу");
@@ -106,15 +108,18 @@ public class TaskForm extends Dialog {
         performers.setRequired(true);
         performers.setRequiredIndicatorVisible(true);
 
+        tags.setItems(getAllTags());
+        tags.setRequired(true);
+        tags.setRequiredIndicatorVisible(true);
+
         addCreationDateValueChangeListener();
         addExpirationDateValueChangeListener();
 
         VerticalLayout content = new VerticalLayout(title, description, creationDate, expirationDate,
-                performers, comment, status);
+                performers, comment, status, tags);
         add(content);
 
         prepareForm(task);
-//        prepareSubmitButton();
     }
 
     private void addCreationDateValueChangeListener() {
@@ -147,6 +152,10 @@ public class TaskForm extends Dialog {
         return new HashSet<>(userService.findAll());
     }
 
+    private Set<Tag> getAllTags() {
+        return new HashSet<>(tagService.findAll());
+    }
+
     private String getUserName(User user) {
         return user.getProfile().getName() + " " + user.getProfile().getSurname();
     }
@@ -166,6 +175,9 @@ public class TaskForm extends Dialog {
         taskBinder.forField(performers)
                 .withValidator(users -> !Objects.equals(null, users) && !users.isEmpty(), "Добавьте минимум 1 исполнителя")
                 .bind(Task_.PERFORMERS);
+
+        taskBinder.forField(tags)
+                .bind(Task_.TAGS);
 
         taskBinder.forField(creationDate)
                 .withConverter(localDate -> LocalDateTime.of(localDate, LocalTime.now()), LocalDateTime::toLocalDate)

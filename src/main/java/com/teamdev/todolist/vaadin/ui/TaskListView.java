@@ -2,19 +2,18 @@ package com.teamdev.todolist.vaadin.ui;
 
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
+import com.teamdev.todolist.entity.Tag;
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
+import com.teamdev.todolist.service.TagService;
 import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TaskForm;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -50,6 +49,7 @@ public class TaskListView extends CustomAppLayout {
     private final TaskService taskService;
     private final UserService userService;
     private final TaskStatusService taskStatusService;
+    private final TagService tagService;
     private final User currentUser;
     private final DateTimeFormatter formatter;
     private final Button update;
@@ -59,10 +59,11 @@ public class TaskListView extends CustomAppLayout {
     private ListDataProvider<Task> authorDataProvider, performerDataProvider;
 
     public TaskListView(TaskService taskService, UserService userService,
-                        TaskStatusService taskStatusService) {
+                        TaskStatusService taskStatusService, TagService tagService) {
         this.userService = userService;
         this.taskService = taskService;
         this.taskStatusService = taskStatusService;
+        this.tagService = tagService;
         this.currentUser = this.userService.findByLogin(SecurityUtils.getUsername());
         this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
         this.authorDataProvider = new ListDataProvider<>(getByAuthor());
@@ -74,7 +75,7 @@ public class TaskListView extends CustomAppLayout {
     }
 
     private void showTaskForm(final OperationEnum operation, final Task task) {
-        TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, operation, task);
+        TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, tagService, operation, task);
         taskForm.addOpenedChangeListener(event -> refreshDataProviders(event.isOpened(), taskForm.getOperation(), taskForm.getTask()));
         taskForm.open();
     }
@@ -158,6 +159,9 @@ public class TaskListView extends CustomAppLayout {
         authorGrid.addColumn(Task::getComment)
                 .setHeader("Комментарий");
 
+        authorGrid.addColumn(this::getAllTags)
+                .setHeader("Тэги");
+
         authorGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
         authorGrid.setMultiSort(true);
 
@@ -237,6 +241,10 @@ public class TaskListView extends CustomAppLayout {
                 .setSortable(true);
         performerGrid.addColumn(Task::getComment)
                 .setHeader("Комментарий");
+
+        performerGrid.addColumn(this::getAllTags)
+                .setHeader("Тэги");
+
         performerGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
         performerGrid.setMultiSort(true);
 
@@ -302,6 +310,12 @@ public class TaskListView extends CustomAppLayout {
     private String getAllPerformers(Task task) {
         return task.getPerformers().stream()
                 .map(performer -> performer.getProfile().getName() + " " + performer.getProfile().getSurname())
+                .collect(Collectors.joining(", "));
+    }
+
+    private String getAllTags(Task task) {
+        return task.getTags().stream()
+                .map(Tag::getTitle)
                 .collect(Collectors.joining(", "));
     }
 
