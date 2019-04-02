@@ -67,6 +67,7 @@ public class Constants {
     public static final String ROLES_PAGE = "roles";
     public static final String ADMIN_ROLES_PAGE = ADMIN_PAGE + PATH_SEPARATOR + ROLES_PAGE;
     public static final String ADMIN_TASK_STATUSES_PAGE = ADMIN_PAGE + PATH_SEPARATOR + "task-statuses";
+    public static final String ADMIN_TAGS_PAGE = ADMIN_PAGE + PATH_SEPARATOR + "tags";
 
     public static final String PROFILE_PAGE = "profile";
     public static final String TASK_LIST_PAGE = "task-list";

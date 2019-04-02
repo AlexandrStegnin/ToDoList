@@ -7,11 +7,9 @@ import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.RoleForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -33,12 +31,13 @@ public class RoleView extends CustomAppLayout {
     private Grid<Role> grid;
     private final Button addNewBtn;
     private ListDataProvider<Role> dataProvider;
+    private RoleForm roleForm;
 
     public RoleView(RoleService roleService) {
         this.roleService = roleService;
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());
-        this.addNewBtn = new Button("New role", VaadinIcon.PLUS.create(),
+        this.addNewBtn = new Button("Создать роль",
                 e -> showDialog(OperationEnum.CREATE, new Role()));
         init();
     }
@@ -77,15 +76,15 @@ public class RoleView extends CustomAppLayout {
         return roleService.findAll();
     }
 
-    private void showDialog(OperationEnum operation, Role role) {
-        Dialog dialog = VaadinViewUtils.initDialog();
-        dialog.addOpenedChangeListener(e -> refreshDataProvider(e.isOpened(), operation, role));
-        dialog.add(new RoleForm(operation, dialog, role, roleService));
-        dialog.open();
+    private void showDialog(final OperationEnum operation, final Role role) {
+        RoleForm roleForm = new RoleForm(operation, role, roleService);
+        this.roleForm = roleForm;
+        roleForm.addOpenedChangeListener(e -> refreshDataProvider(e.isOpened(), operation, role));
+        roleForm.open();
     }
 
     private void refreshDataProvider(final boolean isOpened, final OperationEnum operation, final Role role) {
-        if (!isOpened) {
+        if (!isOpened && !roleForm.isCanceled()) {
             if (operation.compareTo(OperationEnum.CREATE) == 0) dataProvider.getItems().add(role);
             else if (operation.compareTo(OperationEnum.DELETE) == 0) dataProvider.getItems().remove(role);
             dataProvider.refreshAll();
