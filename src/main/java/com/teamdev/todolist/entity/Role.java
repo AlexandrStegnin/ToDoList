@@ -19,7 +19,7 @@ import static com.teamdev.todolist.configuration.support.Constants.ROLE_PREFIX;
 @Entity
 @Table(name = "role")
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false, of = "id")
 public class Role extends AbstractEntity implements GrantedAuthority {
 
     @Id
@@ -32,7 +32,7 @@ public class Role extends AbstractEntity implements GrantedAuthority {
     private Long id;
 
     @Column
-    @Size(min = 3, max = 20, message = "Role title must be greater than 2 and less than 20 characters")
+    @Size(min = 3, max = 20, message = "Название роли должно быть более 2 и менее 21 символа")
     @ApiModelProperty(notes = "The role title")
     private String title;
 
