@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.teamdev.todolist.configuration.support.Constants.TASK_LIST_PAGE;
@@ -54,6 +55,9 @@ public class TaskListView extends CustomAppLayout {
     private final Button addNewBtn;
     private Grid<Task> authorGrid, performerGrid;
     private ListDataProvider<Task> authorDataProvider, performerDataProvider;
+    private Predicate<Task> colorPredicate;
+
+    private final String RED = "red";
 
     public TaskListView(TaskService taskService, UserService userService,
                         TaskStatusService taskStatusService, TagService tagService) {
@@ -68,6 +72,7 @@ public class TaskListView extends CustomAppLayout {
         this.update = new Button("Обновить", e -> buttonsListener(OperationEnum.UPDATE));
         this.delete = new Button("Удалить", e -> buttonsListener(OperationEnum.DELETE));
         this.addNewBtn = new Button("Создать задачу", e -> showTaskForm(OperationEnum.CREATE, new Task()));
+        this.colorPredicate = (task) -> getFormattedDate(task.getExecutionDate()).compareTo(getFormattedDate(LocalDateTime.now())) < 0;
         init();
     }
 
@@ -134,24 +139,28 @@ public class TaskListView extends CustomAppLayout {
     private void createAuthorGrid() {
         authorGrid = new Grid<>();
         authorGrid.setDataProvider(authorDataProvider);
-        Grid.Column<Task> titleColumn = authorGrid.addColumn(Task::getTitle)
+        Grid.Column<Task> titleColumn = authorGrid
+                .addComponentColumn(task -> getColoredData(task, task.getTitle(), colorPredicate, RED))
                 .setHeader("Название")
                 .setFooter("Всего задач: " + authorDataProvider.getItems().size())
                 .setSortable(true);
-        Grid.Column<Task> descriptionColumn = authorGrid.addColumn(Task::getDescription)
+        Grid.Column<Task> descriptionColumn = authorGrid
+                .addComponentColumn(task -> getColoredData(task, task.getDescription(), colorPredicate, RED))
                 .setHeader("Описание");
-        Grid.Column<Task> performerColumn = authorGrid.addColumn(this::getAllPerformers)
+        Grid.Column<Task> performerColumn = authorGrid
+                .addComponentColumn(task -> getColoredData(task, getAllPerformers(task), colorPredicate, RED))
                 .setHeader("Исполнители");
-        Grid.Column<Task> creationDateColumn = authorGrid.addColumn(task -> getFormattedDate(task.getCreationDate()))
+        Grid.Column<Task> creationDateColumn = authorGrid
+                .addComponentColumn(task -> getColoredData(task, getFormattedDate(task.getCreationDate()), colorPredicate, RED))
                 .setHeader("Создана")
                 .setSortable(true);
-        Grid.Column<Task> expiredDateColumn = authorGrid.addComponentColumn(task -> getColoredData(task))
+        Grid.Column<Task> expiredDateColumn = authorGrid
+                .addComponentColumn(task -> getColoredData(task, getFormattedDate(task.getExecutionDate()), colorPredicate, RED))
                 .setHeader("Должна быть решена")
                 .setSortable(true);
-        authorGrid.addColumn(Task::getComment)
+        authorGrid.addComponentColumn(task -> getColoredData(task, task.getComment(), colorPredicate, RED))
                 .setHeader("Комментарий");
-
-        authorGrid.addColumn(this::getAllTags)
+        authorGrid.addComponentColumn(task -> getColoredData(task, getAllTags(task), colorPredicate, RED))
                 .setHeader("Тэги");
 
         authorGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
@@ -211,25 +220,29 @@ public class TaskListView extends CustomAppLayout {
     private void createPerformerGrid() {
         performerGrid = new Grid<>();
         performerGrid.setDataProvider(performerDataProvider);
-        Grid.Column<Task> titleColumn = performerGrid.addColumn(Task::getTitle)
+        Grid.Column<Task> titleColumn = performerGrid
+                .addComponentColumn(task -> getColoredData(task, task.getTitle(), colorPredicate, RED))
                 .setHeader("Название")
                 .setFooter("Всего задач: " + performerDataProvider.getItems().size())
                 .setSortable(true);
-        Grid.Column<Task> descriptionColumn = performerGrid.addColumn(Task::getDescription)
+        Grid.Column<Task> descriptionColumn = performerGrid
+                .addComponentColumn(task -> getColoredData(task, task.getDescription(), colorPredicate, RED))
                 .setHeader("Описание");
-        Grid.Column<Task> authorColumn = performerGrid.addColumn(this::getAuthorFullName)
+        Grid.Column<Task> authorColumn = performerGrid
+                .addComponentColumn(task -> getColoredData(task, getAuthorFullName(task), colorPredicate, RED))
                 .setHeader("Автор")
                 .setSortable(true);
-        Grid.Column<Task> creationDateColumn = performerGrid.addColumn(task -> getFormattedDate(task.getCreationDate()))
+        Grid.Column<Task> creationDateColumn = performerGrid
+                .addComponentColumn(task -> getColoredData(task, getFormattedDate(task.getCreationDate()), colorPredicate, RED))
                 .setHeader("Создана")
                 .setSortable(true);
-        Grid.Column<Task> expiredDateColumn = performerGrid.addComponentColumn(task -> getColoredData(task))
+        Grid.Column<Task> expiredDateColumn = performerGrid
+                .addComponentColumn(task -> getColoredData(task, getFormattedDate(task.getExecutionDate()), colorPredicate, RED))
                 .setHeader("Должна быть решена")
                 .setSortable(true);
-        performerGrid.addColumn(Task::getComment)
+        performerGrid.addComponentColumn(task -> getColoredData(task, task.getComment(), colorPredicate, RED))
                 .setHeader("Комментарий");
-
-        performerGrid.addColumn(this::getAllTags)
+        performerGrid.addComponentColumn(task -> getColoredData(task, getAllTags(task), colorPredicate, RED))
                 .setHeader("Тэги");
 
         performerGrid.getStyle().set("border", "1px solid #9E9E9E").set("height", "22em");
@@ -286,18 +299,10 @@ public class TaskListView extends CustomAppLayout {
         performerGrid.addItemDoubleClickListener(e -> showTaskForm(OperationEnum.UPDATE, e.getItem()));
     }
 
-    private Span getColoredData(Task task) {
-        String date = getFormattedDate(task.getExecutionDate());
-        Span result = new Span(date);
-        if (date.compareTo(getFormattedDate(LocalDateTime.now())) < 0) result.getStyle().set("color", "red");
-        else if (concatDate(date).compareTo(concatDate(getFormattedDate(LocalDateTime.now()))) == 0)
-            result.getStyle().set("color", "orange");
-        else result.getStyle().set("color", "green");
+    private Span getColoredData(Task task, String text, Predicate<Task> predicate, String color) {
+        Span result = new Span(text);
+        if (predicate.test(task)) result.getStyle().set("color", color);
         return result;
-    }
-
-    private String concatDate(String date) {
-        return date.subSequence(0, date.indexOf(' ') + 1).toString();
     }
 
     private String getFormattedDate(LocalDateTime localDateTime) {
