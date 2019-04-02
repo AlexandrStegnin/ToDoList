@@ -31,6 +31,7 @@ public class AdminView extends CustomAppLayout {
         Image usersImg = createImage("images/users-png.png", "Manage users");
         Image rolesImg = createImage("images/manage-roles.png", "Manage roles");
         Image statusesImg = createImage("images/users-png.png", "Manage task statuses");
+        Image tagImg = createImage("images/users-png.png", "Manage tags");
 
         HorizontalLayout btnLayout = new HorizontalLayout();
         btnLayout.setSizeFull();
@@ -41,8 +42,9 @@ public class AdminView extends CustomAppLayout {
         Button usersBtn = new Button(" Users", usersImg, e -> goToPage(UserView.class));
         Button rolesBtn = new Button("Roles", rolesImg, e -> goToPage(RoleView.class));
         Button taskStatusesBtn = new Button("Task statuses", statusesImg, e -> goToPage(TaskStatusView.class));
+        Button tagsBtn = new Button("Tags", tagImg, e -> goToPage(TagView.class));
 
-        btnLayout.add(usersBtn, rolesBtn, taskStatusesBtn);
+        btnLayout.add(usersBtn, rolesBtn, taskStatusesBtn, tagsBtn);
         setContent(btnLayout);
     }
 
