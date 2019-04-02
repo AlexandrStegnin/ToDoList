@@ -10,6 +10,7 @@ import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
+import com.teamdev.todolist.vaadin.form.CalendarForm;
 import com.teamdev.todolist.vaadin.form.TaskForm;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -53,6 +54,7 @@ public class TaskListView extends CustomAppLayout {
     private final Button update;
     private final Button delete;
     private final Button addNewBtn;
+    private final Button calendarBtn;
     private Grid<Task> authorGrid, performerGrid;
     private ListDataProvider<Task> authorDataProvider, performerDataProvider;
     private Predicate<Task> colorPredicate;
@@ -72,6 +74,7 @@ public class TaskListView extends CustomAppLayout {
         this.update = new Button("Обновить", e -> buttonsListener(OperationEnum.UPDATE));
         this.delete = new Button("Удалить", e -> buttonsListener(OperationEnum.DELETE));
         this.addNewBtn = new Button("Создать задачу", e -> showTaskForm(OperationEnum.CREATE, new Task()));
+        this.calendarBtn = new Button("Календарь задач", e -> showCalendarForm());
         this.colorPredicate = (task) -> getFormattedDate(task.getExecutionDate()).compareTo(getFormattedDate(LocalDateTime.now())) < 0;
         init();
     }
@@ -80,6 +83,11 @@ public class TaskListView extends CustomAppLayout {
         TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, tagService, operation, task);
         taskForm.addOpenedChangeListener(event -> refreshDataProviders(event.isOpened(), taskForm.getOperation(), taskForm.getTask()));
         taskForm.open();
+    }
+
+    private void showCalendarForm() {
+        CalendarForm calendarForm = new CalendarForm(userService, taskService, currentUser);
+        calendarForm.open();
     }
 
     private void init() {
@@ -117,7 +125,8 @@ public class TaskListView extends CustomAppLayout {
         performerZoneLayout.add(performerLayout);
         VerticalLayout perfromerRightPane = new VerticalLayout();
         perfromerRightPane.setWidth("15%");
-        perfromerRightPane.add(new Span("Какие-то графики исполнения задач, горящие задачи"));
+        perfromerRightPane.add(calendarBtn);
+        perfromerRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
         performerZoneLayout.add(perfromerRightPane);
         performerZoneLayout.setWidthFull();
 
