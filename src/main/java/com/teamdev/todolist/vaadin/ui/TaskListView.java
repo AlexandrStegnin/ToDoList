@@ -9,15 +9,10 @@ import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TaskForm;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -41,7 +36,6 @@ import static com.teamdev.todolist.configuration.support.Constants.TASK_LIST_PAG
  * @author Leonid Lebidko
  */
 
-// @StyleSheet("task.css") todo: разобраться с импортом css в ваадин. пока не работает из разных путей
 @Route(TASK_LIST_PAGE)
 @PageTitle("Task List")
 @Theme(value = Material.class, variant = Material.LIGHT)
@@ -147,12 +141,7 @@ public class TaskListView extends CustomAppLayout {
         Grid.Column<Task> creationDateColumn = authorGrid.addColumn(task -> getFormattedDate(task.getCreationDate()))
                 .setHeader("Создана")
                 .setSortable(true);
-        Grid.Column<Task> expiredFlag = authorGrid.addComponentColumn(task -> {
-            String date = getFormattedDate(task.getExecutionDate());
-            if (date.compareTo(getFormattedDate(LocalDateTime.now()))>0) return new Span();
-            return new Icon(VaadinIcon.ALARM);
-        }).setFlexGrow(0).setWidth("56px");
-        Grid.Column<Task> expiredDateColumn = authorGrid.addColumn(task -> getFormattedDate(task.getExecutionDate()))
+        Grid.Column<Task> expiredDateColumn = authorGrid.addComponentColumn(task -> getColoredData(task))
                 .setHeader("Должна быть решена")
                 .setSortable(true);
         authorGrid.addColumn(Task::getComment)
@@ -227,12 +216,7 @@ public class TaskListView extends CustomAppLayout {
         Grid.Column<Task> creationDateColumn = performerGrid.addColumn(task -> getFormattedDate(task.getCreationDate()))
                 .setHeader("Создана")
                 .setSortable(true);
-        Grid.Column<Task> expiredFlag = performerGrid.addComponentColumn(task -> {
-            String date = getFormattedDate(task.getExecutionDate());
-            if (date.compareTo(getFormattedDate(LocalDateTime.now()))>0) return new Span();
-            return new Icon(VaadinIcon.ALARM);
-        }).setFlexGrow(0).setWidth("56px");
-        Grid.Column<Task> expiredDateColumn = performerGrid.addColumn(task -> getFormattedDate(task.getExecutionDate()))
+        Grid.Column<Task> expiredDateColumn = performerGrid.addComponentColumn(task -> getColoredData(task))
                 .setHeader("Должна быть решена")
                 .setSortable(true);
         performerGrid.addColumn(Task::getComment)
@@ -303,6 +287,20 @@ public class TaskListView extends CustomAppLayout {
         return task.getPerformers().stream()
                 .map(performer -> performer.getProfile().getName() + " " + performer.getProfile().getSurname())
                 .collect(Collectors.joining(", "));
+    }
+
+    private Span getColoredData(Task task) {
+        String date = getFormattedDate(task.getExecutionDate());
+        Span result = new Span(date);
+        if (date.compareTo(getFormattedDate(LocalDateTime.now())) < 0) result.getStyle().set("color", "red");
+        else if (concatDate(date).compareTo(concatDate(getFormattedDate(LocalDateTime.now()))) == 0)
+            result.getStyle().set("color", "orange");
+        else result.getStyle().set("color", "green");
+        return result;
+    }
+
+    private String concatDate(String date) {
+        return date.subSequence(0, date.indexOf(' ') + 1).toString();
     }
 
     private void refreshDataProviders(final boolean isOpened, final OperationEnum operation, final Task task) {
