@@ -9,6 +9,8 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Alexandr Stegnin
@@ -54,5 +56,13 @@ public class UserProfile extends AbstractEntity {
     @Column
     @ApiModelProperty(notes = "The image path user avatar")
     private String avatar;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
+    @ApiModelProperty(notes = "User work spaces")
+    private Set<WorkSpace> workSpaces = new HashSet<>();
+
+    @ManyToMany(mappedBy = "members")
+    @ApiModelProperty(notes = "User teams")
+    private Set<Team> teams;
 
 }
