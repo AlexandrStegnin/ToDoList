@@ -87,7 +87,7 @@ public class TaskListView extends CustomAppLayout {
     }
 
     private void showCalendarForm() {
-        CalendarForm calendarForm = new CalendarForm(userService, taskService, currentUser);
+        CalendarForm calendarForm = new CalendarForm(getByPerformer());
         calendarForm.open();
     }
 
