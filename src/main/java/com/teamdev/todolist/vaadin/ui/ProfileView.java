@@ -1,9 +1,13 @@
 package com.teamdev.todolist.vaadin.ui;
 
+import com.github.appreciated.card.RippleClickableCard;
+import com.github.appreciated.card.label.SecondaryLabel;
+import com.github.appreciated.card.label.TitleLabel;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.entity.UserProfile;
 import com.teamdev.todolist.entity.UserProfile_;
+import com.teamdev.todolist.entity.WorkSpace;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
@@ -122,7 +126,7 @@ public class ProfileView extends CustomAppLayout {
 
         HorizontalLayout buttons = new HorizontalLayout(saveChanges, cancel);
 
-        content.add(welcome, avatar, formLayout, buttons);
+        content.add(welcome, avatar, workSpacesDiv(), formLayout, buttons);
         content.setAlignItems(FlexComponent.Alignment.CENTER);
         content.setSpacing(true);
         setContent(content);
@@ -215,6 +219,33 @@ public class ProfileView extends CustomAppLayout {
         uploadDiv.add(uploadAvatar);
         content.add(avatar, uploadDiv);
         return content;
+    }
+
+    private Div workSpacesDiv() {
+        Div content = new Div();
+        content.getStyle()
+                .set("display", "flex")
+                .set("flex-direction", "row");
+        currentUser.getProfile().getWorkSpaces().forEach(workSpace -> {
+            Div cardItem = new Div();
+            cardItem.getStyle().set("border", "1px solid black");
+            cardItem.getStyle().set("border-radius", "5px");
+            cardItem.add(createCard(workSpace));
+            cardItem.getStyle().set("margin", "1px");
+            content.add(cardItem);
+        });
+        return content;
+    }
+
+    private RippleClickableCard createCard(WorkSpace workSpace) {
+        RippleClickableCard card = new RippleClickableCard(
+                onClick -> {
+                    System.out.println(workSpace.getTitle());
+                },
+                new TitleLabel(workSpace.getTitle()),
+                new SecondaryLabel(workSpace.getTeam() != null ? workSpace.getTeam().getTitle() : "")
+        );
+        return card;
     }
 
 }
