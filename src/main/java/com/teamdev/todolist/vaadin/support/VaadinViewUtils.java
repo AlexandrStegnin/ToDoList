@@ -117,7 +117,7 @@ public class VaadinViewUtils {
         }
     }
 
-    public static Image getUserAvatar(User user) {
+    public static Image getUserAvatar(final User user, final boolean isNavBarAvatar) {
         String src = user.getProfile().getAvatar() == null ? DEFAULT_SRC :
                 (FILE_UPLOAD_DIRECTORY + user.getLogin() +
                 PATH_SEPARATOR + user.getProfile().getAvatar());
@@ -125,8 +125,10 @@ public class VaadinViewUtils {
         File file = new File(src);
         StreamResource streamResource = createFileResource(file);
         Image image = new Image(streamResource, user.getLogin());
-        image.setHeight("150px");
-        image.setWidth("150px");
+        if (!isNavBarAvatar) {
+            image.setHeight("150px");
+            image.setWidth("150px");
+        }
         return image;
     }
 //

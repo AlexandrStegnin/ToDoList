@@ -3,6 +3,7 @@ package com.teamdev.todolist.vaadin.ui.admin;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Role;
 import com.teamdev.todolist.service.RoleService;
+import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.RoleForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
@@ -33,7 +34,8 @@ public class RoleView extends CustomAppLayout {
     private ListDataProvider<Role> dataProvider;
     private RoleForm roleForm;
 
-    public RoleView(RoleService roleService) {
+    public RoleView(RoleService roleService, UserService userService) {
+        super(userService);
         this.roleService = roleService;
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());

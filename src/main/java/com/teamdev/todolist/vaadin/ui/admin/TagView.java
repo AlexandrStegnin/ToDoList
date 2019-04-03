@@ -3,6 +3,7 @@ package com.teamdev.todolist.vaadin.ui.admin;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Tag;
 import com.teamdev.todolist.service.TagService;
+import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TagForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
@@ -37,7 +38,8 @@ public class TagView extends CustomAppLayout {
     private ListDataProvider<Tag> dataProvider;
     private TagForm tagForm;
 
-    public TagView(TagService tagService) {
+    public TagView(TagService tagService, UserService userService) {
+        super(userService);
         this.tagService = tagService;
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());

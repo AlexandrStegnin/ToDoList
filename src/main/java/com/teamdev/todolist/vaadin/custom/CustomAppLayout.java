@@ -3,6 +3,8 @@ package com.teamdev.todolist.vaadin.custom;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.Constants;
 import com.teamdev.todolist.repository.AuthRepository;
+import com.teamdev.todolist.service.UserService;
+import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.teamdev.todolist.vaadin.ui.LoginView;
 import com.teamdev.todolist.vaadin.ui.ProfileView;
 import com.teamdev.todolist.vaadin.ui.TaskListView;
@@ -23,8 +25,16 @@ public class CustomAppLayout extends AppLayout {
     @Autowired
     private AuthRepository auth;
 
+    private UserService userService;
+
+    private AppLayoutMenu menu;
+
     public CustomAppLayout() {
-        AppLayoutMenu menu = createMenu();
+        init();
+    }
+
+    private void init() {
+        menu = createMenu();
         Image img = new Image("images/todo-list-logo.png", "ToDo List Logo");
         img.setHeight("44px");
         setBranding(img);
@@ -35,7 +45,7 @@ public class CustomAppLayout extends AppLayout {
         AppLayoutMenuItem logoutItem = new AppLayoutMenuItem(VaadinIcon.SIGN_OUT.create(), "Logout", e -> logout());
         AppLayoutMenuItem loginItem = new AppLayoutMenuItem(VaadinIcon.SIGN_IN.create(), "Login", e -> goToPage(LoginView.class));
         AppLayoutMenuItem adminItem = new AppLayoutMenuItem(VaadinIcon.COGS.create(), "Admin", e -> goToPage(AdminView.class));
-        AppLayoutMenuItem profileItem = new AppLayoutMenuItem(VaadinIcon.USER.create(), "Profile", e -> goToPage(ProfileView.class));
+        AppLayoutMenuItem profileItem = new AppLayoutMenuItem(createAvatarDiv(), SecurityUtils.getUsername() + " / profile", e -> goToPage(ProfileView.class));
 
         if (SecurityUtils.isUserInRole(ROLE_ADMIN)) menu.addMenuItems(adminItem);
         if (SecurityUtils.isUserLoggedIn()) {
@@ -47,17 +57,30 @@ public class CustomAppLayout extends AppLayout {
         }
     }
 
-    public CustomAppLayout(AuthRepository auth) {
-        this.auth = auth;
+    public CustomAppLayout(UserService userService) {
+        this.userService = userService;
+        init();
     }
 
     private void logout() {
         Notification.show("You have been Log Out successful!", 3000, Notification.Position.TOP_END);
-        this.getUI().ifPresent(ui -> ui.navigate(Constants.LOGIN_URL.replace("/", "")));
+        this.getUI().ifPresent(ui -> ui.navigate(Constants.LOGIN_PAGE));
         auth.logout();
     }
 
     private void goToPage(Class<? extends Component> clazz) {
         getUI().ifPresent(ui -> ui.navigate(clazz));
+    }
+
+    private Component createAvatarDiv () {
+        Image userAvatar = VaadinViewUtils.getUserAvatar(userService.findByLogin(SecurityUtils.getUsername()), true);
+        userAvatar.setMaxHeight("24px");
+        userAvatar.getStyle().set("margin-bottom", "8px");
+        return userAvatar;
+    }
+
+    public void reload() {
+        menu.clearMenuItems();
+        init();
     }
 }

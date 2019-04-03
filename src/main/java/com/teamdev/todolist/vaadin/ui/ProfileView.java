@@ -50,6 +50,7 @@ public class ProfileView extends CustomAppLayout {
     private Upload uploadAvatar;
 
     public ProfileView(UserService userService) {
+        super(userService);
         this.buffer = new MemoryBuffer();
         this.userService = userService;
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
@@ -133,6 +134,7 @@ public class ProfileView extends CustomAppLayout {
             userService.saveUserAvatar(currentUser, buffer);
             userService.save(currentUser);
             Notification.show("Changes have been saved successfully", 3000, Notification.Position.TOP_STRETCH);
+            reload();
         }
     }
 
@@ -201,7 +203,7 @@ public class ProfileView extends CustomAppLayout {
         avatar.setWidth("150px");
         avatar.setHeight("150px");
         avatar.getStyle().set("text-align", "center");
-        Image userAvatar = VaadinViewUtils.getUserAvatar(currentUser);
+        Image userAvatar = VaadinViewUtils.getUserAvatar(currentUser, false);
         avatar.add(userAvatar);
 
         Div uploadDiv = new Div();

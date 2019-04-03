@@ -63,6 +63,7 @@ public class TaskListView extends CustomAppLayout {
 
     public TaskListView(TaskService taskService, UserService userService,
                         TaskStatusService taskStatusService, TagService tagService) {
+        super(userService);
         this.userService = userService;
         this.taskService = taskService;
         this.taskStatusService = taskStatusService;

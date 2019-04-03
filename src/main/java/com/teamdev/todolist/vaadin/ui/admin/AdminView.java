@@ -1,5 +1,6 @@
 package com.teamdev.todolist.vaadin.ui.admin;
 
+import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.ui.TaskStatusView;
 import com.vaadin.flow.component.Component;
@@ -18,12 +19,14 @@ import static com.teamdev.todolist.configuration.support.Constants.ADMIN_PAGE;
 @PageTitle("Administration")
 @Theme(value = Material.class, variant = Material.LIGHT)
 public class AdminView extends CustomAppLayout {
-
-    public AdminView() {
+        
+    public AdminView(UserService userService) {
+        super(userService);
         init();
     }
 
     private void init() {
+//        System.out.println(userService.findByLogin("ivan").getLogin());
         HorizontalLayout content = new HorizontalLayout();
         content.setAlignItems(FlexComponent.Alignment.CENTER);
         content.setSizeFull();

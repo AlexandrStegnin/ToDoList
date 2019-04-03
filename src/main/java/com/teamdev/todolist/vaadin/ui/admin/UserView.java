@@ -48,6 +48,7 @@ public class UserView extends CustomAppLayout {
     private Binder<User> binder; // отвечает за привязку данных с полей формы
 
     public UserView(UserService userService, RoleService roleService) {
+        super(userService);
         this.userService = userService;
         this.roleService = roleService;
         this.grid = new Grid<>(); // инициализация Grid'a

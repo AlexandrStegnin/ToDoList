@@ -4,6 +4,7 @@ import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.TaskStatus;
 import com.teamdev.todolist.entity.TaskStatus_;
 import com.teamdev.todolist.service.TaskStatusService;
+import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
@@ -44,7 +45,8 @@ public class TaskStatusView extends CustomAppLayout {
     private Binder<TaskStatus> binder; // отвечает за привязку данных с полей формы
     private final Button addNewBtn;
 
-    public TaskStatusView(TaskStatusService taskStatusService) {
+    public TaskStatusView(TaskStatusService taskStatusService, UserService userService) {
+        super(userService);
         this.addNewBtn = new Button("Add new task status", e -> showDialog(new TaskStatus(), OperationEnum.CREATE));
         this.taskStatusService = taskStatusService;
         this.grid = new Grid<>();
