@@ -145,6 +145,12 @@
             <version>0.0.3.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.appreciated</groupId>
+            <artifactId>card</artifactId>
+            <version>0.9.4</version>
+        </dependency>
+
         <!-- For create metamodel with Hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>
