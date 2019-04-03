@@ -1,0 +1,2 @@
+ALTER TABLE todo_list_db.team ADD created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL;
+ALTER TABLE todo_list_db.team ADD updated TIMESTAMP NULL;
