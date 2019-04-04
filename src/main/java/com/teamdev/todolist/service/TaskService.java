@@ -2,6 +2,7 @@ package com.teamdev.todolist.service;
 
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
+import com.teamdev.todolist.entity.WorkSpace;
 import com.teamdev.todolist.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,11 @@ public class TaskService {
 
     private TaskRepository taskRepository;
     private UserService userService;
+    private WorkspaceService workspaceService;
 
     @Autowired
-    public void setTaskRepository(TaskRepository taskRepository,
-                                  UserService userService) {
+    public void setTaskRepository(TaskRepository taskRepository, UserService userService, WorkspaceService workspaceService) {
+        this.workspaceService = workspaceService;
         this.taskRepository = taskRepository;
         this.userService = userService;
     }
@@ -73,5 +75,11 @@ public class TaskService {
         User performer = userService.findOne(performerId);
         task.removePerformer(performer);
         return taskRepository.save(task);
+    }
+
+    public List<Task> findAllByWorkspaceId(Long workspaceId) {
+        // todo добавить в поиск пользователя, чтобы не попасть в чужую рабочую область
+        WorkSpace workspace = workspaceService.findById(workspaceId);
+        return taskRepository.findByWorkSpace(workspace);
     }
 }

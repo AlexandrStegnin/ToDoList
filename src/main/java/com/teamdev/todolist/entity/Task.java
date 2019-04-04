@@ -91,6 +91,11 @@ public class Task extends AbstractEntity {
     @ApiModelProperty(notes = "Task tags")
     private Set<Tag> tags = new HashSet<>();
 
+    @OneToOne
+    @JoinColumn(name = "workspace_id")
+    @ApiModelProperty(notes = "Task workspace")
+    private WorkSpace workSpace;
+
     public void addPerformer(User performer) {
         performers.add(performer);
     }
