@@ -71,6 +71,7 @@ public class Constants {
 
     public static final String PROFILE_PAGE = "profile";
     public static final String TASK_LIST_PAGE = "task-list";
+    public static final String WORKSPACE_PAGE = "workspace";
 
     public static final String DEFAULT_SRC = "images/users-png.png";
 

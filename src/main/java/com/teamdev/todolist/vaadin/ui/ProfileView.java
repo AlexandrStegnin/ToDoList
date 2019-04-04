@@ -34,7 +34,7 @@ import com.vaadin.flow.theme.material.Material;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.teamdev.todolist.configuration.support.Constants.PROFILE_PAGE;
+import static com.teamdev.todolist.configuration.support.Constants.*;
 
 /**
  * @author stegnin
@@ -240,10 +240,11 @@ public class ProfileView extends CustomAppLayout {
     private RippleClickableCard createCard(WorkSpace workSpace) {
         RippleClickableCard card = new RippleClickableCard(
                 onClick -> {
-                    System.out.println(workSpace.getTitle());
+                    String workSpaceId = workSpace.getId().toString();
+                    getUI().ifPresent(ui -> ui.navigate(WORKSPACE_PAGE + PATH_SEPARATOR + workSpaceId));
                 },
                 new TitleLabel(workSpace.getTitle()),
-                new SecondaryLabel(workSpace.getTeam() != null ? workSpace.getTeam().getTitle() : "")
+                new SecondaryLabel(workSpace.getTeam() != null ? workSpace.getTeam().getTitle() : "Личное")
         );
         return card;
     }
