@@ -1,6 +1,7 @@
 package com.teamdev.todolist.vaadin.ui;
 
 import com.github.appreciated.card.RippleClickableCard;
+import com.github.appreciated.card.action.ActionButton;
 import com.github.appreciated.card.content.HorizontalCardComponentContainer;
 import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
@@ -15,6 +16,8 @@ import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.WorkspaceForm;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.Theme;
@@ -64,6 +67,19 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
     }
 
     private RippleClickableCard createCard(Workspace workspace) {
+        Icon trashIcon = VaadinIcon.TRASH.create();
+        trashIcon.getStyle()
+                .set("display", "inline-block")
+                .set("margin-bottom", "2px")
+                .set("margin-left", "2px");
+        ActionButton deleteBtn = new ActionButton("Удалить", trashIcon,
+                e -> showDialog(OperationEnum.DELETE, workspace));
+        deleteBtn.setIconAfterText(true);
+        deleteBtn.getStyle()
+                .set("position", "absolute")
+                .set("right", "0")
+                .set("bottom", "0")
+                .set("color", "red");
         TitleLabel titleLabel = new TitleLabel(workspace.getTitle());
         titleLabel.setFlexGrow(1);
 
@@ -77,7 +93,8 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
                 // if you don't want the title to wrap you can set the whitespace = nowrap
                 titleLabel,
                 teamLabel,
-                taskCountLabel
+                taskCountLabel,
+                deleteBtn
         );
         stylizeCard(card);
         return card;
@@ -86,7 +103,7 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
     private RippleClickableCard createAddNewCard() {
         Image plusImg = new Image("images/plus.png", "Добавить рабочую область");
         plusImg.setMaxWidth("250px");
-        plusImg.setMaxHeight("90px");
+        plusImg.setMaxHeight("140px");
         RippleClickableCard card = new RippleClickableCard(
                 onClick -> showDialog(OperationEnum.CREATE, new Workspace()),
                 new PrimaryLabel("Добавить рабочую область"),
@@ -100,7 +117,7 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
     private void stylizeCard(RippleClickableCard card) {
         card.setFlexGrow(1);
         card.setWidth("250px");
-        card.setHeight("150px");
+        card.setHeight("200px");
         card.getStyle().set("margin", "10px");
         card.getStyle().set("border", "1px solid black");
         card.getStyle().set("border-radius", "5px");
@@ -115,7 +132,12 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
     private void showDialog(final OperationEnum operation, final Workspace workspace) {
         WorkspaceForm workspaceForm = new WorkspaceForm(workspaceService, workspace, teamService, operation, getCurrentDbUser());
         this.workspaceForm = workspaceForm;
+        workspaceForm.addOpenedChangeListener(event -> reload(!event.isOpened(), !workspaceForm.isCanceled()));
         workspaceForm.open();
+    }
+
+    private void reload(final boolean isClosed, final boolean isNotCanceled) {
+        if (isClosed && isNotCanceled) init();
     }
 
     @Override

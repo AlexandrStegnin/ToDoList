@@ -49,6 +49,8 @@ public class WorkspaceForm extends Dialog {
 
     private Binder<Workspace> workspaceBinder;
 
+    private boolean canceled = false;
+
     public WorkspaceForm(WorkspaceService workspaceService, Workspace workspace, TeamService teamService,
                          OperationEnum operation, User owner) {
         this.workspaceBinder = new BeanValidationBinder<>(Workspace.class);
@@ -58,7 +60,10 @@ public class WorkspaceForm extends Dialog {
         this.title = new TextField("Название");
         this.team = new Select<>();
         this.buttons = new HorizontalLayout();
-        this.cancel = new Button("Отменить", e -> this.close());
+        this.cancel = new Button("Отменить", e -> {
+            this.canceled = true;
+            this.close();
+        });
         this.submit = new Button(operation.name);
         this.operation = operation;
         this.owner = owner;
@@ -118,10 +123,17 @@ public class WorkspaceForm extends Dialog {
     }
 
     private void executeCommand(Command command) {
-        if (workspaceBinder.writeBeanIfValid(workspace)) {
+        if (command instanceof DeleteWorkspaceCommand) {
+            command.execute();
+            this.close();
+        } else if (workspaceBinder.writeBeanIfValid(workspace)) {
             command.execute();
             this.close();
         }
+    }
+
+    public boolean isCanceled() {
+        return canceled;
     }
 
 }
