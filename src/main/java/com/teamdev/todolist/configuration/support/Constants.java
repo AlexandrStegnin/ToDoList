@@ -71,7 +71,6 @@ public class Constants {
     public static final String ADMIN_TAGS_PAGE = ADMIN_PAGE + PATH_SEPARATOR + "tags";
 
     public static final String PROFILE_PAGE = "profile";
-    public static final String TASK_LIST_PAGE = "task-list";
     public static final String WORKSPACES_PAGE = "workspaces";
 
     public static final String DEFAULT_SRC = "images/users-png.png";
