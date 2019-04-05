@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Table(name = "work_space")
 @EqualsAndHashCode(callSuper = false, of = "id")
-public class WorkSpace extends AbstractEntity {
+public class Workspace extends AbstractEntity {
 
     @Id
     @TableGenerator(name = "workSpaceSeqStore", table = "SEQ_STORE",

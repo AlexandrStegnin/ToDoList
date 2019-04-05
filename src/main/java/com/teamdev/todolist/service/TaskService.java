@@ -2,7 +2,7 @@ package com.teamdev.todolist.service;
 
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
-import com.teamdev.todolist.entity.WorkSpace;
+import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,7 +79,7 @@ public class TaskService {
 
     public List<Task> findAllByWorkspaceId(Long workspaceId) {
         // todo добавить в поиск пользователя, чтобы не попасть в чужую рабочую область
-        WorkSpace workspace = workspaceService.findById(workspaceId);
+        Workspace workspace = workspaceService.findById(workspaceId);
         return taskRepository.findByWorkSpace(workspace);
     }
 }

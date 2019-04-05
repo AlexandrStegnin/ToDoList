@@ -1,6 +1,6 @@
 package com.teamdev.todolist.repository;
 
-import com.teamdev.todolist.entity.WorkSpace;
+import com.teamdev.todolist.entity.Workspace;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface WorkspaceRepository extends JpaRepository<WorkSpace, Long> {
+public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
 }

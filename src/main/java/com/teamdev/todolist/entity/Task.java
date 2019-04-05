@@ -94,7 +94,7 @@ public class Task extends AbstractEntity {
     @OneToOne
     @JoinColumn(name = "workspace_id")
     @ApiModelProperty(notes = "Task workspace")
-    private WorkSpace workSpace;
+    private Workspace workSpace;
 
     public void addPerformer(User performer) {
         performers.add(performer);

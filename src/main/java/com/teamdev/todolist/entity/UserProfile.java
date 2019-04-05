@@ -59,7 +59,7 @@ public class UserProfile extends AbstractEntity {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
     @ApiModelProperty(notes = "User work spaces")
-    private Set<WorkSpace> workSpaces = new HashSet<>();
+    private Set<Workspace> workspaces = new HashSet<>();
 
     @ManyToMany(mappedBy = "members")
     @ApiModelProperty(notes = "User teams")

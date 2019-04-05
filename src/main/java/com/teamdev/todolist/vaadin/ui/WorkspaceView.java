@@ -18,14 +18,15 @@ import static com.teamdev.todolist.configuration.support.Constants.WORKSPACE_PAG
 @Route(WORKSPACE_PAGE)
 @PageTitle("Work space")
 @Theme(value = Material.class, variant = Material.LIGHT)
-public class WorkSpaceView extends CustomAppLayout implements HasUrlParameter<String> {
+public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<String> {
 
     private Long workspaceId;
-    private UserService userService;
-    private TaskService taskService;
+    private final UserService userService;
+    private final TaskService taskService;
 
-    public WorkSpaceView(UserService userService, TaskService taskService) {
+    public WorkspaceView(UserService userService, TaskService taskService) {
         super(userService);
+        this.userService = userService;
         this.taskService = taskService;
     }
 

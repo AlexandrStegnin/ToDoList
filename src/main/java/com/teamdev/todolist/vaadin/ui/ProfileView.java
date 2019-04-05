@@ -7,7 +7,7 @@ import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.entity.UserProfile;
 import com.teamdev.todolist.entity.UserProfile_;
-import com.teamdev.todolist.entity.WorkSpace;
+import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
@@ -226,7 +226,7 @@ public class ProfileView extends CustomAppLayout {
         content.getStyle()
                 .set("display", "flex")
                 .set("flex-direction", "row");
-        currentUser.getProfile().getWorkSpaces().forEach(workSpace -> {
+        currentUser.getProfile().getWorkspaces().forEach(workSpace -> {
             Div cardItem = new Div();
             cardItem.getStyle().set("border", "1px solid black");
             cardItem.getStyle().set("border-radius", "5px");
@@ -237,7 +237,7 @@ public class ProfileView extends CustomAppLayout {
         return content;
     }
 
-    private RippleClickableCard createCard(WorkSpace workSpace) {
+    private RippleClickableCard createCard(Workspace workSpace) {
         RippleClickableCard card = new RippleClickableCard(
                 onClick -> {
                     String workSpaceId = workSpace.getId().toString();
