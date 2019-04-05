@@ -4,9 +4,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 /**
  * @author Alexandr Stegnin
@@ -16,6 +18,7 @@ import javax.validation.constraints.Size;
 @Entity
 @NoArgsConstructor
 @Table(name = "work_space")
+@ToString(exclude = "tasks")
 @EqualsAndHashCode(callSuper = false, of = "id")
 public class Workspace extends AbstractEntity {
 
@@ -42,5 +45,8 @@ public class Workspace extends AbstractEntity {
     @JoinColumn(name = "team_id")
     @ApiModelProperty(notes = "Workspace team")
     private Team team;
+
+    @OneToMany(mappedBy = "workspace")
+    private Set<Task> tasks;
 
 }

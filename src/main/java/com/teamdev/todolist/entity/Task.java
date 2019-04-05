@@ -92,7 +92,7 @@ public class Task extends AbstractEntity {
     @ApiModelProperty(notes = "Task tags")
     private Set<Tag> tags = new HashSet<>();
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "workspace_id")
     @ApiModelProperty(notes = "Task workspace")
     @NotNull(message = "Выбери рабочую область для задачи")
