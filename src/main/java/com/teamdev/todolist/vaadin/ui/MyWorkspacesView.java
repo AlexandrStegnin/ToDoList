@@ -6,13 +6,15 @@ import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
 import com.github.appreciated.card.label.TitleLabel;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
+import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.Workspace;
+import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
+import com.teamdev.todolist.vaadin.form.WorkspaceForm;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.Theme;
@@ -35,11 +37,14 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
 
     private String userLogin;
     private final WorkspaceService workspaceService;
+    private final TeamService teamService;
     private List<Workspace> workspaces;
+    private WorkspaceForm workspaceForm;
 
-    public MyWorkspacesView(UserService userService, WorkspaceService workspaceService) {
+    public MyWorkspacesView(UserService userService, WorkspaceService workspaceService, TeamService teamService) {
         super(userService);
         this.workspaceService = workspaceService;
+        this.teamService = teamService;
     }
 
     private void init() {
@@ -101,7 +106,7 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
     }
 
     private void showAddNewWorkspaceForm() {
-        Notification.show("Скоро будет", 2000, Notification.Position.MIDDLE);
+        showDialog(OperationEnum.CREATE, new Workspace());
     }
 
     private void stylizeCard(RippleClickableCard card) {
@@ -117,6 +122,12 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
         return tasks.stream()
                 .filter(task -> !task.getStatus().getTitle().equalsIgnoreCase(TASK_STATUS_COMPLETED))
                 .count();
+    }
+
+    private void showDialog(final OperationEnum operation, final Workspace workspace) {
+        WorkspaceForm workspaceForm = new WorkspaceForm(workspaceService, workspace, teamService, operation, getCurrentDbUser());
+        this.workspaceForm = workspaceForm;
+        workspaceForm.open();
     }
 
 }
