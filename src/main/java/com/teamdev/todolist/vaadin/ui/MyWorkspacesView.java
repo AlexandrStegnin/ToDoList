@@ -63,15 +63,6 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
         setContent(cardContainer);
     }
 
-    @Override
-    public void setParameter(BeforeEvent beforeEvent, String s) {
-        Location location = beforeEvent.getLocation();
-        userLogin = location.getSegments().get(1);
-        if (Objects.equals(SecurityUtils.getUsername(), userLogin)) {
-            init();
-        }
-    }
-
     private RippleClickableCard createCard(Workspace workspace) {
         TitleLabel titleLabel = new TitleLabel(workspace.getTitle());
         titleLabel.setFlexGrow(1);
@@ -97,17 +88,13 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
         plusImg.setMaxWidth("250px");
         plusImg.setMaxHeight("90px");
         RippleClickableCard card = new RippleClickableCard(
-                onClick -> showAddNewWorkspaceForm(),
+                onClick -> showDialog(OperationEnum.CREATE, new Workspace()),
                 new PrimaryLabel("Добавить рабочую область"),
                 plusImg
         );
         card.getChildren().findFirst().ifPresent(component -> component.getElement().getStyle().set("align-items", "center"));
         stylizeCard(card);
         return card;
-    }
-
-    private void showAddNewWorkspaceForm() {
-        showDialog(OperationEnum.CREATE, new Workspace());
     }
 
     private void stylizeCard(RippleClickableCard card) {
@@ -129,6 +116,15 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
         WorkspaceForm workspaceForm = new WorkspaceForm(workspaceService, workspace, teamService, operation, getCurrentDbUser());
         this.workspaceForm = workspaceForm;
         workspaceForm.open();
+    }
+
+    @Override
+    public void setParameter(BeforeEvent beforeEvent, String s) {
+        Location location = beforeEvent.getLocation();
+        userLogin = location.getSegments().get(1);
+        if (Objects.equals(SecurityUtils.getUsername(), userLogin)) {
+            init();
+        }
     }
 
 }

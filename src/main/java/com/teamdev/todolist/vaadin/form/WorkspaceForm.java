@@ -8,6 +8,7 @@ import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Team;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.entity.Workspace;
+import com.teamdev.todolist.entity.Workspace_;
 import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.WorkspaceService;
 import com.vaadin.flow.component.button.Button;
@@ -21,6 +22,7 @@ import com.vaadin.flow.data.binder.Binder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Alexandr Stegnin
@@ -79,9 +81,14 @@ public class WorkspaceForm extends Dialog {
         privateOrTeam.setPlaceholder("Вид рабочей области");
         privateOrTeam.addValueChangeListener(event -> {
             if (PRIVATE_WS.equalsIgnoreCase(privateOrTeam.getValue())) {
+                team.setVisible(false);
                 workspace.setTeam(null);
             } else {
                 team.setVisible(true);
+                workspaceBinder.forField(team)
+                        .withValidator(t -> !team.isVisible() || !Objects.equals(null, t),
+                                "Для командной РО необходимо выбрать команду")
+                        .bind(Workspace_.TEAM);
             }
         });
 
