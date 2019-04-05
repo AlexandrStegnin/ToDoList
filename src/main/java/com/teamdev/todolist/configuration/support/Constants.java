@@ -48,6 +48,7 @@ public class Constants {
     public static final String[] ALL_SWAGGER_MATCHERS = {"/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**"};
 
     public static final String PATH_SEPARATOR = "/";
+    public static final String TASK_STATUS_COMPLETED = "Решенная";
 
     /* Application pages constants */
     public static final String LOGIN_PAGE = "login";
@@ -72,6 +73,7 @@ public class Constants {
     public static final String PROFILE_PAGE = "profile";
     public static final String TASK_LIST_PAGE = "task-list";
     public static final String WORKSPACE_PAGE = "workspace";
+    public static final String WORKSPACES_PAGE = "workspaces";
 
     public static final String DEFAULT_SRC = "images/users-png.png";
 
