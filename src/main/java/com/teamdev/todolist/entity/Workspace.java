@@ -41,7 +41,7 @@ public class Workspace extends AbstractEntity {
     @ApiModelProperty(notes = "Workspace owner")
     private User owner;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "team_id")
     @ApiModelProperty(notes = "Workspace team")
     private Team team;
