@@ -267,7 +267,7 @@ public class TaskForm extends Dialog {
     }
 
     private List<Workspace> getMyWorkspaces() {
-        return workspaceService.getMyWorkspaces(currentUser);
+        return workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
     }
 
 }

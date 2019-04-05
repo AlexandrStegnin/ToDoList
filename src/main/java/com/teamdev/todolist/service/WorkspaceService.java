@@ -1,9 +1,10 @@
 package com.teamdev.todolist.service;
 
-import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.repository.WorkspaceRepository;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  */
 
 @Service
+@Transactional(readOnly = true)
 public class WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
@@ -24,8 +26,14 @@ public class WorkspaceService {
         return workspaceRepository.getOne(id);
     }
 
-    public List<Workspace> getMyWorkspaces(User owner) {
-        return workspaceRepository.findByOwner(owner);
+    public List<Workspace> getMyWorkspaces(String login) {
+        List<Workspace> workspaces = workspaceRepository.findByOwnerLogin(login);
+        workspaces.forEach(workspace -> Hibernate.initialize(workspace.getTasks()));
+        return workspaces;
+    }
+
+    public Workspace getMyWorkspaceTasks(String ownerLogin, Long workspaceId) {
+        return workspaceRepository.findByOwnerLoginAndWorkspaceId(ownerLogin, workspaceId);
     }
 
 }

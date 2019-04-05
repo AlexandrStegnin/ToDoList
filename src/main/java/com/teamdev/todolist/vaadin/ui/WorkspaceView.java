@@ -1,7 +1,8 @@
 package com.teamdev.todolist.vaadin.ui;
 
-import com.teamdev.todolist.service.TaskService;
+import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.service.UserService;
+import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
@@ -21,17 +22,16 @@ import static com.teamdev.todolist.configuration.support.Constants.WORKSPACE_PAG
 public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<String> {
 
     private Long workspaceId;
-    private final UserService userService;
-    private final TaskService taskService;
+    private final WorkspaceService workspaceService;
 
-    public WorkspaceView(UserService userService, TaskService taskService) {
+    public WorkspaceView(UserService userService, WorkspaceService workspaceService) {
         super(userService);
-        this.userService = userService;
-        this.taskService = taskService;
+        this.workspaceService = workspaceService;
     }
 
     private void init() {
-        setContent(new Div(new Span(taskService.findByWorkspaceId(getCurrentDbUser().getId(), workspaceId).toString())));
+        setContent(new Div(new Span(workspaceService.getMyWorkspaceTasks(SecurityUtils.getUsername(), workspaceId)
+                .getTasks().toString())));
     }
 
     @Override

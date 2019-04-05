@@ -1,6 +1,7 @@
 package com.teamdev.todolist.vaadin.ui;
 
 import com.github.appreciated.card.RippleClickableCard;
+import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
 import com.github.appreciated.card.label.TitleLabel;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
@@ -9,6 +10,7 @@ import com.teamdev.todolist.entity.UserProfile;
 import com.teamdev.todolist.entity.UserProfile_;
 import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.service.UserService;
+import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
@@ -31,6 +33,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,13 +53,16 @@ public class ProfileView extends CustomAppLayout {
     private final Binder<User> binder; // отвечает за привязку данных с полей формы
     private final Binder<UserProfile> profileBinder;
     private final Button saveChanges;
+    private final WorkspaceService workspaceService;
+    private List<Workspace> workspaces;
     private MemoryBuffer buffer;
     private Upload uploadAvatar;
 
-    public ProfileView(UserService userService) {
+    public ProfileView(UserService userService, WorkspaceService workspaceService) {
         super(userService);
         this.buffer = new MemoryBuffer();
         this.userService = userService;
+        this.workspaceService = workspaceService;
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
         this.binder = new BeanValidationBinder<>(User.class);
         this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
@@ -66,6 +72,7 @@ public class ProfileView extends CustomAppLayout {
 
     private void init() {
         VerticalLayout content = new VerticalLayout();
+        workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
         saveChanges.setEnabled(false);
         Span message = new Span("Привет, " + currentUser.getProfile().getName() + "!");
         message.getStyle()
@@ -226,7 +233,7 @@ public class ProfileView extends CustomAppLayout {
         content.getStyle()
                 .set("display", "flex")
                 .set("flex-direction", "row");
-        currentUser.getProfile().getWorkspaces().forEach(workSpace -> {
+        workspaces.forEach(workSpace -> {
             Div cardItem = new Div();
             cardItem.getStyle().set("border", "1px solid black");
             cardItem.getStyle().set("border-radius", "5px");
@@ -244,7 +251,9 @@ public class ProfileView extends CustomAppLayout {
                     getUI().ifPresent(ui -> ui.navigate(WORKSPACE_PAGE + PATH_SEPARATOR + workSpaceId));
                 },
                 new TitleLabel(workSpace.getTitle()),
-                new SecondaryLabel(workSpace.getTeam() != null ? workSpace.getTeam().getTitle() : "Личное")
+                new PrimaryLabel(workSpace.getTeam() != null ? workSpace.getTeam().getTitle() : "Личное"),
+                new SecondaryLabel("Кол-во задач: " + workSpace.getTasks().size())
+
         );
         return card;
     }
