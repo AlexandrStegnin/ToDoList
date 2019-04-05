@@ -36,4 +36,19 @@ public class WorkspaceService {
         return workspaceRepository.findByOwnerLoginAndWorkspaceId(ownerLogin, workspaceId);
     }
 
+    @Transactional
+    public void delete(Workspace workspace) {
+        workspaceRepository.delete(workspace);
+    }
+
+    @Transactional
+    public Workspace create(Workspace workspace) {
+        return workspaceRepository.save(workspace);
+    }
+
+    @Transactional
+    public Workspace update(Workspace workspace) {
+        return create(workspace);
+    }
+
 }
