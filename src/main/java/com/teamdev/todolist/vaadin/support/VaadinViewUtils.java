@@ -131,31 +131,6 @@ public class VaadinViewUtils {
         }
         return image;
     }
-//
-//    public static Details createDetails(Order order, @Nullable Anchor link) {
-//        Details details = new Details();
-//        details.getElement().getStyle().set("margin", "1em");
-//        Div div = new Div();
-//        order.getOrderItems().forEach(orderItem -> {
-//            Image image = VaadinViewUtils.getProductImage(orderItem.getProduct(), false);
-//            image.getStyle().set("float", "left");
-//            image.getStyle().set("margin-right", "1em");
-//            div.add(image);
-//            Span span = new Span(orderItem.getProduct().getShortDescription());
-//            div.add(span);
-//            div.getStyle().set("display","flex");
-//            div.getStyle().set("align-items", "center");
-//            details.setSummaryText(NumberFormat.getCurrencyInstance(LOCALE_RU).format(order.getPrice()) + " - " + order.getStatus().getTitle());
-//            details.setContent(div);
-//            if (link != null) {
-//                link.getStyle()
-//                        .set("margin", "1em 0em 1em 1em")
-//                        .set("float", "right");
-//                details.addContent(link);
-//            }
-//        });
-//        return details;
-//    }
 
     // использовалось для вывода сообщений, если к примеру корзина пустая
     public static Div createInfoDiv(String message) {

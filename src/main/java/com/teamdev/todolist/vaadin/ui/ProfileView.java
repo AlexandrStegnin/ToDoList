@@ -71,7 +71,9 @@ public class ProfileView extends CustomAppLayout {
     }
 
     private void init() {
-        VerticalLayout content = new VerticalLayout();
+        HorizontalLayout content = new HorizontalLayout();
+        VerticalLayout leftContent = new VerticalLayout();
+        VerticalLayout rightContent = new VerticalLayout();
         workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
         saveChanges.setEnabled(false);
         Span message = new Span("Привет, " + currentUser.getProfile().getName() + "!");
@@ -114,8 +116,8 @@ public class ProfileView extends CustomAppLayout {
 
         saveChanges.addClickListener(e -> {
             updateUserProfile();
-            content.remove(avatar);
-            content.addComponentAtIndex(1, createAvatarDiv());
+            leftContent.remove(avatar);
+            leftContent.addComponentAtIndex(1, createAvatarDiv());
             pwdField.setValue("");
         });
 
@@ -127,15 +129,20 @@ public class ProfileView extends CustomAppLayout {
         formLayout.getStyle()
                 .set("width", "50%")
                 .set("position", "relative")
-                .set("left", "25%")
-                .set("top", "25%");
+                .set("left", "25%");
         formLayout.add(nameField, surnameField, email, pwdField);
 
         HorizontalLayout buttons = new HorizontalLayout(saveChanges, cancel);
 
-        content.add(welcome, avatar, workSpacesDiv(), formLayout, buttons);
-        content.setAlignItems(FlexComponent.Alignment.CENTER);
-        content.setSpacing(true);
+        leftContent.add(welcome, avatar, formLayout, buttons);
+        leftContent.setAlignItems(FlexComponent.Alignment.CENTER);
+        leftContent.setSpacing(true);
+        leftContent.setWidth("50%");
+
+        rightContent.setSpacing(true);
+        rightContent.add(workSpacesDiv());
+        rightContent.setWidth("50%");
+        content.add(leftContent, rightContent);
         setContent(content);
     }
 
@@ -238,7 +245,7 @@ public class ProfileView extends CustomAppLayout {
             cardItem.getStyle().set("border", "1px solid black");
             cardItem.getStyle().set("border-radius", "5px");
             cardItem.add(createCard(workSpace));
-            cardItem.getStyle().set("margin", "1px");
+            cardItem.getStyle().set("margin", "5px");
             content.add(cardItem);
         });
         return content;
@@ -253,7 +260,6 @@ public class ProfileView extends CustomAppLayout {
                 new TitleLabel(workSpace.getTitle()),
                 new PrimaryLabel(workSpace.getTeam() != null ? workSpace.getTeam().getTitle() : "Личное"),
                 new SecondaryLabel("Кол-во задач: " + workSpace.getTasks().size())
-
         );
         return card;
     }
