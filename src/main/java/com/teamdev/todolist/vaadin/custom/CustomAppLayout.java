@@ -7,8 +7,8 @@ import com.teamdev.todolist.repository.AuthRepository;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.teamdev.todolist.vaadin.ui.LoginView;
+import com.teamdev.todolist.vaadin.ui.MyWorkspacesView;
 import com.teamdev.todolist.vaadin.ui.ProfileView;
-import com.teamdev.todolist.vaadin.ui.TaskListView;
 import com.teamdev.todolist.vaadin.ui.admin.AdminView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -19,7 +19,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.teamdev.todolist.configuration.support.Constants.ROLE_ADMIN;
+import static com.teamdev.todolist.configuration.support.Constants.*;
 
 public class CustomAppLayout extends AppLayout {
 
@@ -44,15 +44,17 @@ public class CustomAppLayout extends AppLayout {
 
         this.getElement().getStyle().set("margin-top", "10px");
 
-        AppLayoutMenuItem taskListItem = new AppLayoutMenuItem(VaadinIcon.TASKS.create(), "Task List", e -> goToPage(TaskListView.class));
+        AppLayoutMenuItem workspacesItem = new AppLayoutMenuItem(VaadinIcon.TASKS.create(), "Workspaces",
+                e -> goToPage(MyWorkspacesView.class, SecurityUtils.getUsername()));
         AppLayoutMenuItem logoutItem = new AppLayoutMenuItem(VaadinIcon.SIGN_OUT.create(), "Logout", e -> logout());
-        AppLayoutMenuItem loginItem = new AppLayoutMenuItem(VaadinIcon.SIGN_IN.create(), "Login", e -> goToPage(LoginView.class));
-        AppLayoutMenuItem adminItem = new AppLayoutMenuItem(VaadinIcon.COGS.create(), "Admin", e -> goToPage(AdminView.class));
-        AppLayoutMenuItem profileItem = new AppLayoutMenuItem(createAvatarDiv(), SecurityUtils.getUsername() + " / profile", e -> goToPage(ProfileView.class));
+        AppLayoutMenuItem loginItem = new AppLayoutMenuItem(VaadinIcon.SIGN_IN.create(), "Login", e -> goToPage(LoginView.class, null));
+        AppLayoutMenuItem adminItem = new AppLayoutMenuItem(VaadinIcon.COGS.create(), "Admin", e -> goToPage(AdminView.class, null));
+        AppLayoutMenuItem profileItem = new AppLayoutMenuItem(createAvatarDiv(), SecurityUtils.getUsername() + " / profile",
+                e -> goToPage(ProfileView.class, null));
 
         if (SecurityUtils.isUserInRole(ROLE_ADMIN)) menu.addMenuItems(adminItem);
         if (SecurityUtils.isUserLoggedIn()) {
-            menu.addMenuItem(taskListItem);
+            menu.addMenuItem(workspacesItem);
             menu.addMenuItem(profileItem);
             menu.addMenuItem(logoutItem);
         } else {
@@ -76,7 +78,12 @@ public class CustomAppLayout extends AppLayout {
         getUI().ifPresent(ui -> ui.navigate(clazz));
     }
 
-    private Component createAvatarDiv () {
+    private void goToPage(Class<? extends Component> clazz, String param) {
+        if (param == null) goToPage(clazz);
+        getUI().ifPresent(ui -> ui.navigate(MyWorkspacesView.class, param));
+    }
+
+    private Component createAvatarDiv() {
         Image userAvatar = VaadinViewUtils.getUserAvatar(userService.findByLogin(SecurityUtils.getUsername()), true);
         userAvatar.setMaxHeight("24px");
         userAvatar.getStyle().set("margin-bottom", "8px");
