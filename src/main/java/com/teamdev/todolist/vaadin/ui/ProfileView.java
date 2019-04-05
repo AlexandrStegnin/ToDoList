@@ -248,7 +248,7 @@ public class ProfileView extends CustomAppLayout {
         RippleClickableCard card = new RippleClickableCard(
                 onClick -> {
                     String workSpaceId = workSpace.getId().toString();
-                    getUI().ifPresent(ui -> ui.navigate(WORKSPACE_PAGE + PATH_SEPARATOR + workSpaceId));
+                    getUI().ifPresent(ui -> ui.navigate(WORKSPACES_PAGE + PATH_SEPARATOR + workSpaceId));
                 },
                 new TitleLabel(workSpace.getTitle()),
                 new PrimaryLabel(workSpace.getTeam() != null ? workSpace.getTeam().getTitle() : "Личное"),

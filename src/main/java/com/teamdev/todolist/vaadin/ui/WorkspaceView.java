@@ -31,13 +31,13 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.teamdev.todolist.configuration.support.Constants.WORKSPACE_PAGE;
+import static com.teamdev.todolist.configuration.support.Constants.WORKSPACES_PAGE;
 
 /**
  * @author Alexandr Stegnin
  */
 
-@Route(WORKSPACE_PAGE)
+@Route(WORKSPACES_PAGE)
 @PageTitle("Work space")
 @Theme(value = Material.class, variant = Material.LIGHT)
 public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<String> {
@@ -372,9 +372,9 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, String s) {
+    public void setParameter(BeforeEvent beforeEvent, @WildcardParameter String param) {
         Location location = beforeEvent.getLocation();
-        workspaceId = Long.valueOf(location.getSegments().get(1));
+        workspaceId = Long.valueOf(location.getSegments().get(2));
         init();
     }
 }

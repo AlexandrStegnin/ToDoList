@@ -81,7 +81,8 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
         SecondaryLabel taskCountLabel = new SecondaryLabel(String.format("Кол-во активных задач: %d", activeTasksCount(workspace.getTasks())));
 
         RippleClickableCard card = new RippleClickableCard(
-                onClick -> getUI().ifPresent(ui -> ui.navigate(WORKSPACE_PAGE + PATH_SEPARATOR + workspace.getId())),
+                onClick -> getUI().ifPresent(ui -> ui.navigate(
+                        WORKSPACES_PAGE + PATH_SEPARATOR + SecurityUtils.getUsername() + PATH_SEPARATOR + workspace.getId())),
                 // if you don't want the title to wrap you can set the whitespace = nowrap
                 titleLabel,
                 teamLabel,
