@@ -2,6 +2,7 @@ package com.teamdev.todolist.vaadin.custom;
 
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.Constants;
+import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.repository.AuthRepository;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
@@ -28,6 +29,8 @@ public class CustomAppLayout extends AppLayout {
     private UserService userService;
 
     private AppLayoutMenu menu;
+
+    private User currentDbUser;
 
     public CustomAppLayout() {
         init();
@@ -59,6 +62,7 @@ public class CustomAppLayout extends AppLayout {
 
     public CustomAppLayout(UserService userService) {
         this.userService = userService;
+        this.currentDbUser = userService.findByLogin(SecurityUtils.getUsername());
         init();
     }
 
@@ -79,8 +83,13 @@ public class CustomAppLayout extends AppLayout {
         return userAvatar;
     }
 
-    public void reload() {
+    protected void reload() {
         menu.clearMenuItems();
         init();
     }
+
+    protected User getCurrentDbUser() {
+        return currentDbUser;
+    }
+
 }

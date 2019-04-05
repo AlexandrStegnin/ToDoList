@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -94,7 +95,8 @@ public class Task extends AbstractEntity {
     @OneToOne
     @JoinColumn(name = "workspace_id")
     @ApiModelProperty(notes = "Task workspace")
-    private Workspace workSpace;
+    @NotNull(message = "Выбери рабочую область для задачи")
+    private Workspace workspace;
 
     public void addPerformer(User performer) {
         performers.add(performer);

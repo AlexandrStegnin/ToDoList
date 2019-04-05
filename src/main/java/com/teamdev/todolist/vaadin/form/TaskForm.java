@@ -7,10 +7,7 @@ import com.teamdev.todolist.command.task.UpdateTaskCommand;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.*;
-import com.teamdev.todolist.service.TagService;
-import com.teamdev.todolist.service.TaskService;
-import com.teamdev.todolist.service.TaskStatusService;
-import com.teamdev.todolist.service.UserService;
+import com.teamdev.todolist.service.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -42,6 +39,7 @@ public class TaskForm extends Dialog {
     private final TaskStatusService taskStatusService;
     private final TaskService taskService;
     private final TagService tagService;
+    private final WorkspaceService workspaceService;
     private Task task;
     private OperationEnum operation;
     private HorizontalLayout buttons;
@@ -55,6 +53,7 @@ public class TaskForm extends Dialog {
     private final DatePicker expirationDate;
     private final Select<TaskStatus> status;
     private final TextField comment;
+    private final Select<Workspace> workspace;
     private final User currentUser;
     private Binder<Task> taskBinder;
     private final Button cancel;
@@ -64,11 +63,12 @@ public class TaskForm extends Dialog {
 
     public TaskForm(UserService userService, TaskService taskService,
                     TaskStatusService taskStatusService, TagService tagService,
-                    OperationEnum operation, Task task) {
+                    WorkspaceService workspaceService, OperationEnum operation, Task task) {
         this.userService = userService;
         this.taskService = taskService;
         this.taskStatusService = taskStatusService;
         this.tagService = tagService;
+        this.workspaceService = workspaceService;
         this.taskBinder = new BeanValidationBinder<>(Task.class);
         this.operation = operation;
         this.task = task;
@@ -76,6 +76,7 @@ public class TaskForm extends Dialog {
         this.description = new TextField("Описание");
         this.author = new Select<>();
         this.status = new Select<>();
+        this.workspace = new Select<>();
         this.creationDate = new DatePicker("Дата создания");
         this.expirationDate = new DatePicker("Дата окончания");
         this.performers = new MultiselectComboBox<>(this::getUserName);
@@ -112,11 +113,14 @@ public class TaskForm extends Dialog {
         tags.setRequired(true);
         tags.setRequiredIndicatorVisible(true);
 
+        workspace.setItems(getMyWorkspaces());
+        workspace.setTextRenderer(Workspace::getTitle);
+
         addCreationDateValueChangeListener();
         addExpirationDateValueChangeListener();
 
         VerticalLayout content = new VerticalLayout(title, description, creationDate, expirationDate,
-                performers, comment, status, tags);
+                performers, comment, status, tags, workspace);
         add(content);
 
         prepareForm(task);
@@ -260,6 +264,10 @@ public class TaskForm extends Dialog {
 
     public Task getTask() {
         return task;
+    }
+
+    private List<Workspace> getMyWorkspaces() {
+        return workspaceService.getMyWorkspaces(currentUser);
     }
 
 }

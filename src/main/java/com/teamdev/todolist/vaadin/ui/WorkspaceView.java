@@ -31,7 +31,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
     }
 
     private void init() {
-        setContent(new Div(new Span(taskService.findAllByWorkspaceId(workspaceId).toString())));
+        setContent(new Div(new Span(taskService.findByWorkspaceId(getCurrentDbUser().getId(), workspaceId).toString())));
     }
 
     @Override

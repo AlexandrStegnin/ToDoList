@@ -5,10 +5,7 @@ import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Tag;
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
-import com.teamdev.todolist.service.TagService;
-import com.teamdev.todolist.service.TaskService;
-import com.teamdev.todolist.service.TaskStatusService;
-import com.teamdev.todolist.service.UserService;
+import com.teamdev.todolist.service.*;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.CalendarForm;
 import com.teamdev.todolist.vaadin.form.TaskForm;
@@ -48,6 +45,7 @@ public class TaskListView extends CustomAppLayout {
     private final TaskService taskService;
     private final UserService userService;
     private final TaskStatusService taskStatusService;
+    private final WorkspaceService workspaceService;
     private final TagService tagService;
     private final User currentUser;
     private final DateTimeFormatter formatter;
@@ -61,13 +59,14 @@ public class TaskListView extends CustomAppLayout {
 
     private final String RED = "red";
 
-    public TaskListView(TaskService taskService, UserService userService,
+    public TaskListView(TaskService taskService, UserService userService, WorkspaceService workspaceService,
                         TaskStatusService taskStatusService, TagService tagService) {
         super(userService);
         this.userService = userService;
         this.taskService = taskService;
         this.taskStatusService = taskStatusService;
         this.tagService = tagService;
+        this.workspaceService = workspaceService;
         this.currentUser = this.userService.findByLogin(SecurityUtils.getUsername());
         this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
         this.authorDataProvider = new ListDataProvider<>(getByAuthor());
@@ -81,7 +80,7 @@ public class TaskListView extends CustomAppLayout {
     }
 
     private void showTaskForm(final OperationEnum operation, final Task task) {
-        TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, tagService, operation, task);
+        TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, tagService, workspaceService, operation, task);
         taskForm.addOpenedChangeListener(event -> refreshDataProviders(event.isOpened(), taskForm.getOperation(), taskForm.getTask()));
         taskForm.open();
     }
