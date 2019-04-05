@@ -2,6 +2,7 @@ package com.teamdev.todolist.service;
 
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
+import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,8 +38,12 @@ public class TaskService {
         return taskRepository.findAllByAuthor(author);
     }
 
-    public List<Task> findAllByPerformer(User performer) {
-        return taskRepository.findAllByPerformers(Collections.singletonList(performer));
+    public List<Task> findByAuthorLoginAndWorkspaceId(String login, Long workspaceId) {
+        return taskRepository.getTasksByAuthorLoginAndWorkspaceId(login, workspaceId);
+    }
+
+    public List<Task> findAllByPerformer(User performer, Workspace workspace) {
+        return taskRepository.findAllByPerformersAndWorkspace(Collections.singletonList(performer), workspace);
     }
 
     @Transactional
