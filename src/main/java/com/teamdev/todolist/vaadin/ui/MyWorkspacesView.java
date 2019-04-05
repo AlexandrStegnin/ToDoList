@@ -67,19 +67,7 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
     }
 
     private RippleClickableCard createCard(Workspace workspace) {
-        Icon trashIcon = VaadinIcon.TRASH.create();
-        trashIcon.getStyle()
-                .set("display", "inline-block")
-                .set("margin-bottom", "2px")
-                .set("margin-left", "2px");
-        ActionButton deleteBtn = new ActionButton("Удалить", trashIcon,
-                e -> showDialog(OperationEnum.DELETE, workspace));
-        deleteBtn.setIconAfterText(true);
-        deleteBtn.getStyle()
-                .set("position", "absolute")
-                .set("right", "0")
-                .set("bottom", "0")
-                .set("color", "red");
+
         TitleLabel titleLabel = new TitleLabel(workspace.getTitle());
         titleLabel.setFlexGrow(1);
 
@@ -94,7 +82,8 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
                 titleLabel,
                 teamLabel,
                 taskCountLabel,
-                deleteBtn
+                getButton(workspace, OperationEnum.DELETE),
+                getButton(workspace, OperationEnum.UPDATE)
         );
         stylizeCard(card);
         return card;
@@ -121,6 +110,41 @@ public class MyWorkspacesView extends CustomAppLayout implements HasUrlParameter
         card.getStyle().set("margin", "10px");
         card.getStyle().set("border", "1px solid black");
         card.getStyle().set("border-radius", "5px");
+    }
+
+    private ActionButton getButton(Workspace workspace, OperationEnum operation) {
+        Icon icon = null;
+        ActionButton btn = null;
+        switch (operation) {
+            case DELETE:
+                icon = VaadinIcon.TRASH.create();
+                btn = new ActionButton(operation.name, icon,
+                        e -> showDialog(operation, workspace));
+                btn.setIconAfterText(true);
+                btn.getStyle()
+                        .set("position", "absolute")
+                        .set("right", "2px")
+                        .set("bottom", "2px")
+                        .set("color", "red");
+                break;
+            case UPDATE:
+                icon = VaadinIcon.EDIT.create();
+                btn = new ActionButton("Изменить", icon,
+                        e -> showDialog(operation, workspace));
+                btn.setIconAfterText(true);
+                btn.getStyle()
+                        .set("position", "absolute")
+                        .set("left", "2px")
+                        .set("bottom", "2px");
+                break;
+        }
+        if (icon != null) {
+            icon.getStyle()
+                    .set("display", "inline-block")
+                    .set("margin-bottom", "2px")
+                    .set("margin-left", "2px");
+        }
+        return btn;
     }
 
     private Long activeTasksCount(Set<Task> tasks) {
