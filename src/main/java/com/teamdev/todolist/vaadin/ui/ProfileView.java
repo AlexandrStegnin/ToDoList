@@ -5,13 +5,13 @@ import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
 import com.github.appreciated.card.label.TitleLabel;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
-import com.teamdev.todolist.entity.User;
-import com.teamdev.todolist.entity.UserProfile;
-import com.teamdev.todolist.entity.UserProfile_;
-import com.teamdev.todolist.entity.Workspace;
+import com.teamdev.todolist.configuration.support.OperationEnum;
+import com.teamdev.todolist.entity.*;
+import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
+import com.teamdev.todolist.vaadin.form.TeamForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -33,6 +33,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,18 +50,21 @@ import static com.teamdev.todolist.configuration.support.Constants.*;
 public class ProfileView extends CustomAppLayout {
 
     private final UserService userService;
+    private final TeamService teamService;
     private final User currentUser;
     private final Binder<User> binder; // отвечает за привязку данных с полей формы
     private final Binder<UserProfile> profileBinder;
     private final Button saveChanges;
     private final WorkspaceService workspaceService;
+    private TeamForm teamForm;
     private List<Workspace> workspaces;
     private MemoryBuffer buffer;
     private Upload uploadAvatar;
 
-    public ProfileView(UserService userService, WorkspaceService workspaceService) {
+    public ProfileView(UserService userService, WorkspaceService workspaceService, TeamService teamService) {
         super(userService);
         this.buffer = new MemoryBuffer();
+        this.teamService = teamService;
         this.userService = userService;
         this.workspaceService = workspaceService;
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
@@ -141,6 +145,7 @@ public class ProfileView extends CustomAppLayout {
 
         rightContent.setSpacing(true);
         rightContent.add(workSpacesDiv());
+        rightContent.add(teamDiv());
         rightContent.setWidth("50%");
         content.add(leftContent, rightContent);
         setContent(content);
@@ -251,6 +256,28 @@ public class ProfileView extends CustomAppLayout {
         return content;
     }
 
+    private Div teamDiv() {
+        Div content = new Div();
+        content.getStyle()
+                .set("display", "flex")
+                .set("flex-direction", "row");
+        getMyTeams().forEach(team -> {
+            Div cardItem = new Div();
+            cardItem.getStyle().set("border", "1px solid black");
+            cardItem.getStyle().set("border-radius", "5px");
+            cardItem.add(createTeamCard(team));
+            cardItem.getStyle().set("margin", "5px");
+            content.add(cardItem);
+        });
+        Div cardItem = new Div();
+        cardItem.getStyle().set("border", "1px solid black");
+        cardItem.getStyle().set("border-radius", "5px");
+        cardItem.add(createAddNewCard());
+        cardItem.getStyle().set("margin", "5px");
+        content.add(cardItem);
+        return content;
+    }
+
     private RippleClickableCard createCard(Workspace workSpace) {
         RippleClickableCard card = new RippleClickableCard(
                 onClick -> {
@@ -262,6 +289,45 @@ public class ProfileView extends CustomAppLayout {
                 new SecondaryLabel("Кол-во задач: " + workSpace.getTasks().size())
         );
         return card;
+    }
+
+    private RippleClickableCard createTeamCard(Team team) {
+        RippleClickableCard card = new RippleClickableCard(
+                onClick -> {
+                    //
+                },
+                new TitleLabel(team.getTitle()),
+                new SecondaryLabel("Участников: " + team.getMembers().size())
+        );
+        return card;
+    }
+
+    private List<Team> getMyTeams() {
+        return teamService.findByMember(Collections.singletonList(currentUser));
+    }
+
+    private RippleClickableCard createAddNewCard() {
+        Image plusImg = new Image("images/plus.png", "Добавить команду");
+        plusImg.setMaxWidth("150px");
+        plusImg.setMaxHeight("150px");
+        RippleClickableCard card = new RippleClickableCard(
+                onClick -> showDialog(OperationEnum.CREATE, new Team()),
+                new PrimaryLabel("Добавить команду"),
+                plusImg
+        );
+        card.getChildren().findFirst().ifPresent(component -> component.getElement().getStyle().set("align-items", "center"));
+        return card;
+    }
+
+    private void showDialog(final OperationEnum operation, final Team team) {
+        TeamForm teamForm = new TeamForm(userService, teamService, team, operation);
+        this.teamForm = teamForm;
+        teamForm.addOpenedChangeListener(event -> reload(!event.isOpened(), !this.teamForm.isCanceled()));
+        teamForm.open();
+    }
+
+    private void reload(final boolean isClosed, final boolean isNotCanceled) {
+        if (isClosed && isNotCanceled) init();
     }
 
 }

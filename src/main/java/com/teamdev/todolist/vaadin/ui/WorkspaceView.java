@@ -115,11 +115,11 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
 
         HorizontalLayout performerZoneLayout = new HorizontalLayout();
         performerZoneLayout.add(performerLayout);
-        VerticalLayout perfromerRightPane = new VerticalLayout();
-        perfromerRightPane.setWidth("15%");
-        perfromerRightPane.add(calendarBtn);
-        perfromerRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
-        performerZoneLayout.add(perfromerRightPane);
+        VerticalLayout performerRightPane = new VerticalLayout();
+        performerRightPane.setWidth("15%");
+        performerRightPane.add(calendarBtn);
+        performerRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
+        performerZoneLayout.add(performerRightPane);
         performerZoneLayout.setWidthFull();
 
         VerticalLayout mainLayout = new VerticalLayout();
