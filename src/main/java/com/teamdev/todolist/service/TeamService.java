@@ -24,4 +24,16 @@ public class TeamService {
         return teamRepository.findByMembers(members);
     }
 
+    public Team update(Team team) {
+        return teamRepository.save(team);
+    }
+
+    public Team create(Team team) {
+        return teamRepository.save(team);
+    }
+
+    public void delete(Team team) {
+        teamRepository.delete(team);
+    }
+
 }
