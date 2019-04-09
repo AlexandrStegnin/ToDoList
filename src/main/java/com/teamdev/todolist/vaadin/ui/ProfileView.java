@@ -1,6 +1,7 @@
 package com.teamdev.todolist.vaadin.ui;
 
 import com.github.appreciated.card.RippleClickableCard;
+import com.github.appreciated.card.action.ActionButton;
 import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
 import com.github.appreciated.card.label.TitleLabel;
@@ -18,6 +19,8 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -297,7 +300,9 @@ public class ProfileView extends CustomAppLayout {
                     //
                 },
                 new TitleLabel(team.getTitle()),
-                new SecondaryLabel("Участников: " + team.getMembers().size())
+                new SecondaryLabel("Участников: " + team.getMembers().size()),
+                getButton(team, OperationEnum.DELETE),
+                getButton(team, OperationEnum.UPDATE)
         );
         return card;
     }
@@ -328,6 +333,41 @@ public class ProfileView extends CustomAppLayout {
 
     private void reload(final boolean isClosed, final boolean isNotCanceled) {
         if (isClosed && isNotCanceled) init();
+    }
+
+    private ActionButton getButton(Team team, OperationEnum operation) {
+        Icon icon = null;
+        ActionButton btn = null;
+        switch (operation) {
+            case DELETE:
+                icon = VaadinIcon.TRASH.create();
+                btn = new ActionButton(operation.name, icon,
+                        e -> showDialog(operation, team));
+                btn.setIconAfterText(true);
+                btn.getStyle()
+                        .set("position", "absolute")
+                        .set("right", "2px")
+                        .set("bottom", "2px")
+                        .set("color", "red");
+                break;
+            case UPDATE:
+                icon = VaadinIcon.EDIT.create();
+                btn = new ActionButton("Изменить", icon,
+                        e -> showDialog(operation, team));
+                btn.setIconAfterText(true);
+                btn.getStyle()
+                        .set("position", "absolute")
+                        .set("right", "2px")
+                        .set("bottom", "40px");
+                break;
+        }
+        if (icon != null) {
+            icon.getStyle()
+                    .set("display", "inline-block")
+                    .set("margin-bottom", "2px")
+                    .set("margin-left", "2px");
+        }
+        return btn;
     }
 
 }
