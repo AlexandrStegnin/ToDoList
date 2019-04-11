@@ -1,10 +1,5 @@
 package com.teamdev.todolist.vaadin.ui;
 
-import com.github.appreciated.card.RippleClickableCard;
-import com.github.appreciated.card.action.ActionButton;
-import com.github.appreciated.card.label.PrimaryLabel;
-import com.github.appreciated.card.label.SecondaryLabel;
-import com.github.appreciated.card.label.TitleLabel;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.*;
@@ -20,8 +15,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -49,6 +42,8 @@ import static com.teamdev.todolist.configuration.support.Constants.*;
 @Route(value = PROFILE_PAGE, layout = MainLayout.class)
 @PageTitle("Profile")
 public class ProfileView extends CustomAppLayout {
+    // TODO добавить создание нового РП/удаление/изменение
+    private final String MY_WORKSPACE =  WORKSPACES_PAGE + PATH_SEPARATOR + SecurityUtils.getUsername() + PATH_SEPARATOR;
 
     private final UserService userService;
     private final TeamService teamService;
@@ -77,85 +72,9 @@ public class ProfileView extends CustomAppLayout {
 
     private void init() {
         saveChanges.setEnabled(false);
-//        VerticalLayout leftContent = new VerticalLayout();
-//        VerticalLayout rightContent = new VerticalLayout();
-//        workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
-//        saveChanges.setEnabled(false);
+        workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
 
         Div profileDiv = profilePage();
-
-//        FormLayout formLayout = new FormLayout();
-//
-//        TextField nameField = new TextField("Name");
-//        nameField.setValue(currentUser.getProfile().getName());
-//        nameField.addValueChangeListener(event ->
-//                enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getName())));
-//        profileBinder.forField(nameField)
-//                .bind(UserProfile_.NAME);
-//
-//        TextField surnameField = new TextField("Surname");
-//        surnameField.setValue(currentUser.getProfile().getSurname());
-//        surnameField.addValueChangeListener(event -> {
-//            enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getSurname()));
-//        });
-//        profileBinder.forField(surnameField)
-//                .bind(UserProfile_.SURNAME);
-//
-//        TextField email = new TextField("Email");
-//        email.setValue(currentUser.getProfile().getEmail());
-//        email.addValueChangeListener(event ->
-//                enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getEmail())));
-//        profileBinder.forField(email)
-//                .withValidator(this::emailIsFree, "Email busy, input another email")
-//                .bind(UserProfile_.EMAIL);
-//
-//        TextField pwdField = new TextField("Password");
-//        pwdField.setValue("");
-//        pwdField.addValueChangeListener(event -> enabledSaveButton(
-//                event.getValue().length() > 2));
-//        binder.forField(pwdField)
-//                .withValidator(pwd -> pwd.isEmpty() || pwd.length() > 2, "Password must be greater then 2 characters")
-//                .bind("password");
-//
-//        saveChanges.addClickListener(e -> {
-//            updateUserProfile();
-//            leftContent.remove(profileDiv);
-//            leftContent.addComponentAtIndex(1, profileDiv());
-//            pwdField.setValue("");
-//        });
-//
-//        Button cancel = new Button("Cancel", e -> {
-//            binder.readBean(currentUser);
-//            profileBinder.readBean(currentUser.getProfile());
-//        });
-
-//        formLayout.getStyle()
-//                .set("width", "50%")
-//                .set("position", "relative")
-//                .set("left", "25%");
-//        formLayout.add(nameField, surnameField, email, pwdField);
-
-//        HorizontalLayout buttons = new HorizontalLayout(saveChanges, cancel);
-
-//        leftContent.add(profileDiv/*, formLayout, buttons*/);
-//        leftContent.setAlignItems(FlexComponent.Alignment.CENTER);
-//        leftContent.setSpacing(true);
-//        leftContent.setWidth("50%");
-
-//        Div containerFluid = new Div();
-//        containerFluid.addClassName("container-fluid");
-//
-//        Div rowClearFix = new Div();
-//        rowClearFix.addClassNames("row", "clearfix");
-//        containerFluid.add(rowClearFix);
-
-//        workspaces.forEach(workspace -> rowClearFix.add(createCardDiv(workspace)));
-
-//        rightContent.setSpacing(true);
-//        rightContent.add(containerFluid);
-//        rightContent.setWidth("50%");
-//        content.add(leftContent/*, rightContent*/);
-//        content.add(profileDiv);
         profileDiv.getStyle().set("margin-top", "16px");
         setContent(profileDiv);
     }
@@ -246,55 +165,35 @@ public class ProfileView extends CustomAppLayout {
         body.addClassName("body");
         card.add(body);
 
-//        Div empty = new Div();
-//        body.add(empty);
-
-//        Html ul = new Html(
-//                "<ul class=\"nav nav-tabs\" role=\"tablist\">" +
-//                            "<li role=\"presentation\" class=\"active\">" +
-//                                "<a href=\"#profile_settings\" aria-controls=\"settings\" role=\"tab\" data-toggle=\"tab\" aria-expanded=\"true\">" +
-//                                    "Настройки профиля" +
-//                                "</a>" +
-//                            "</li>" +
-//                            "<li role=\"presentation\">" +
-//                                "<a href=\"#change_password_settings\" aria-controls=\"settings\" role=\"tab\" data-toggle=\"tab\" aria-expanded=\"false\">" +
-//                                    "Изменить пароль" +
-//                                "</a>" +
-//                            "</li>" +
-//                        "</ul>");
-
-//        Tabs profileSettings = tabs();
-
         body.add(tabs(settings()));
-//        empty.add(settings());
-//        Div tabContent = new Div();
-//        tabContent.addClassName("tab-content");
-//        empty.add(tabContent);
-//
-//        Div tabPane = new Div();
-//        tabPane.addClassNames("tab-pane", "fade", "in", "active");
-//        tabPane.setId("profile_settings");
-//        tabPane.getStyle().set("role", "tabpanel");
-//        tabPane.add(profileForm());
-//        tabContent.add(tabPane);
         return cols;
     }
 
     private Map<Integer, Div> settings() {
         Map<Integer, Div> divMap = new HashMap<>();
+
+        Div myWorkspacesPage = new Div();
+        myWorkspacesPage.add(workspaceDiv());
+
         Div profilePage = new Div();
         profilePage.add(profileForm());
+        profilePage.setVisible(false);
+
         Div changePassPage = new Div();
         changePassPage.add(changePasswordForm());
         changePassPage.setVisible(false);
 
-        divMap.put(1, profilePage);
-        divMap.put(2, changePassPage);
+        divMap.put(1, myWorkspacesPage);
+        divMap.put(2, profilePage);
+        divMap.put(3, changePassPage);
 
         return divMap;
     }
 
     private Div tabs(Map<Integer, Div> divMap) {
+        Tab myWorkspaces = new Tab("Рабочие области");
+        myWorkspaces.getStyle().set("color", "black");
+
         Tab profileSettings = new Tab("Настройки профиля");
         profileSettings.getStyle().set("color", "black");
 
@@ -302,9 +201,11 @@ public class ProfileView extends CustomAppLayout {
         changePassword.getStyle().set("color", "black");
 
         Map<Tab, Component> tabsToPages = new HashMap<>();
-        tabsToPages.put(profileSettings, divMap.get(1));
-        tabsToPages.put(changePassword, divMap.get(2));
-        Tabs tabs = new Tabs(profileSettings, changePassword);
+
+        tabsToPages.put(myWorkspaces, divMap.get(1));
+        tabsToPages.put(profileSettings, divMap.get(2));
+        tabsToPages.put(changePassword, divMap.get(3));
+        Tabs tabs = new Tabs(myWorkspaces, profileSettings, changePassword);
         Set<Component> pagesShown = new HashSet<>(divMap.values());
         tabs.addSelectedChangeListener(event -> {
             pagesShown.forEach(page -> page.setVisible(false));
@@ -317,6 +218,7 @@ public class ProfileView extends CustomAppLayout {
         Div pages = new Div();
         pages.add(divMap.get(1));
         pages.add(divMap.get(2));
+        pages.add(divMap.get(3));
 
         return new Div(tabs, pages);
     }
@@ -404,31 +306,56 @@ public class ProfileView extends CustomAppLayout {
                 .collect(Collectors.joining(", "));
     }
 
-    private Div createCardDiv(Workspace workspace) {
-        Div cardDiv = new Div();
-        cardDiv.addClassNames("col-lg-4", "col-md-4", "col-sm-6", "col-xs-12");
+    private Div workspaceDiv() {
+        Div row = new Div();
+        row.addClassName("row");
+        row.getStyle().set("padding-top", "10px");
 
-        Div card = new Div();
-        card.addClassName("card");
+        workspaces.forEach(workspace -> {
 
-        cardDiv.add(card);
+            String iconType = workspace.getTeam() != null ? "people" : "person";
+            String bgColor = workspace.getTeam() != null ? "bg-blue" : "bg-deep-orange";
 
-        Div headerDiv = new Div();
-        headerDiv.addClassNames("header", "bg-green");
+            Div colDiv = new Div();
 
-        card.add(headerDiv);
+            colDiv.addClickListener(onClick -> getUI().ifPresent(
+                    ui -> ui.navigate(MY_WORKSPACE + workspace.getId()))
+            );
 
-        Html h2 = new Html(
-                "<h2>" + workspace.getTitle() +
-                        "<small>" + workspace.getOwner().getLogin() + "</small>" +
-                        "</h2>");
-        headerDiv.add(h2);
+            colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
+            Div infoBox = new Div();
+            infoBox.addClassNames("info-box-3", bgColor, "hover-zoom-effect");
+            colDiv.add(infoBox);
+            Div icon = new Div();
+            icon.addClassName("icon");
+            infoBox.add(icon);
+            Html i = new Html("<i class=\"material-icons\">" + iconType + "</i>");
+            icon.add(i);
+            Div content = new Div();
+            content.addClassName("content");
+            infoBox.add(content);
 
-        Div body = new Div();
-        body.addClassName("body");
-        body.setText(workspace.getTitle());
-        card.add(body);
-        return cardDiv;
+            Div wsTypeText = new Div();
+            wsTypeText.addClassName("text");
+            wsTypeText.setText(workspace.getTitle());
+            wsTypeText.getStyle().set("font-size", "16px");
+            wsTypeText.getStyle().set("margin-top", "0");
+            content.add(wsTypeText);
+
+            Div wsText = new Div();
+            wsText.addClassName("text");
+            wsText.setText("Активных задач");
+            wsText.getStyle().set("margin-top", "0");
+            content.add(wsText);
+
+            Div tasksCount = new Div();
+            tasksCount.addClassName("number");
+            tasksCount.setText(String.valueOf(workspace.getTasks().size()));
+            content.add(tasksCount);
+            row.add(colDiv);
+        });
+
+        return row;
     }
 
     private void updateUserProfile() {
@@ -499,112 +426,8 @@ public class ProfileView extends CustomAppLayout {
         return upload;
     }
 
-    private Div createAvatarDiv() {
-        Div content = new Div();
-        content.getStyle()
-                .set("display", "flex")
-                .set("justify-content", "center")
-                .set("align-items", "center")
-                .set("flex-direction", "column");
-        content.setWidth("300px");
-        content.setHeight("300px");
-        Div avatar = new Div();
-        avatar.setWidth("150px");
-        avatar.setHeight("150px");
-        avatar.getStyle().set("text-align", "center");
-        Image userAvatar = VaadinViewUtils.getUserAvatar(currentUser, false);
-        avatar.add(userAvatar);
-
-        Div uploadDiv = new Div();
-        uploadDiv.setWidth("300px");
-        uploadDiv.setHeight("150px");
-        uploadDiv.getStyle().set("text-align", "center");
-        uploadAvatar = initUpload();
-        uploadAvatar.addSucceededListener(e -> enabledSaveButton(true));
-        uploadDiv.add(uploadAvatar);
-        content.add(avatar, uploadDiv);
-        return content;
-    }
-
-    private Div workSpacesDiv() {
-        Div content = new Div();
-        content.getStyle()
-                .set("display", "flex")
-                .set("flex-direction", "row");
-        workspaces.forEach(workSpace -> {
-            Div cardItem = new Div();
-            cardItem.getStyle().set("border", "1px solid black");
-            cardItem.getStyle().set("border-radius", "5px");
-            cardItem.add(createCard(workSpace));
-            cardItem.getStyle().set("margin", "5px");
-            content.add(cardItem);
-        });
-        return content;
-    }
-
-    private Div teamDiv() {
-        Div content = new Div();
-        content.getStyle()
-                .set("display", "flex")
-                .set("flex-direction", "row");
-        getMyTeams().forEach(team -> {
-            Div cardItem = new Div();
-            cardItem.getStyle().set("border", "1px solid black");
-            cardItem.getStyle().set("border-radius", "5px");
-            cardItem.add(createTeamCard(team));
-            cardItem.getStyle().set("margin", "5px");
-            content.add(cardItem);
-        });
-        Div cardItem = new Div();
-        cardItem.getStyle().set("border", "1px solid black");
-        cardItem.getStyle().set("border-radius", "5px");
-        cardItem.add(createAddNewCard());
-        cardItem.getStyle().set("margin", "5px");
-        content.add(cardItem);
-        return content;
-    }
-
-    private RippleClickableCard createCard(Workspace workSpace) {
-        RippleClickableCard card = new RippleClickableCard(
-                onClick -> {
-                    String workSpaceId = workSpace.getId().toString();
-                    getUI().ifPresent(ui -> ui.navigate(WORKSPACES_PAGE + PATH_SEPARATOR + workSpaceId));
-                },
-                new TitleLabel(workSpace.getTitle()),
-                new PrimaryLabel(workSpace.getTeam() != null ? workSpace.getTeam().getTitle() : "Личное"),
-                new SecondaryLabel("Кол-во задач: " + workSpace.getTasks().size())
-        );
-        return card;
-    }
-
-    private RippleClickableCard createTeamCard(Team team) {
-        RippleClickableCard card = new RippleClickableCard(
-                onClick -> {
-                    //
-                },
-                new TitleLabel(team.getTitle()),
-                new SecondaryLabel("Участников: " + team.getMembers().size()),
-                getButton(team, OperationEnum.DELETE),
-                getButton(team, OperationEnum.UPDATE)
-        );
-        return card;
-    }
-
     private List<Team> getMyTeams() {
         return teamService.findByMember(Collections.singletonList(currentUser));
-    }
-
-    private RippleClickableCard createAddNewCard() {
-        Image plusImg = new Image("images/plus.png", "Добавить команду");
-        plusImg.setMaxWidth("150px");
-        plusImg.setMaxHeight("150px");
-        RippleClickableCard card = new RippleClickableCard(
-                onClick -> showDialog(OperationEnum.CREATE, new Team()),
-                new PrimaryLabel("Добавить команду"),
-                plusImg
-        );
-        card.getChildren().findFirst().ifPresent(component -> component.getElement().getStyle().set("align-items", "center"));
-        return card;
     }
 
     private void showDialog(final OperationEnum operation, final Team team) {
@@ -616,41 +439,6 @@ public class ProfileView extends CustomAppLayout {
 
     private void reload(final boolean isClosed, final boolean isNotCanceled) {
         if (isClosed && isNotCanceled) init();
-    }
-
-    private ActionButton getButton(Team team, OperationEnum operation) {
-        Icon icon = null;
-        ActionButton btn = null;
-        switch (operation) {
-            case DELETE:
-                icon = VaadinIcon.TRASH.create();
-                btn = new ActionButton(operation.name, icon,
-                        e -> showDialog(operation, team));
-                btn.setIconAfterText(true);
-                btn.getStyle()
-                        .set("position", "absolute")
-                        .set("right", "2px")
-                        .set("bottom", "2px")
-                        .set("color", "red");
-                break;
-            case UPDATE:
-                icon = VaadinIcon.EDIT.create();
-                btn = new ActionButton("Изменить", icon,
-                        e -> showDialog(operation, team));
-                btn.setIconAfterText(true);
-                btn.getStyle()
-                        .set("position", "absolute")
-                        .set("right", "2px")
-                        .set("bottom", "40px");
-                break;
-        }
-        if (icon != null) {
-            icon.getStyle()
-                    .set("display", "inline-block")
-                    .set("margin-bottom", "2px")
-                    .set("margin-left", "2px");
-        }
-        return btn;
     }
 
 }

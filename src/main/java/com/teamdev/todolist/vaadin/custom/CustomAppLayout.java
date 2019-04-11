@@ -17,9 +17,10 @@ import com.vaadin.flow.component.applayout.AppLayoutMenuItem;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.dom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.teamdev.todolist.configuration.support.Constants.*;
+import static com.teamdev.todolist.configuration.support.Constants.ROLE_ADMIN;
 
 public class CustomAppLayout extends AppLayout {
 
@@ -34,6 +35,7 @@ public class CustomAppLayout extends AppLayout {
 
     private void init() {
         menu = createMenu();
+        menu.getElement().getStyle().set("padding", "10px");
         Image img = new Image("images/todo-list-logo.png", "ToDo List Logo");
         img.setHeight("44px");
         setBranding(img);
@@ -54,6 +56,15 @@ public class CustomAppLayout extends AppLayout {
         } else {
             menu.addMenuItem(loginItem);
         }
+
+        menu.getElement().getChildren().forEach(this::stylizeItem);
+
+    }
+
+    private void stylizeItem(Element item) {
+        item.getStyle().set("font-size", "16px");
+        item.getStyle().set("font-weight", "bold");
+        item.getStyle().set("color", "#ac1455");
     }
 
     public CustomAppLayout(UserService userService) {
