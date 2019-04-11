@@ -2,6 +2,7 @@ package com.teamdev.todolist.vaadin.ui.admin;
 
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
+import com.teamdev.todolist.vaadin.ui.MainLayout;
 import com.teamdev.todolist.vaadin.ui.TaskStatusView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -10,14 +11,11 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.material.Material;
 
 import static com.teamdev.todolist.configuration.support.Constants.ADMIN_PAGE;
 
-@Route(ADMIN_PAGE)
+@Route(value = ADMIN_PAGE, layout = MainLayout.class)
 @PageTitle("Administration")
-@Theme(value = Material.class, variant = Material.LIGHT)
 public class AdminView extends CustomAppLayout {
         
     public AdminView(UserService userService) {
@@ -26,7 +24,6 @@ public class AdminView extends CustomAppLayout {
     }
 
     private void init() {
-//        System.out.println(userService.findByLogin("ivan").getLogin());
         HorizontalLayout content = new HorizontalLayout();
         content.setAlignItems(FlexComponent.Alignment.CENTER);
         content.setSizeFull();

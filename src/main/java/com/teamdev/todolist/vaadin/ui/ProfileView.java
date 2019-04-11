@@ -14,17 +14,19 @@ import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TeamForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
@@ -33,11 +35,8 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.material.Material;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,9 +46,8 @@ import static com.teamdev.todolist.configuration.support.Constants.*;
  * @author stegnin
  */
 
-@Route(PROFILE_PAGE)
+@Route(value = PROFILE_PAGE, layout = MainLayout.class)
 @PageTitle("Profile")
-@Theme(value = Material.class, variant = Material.LIGHT)
 public class ProfileView extends CustomAppLayout {
 
     private final UserService userService;
@@ -73,31 +71,268 @@ public class ProfileView extends CustomAppLayout {
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
         this.binder = new BeanValidationBinder<>(User.class);
         this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
-        this.saveChanges = new Button("Save changes");
+        this.saveChanges = new Button("СОХРАНИТЬ");
         init();
     }
 
     private void init() {
-        HorizontalLayout content = new HorizontalLayout();
-        VerticalLayout leftContent = new VerticalLayout();
-        VerticalLayout rightContent = new VerticalLayout();
-        workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
         saveChanges.setEnabled(false);
-        Span message = new Span("Привет, " + currentUser.getProfile().getName() + "!");
-        message.getStyle()
-                .set("font-size", "30px");
-        Div welcome = new Div(message);
-        Div avatar = createAvatarDiv();
+//        VerticalLayout leftContent = new VerticalLayout();
+//        VerticalLayout rightContent = new VerticalLayout();
+//        workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
+//        saveChanges.setEnabled(false);
+
+        Div profileDiv = profilePage();
+
+//        FormLayout formLayout = new FormLayout();
+//
+//        TextField nameField = new TextField("Name");
+//        nameField.setValue(currentUser.getProfile().getName());
+//        nameField.addValueChangeListener(event ->
+//                enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getName())));
+//        profileBinder.forField(nameField)
+//                .bind(UserProfile_.NAME);
+//
+//        TextField surnameField = new TextField("Surname");
+//        surnameField.setValue(currentUser.getProfile().getSurname());
+//        surnameField.addValueChangeListener(event -> {
+//            enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getSurname()));
+//        });
+//        profileBinder.forField(surnameField)
+//                .bind(UserProfile_.SURNAME);
+//
+//        TextField email = new TextField("Email");
+//        email.setValue(currentUser.getProfile().getEmail());
+//        email.addValueChangeListener(event ->
+//                enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getEmail())));
+//        profileBinder.forField(email)
+//                .withValidator(this::emailIsFree, "Email busy, input another email")
+//                .bind(UserProfile_.EMAIL);
+//
+//        TextField pwdField = new TextField("Password");
+//        pwdField.setValue("");
+//        pwdField.addValueChangeListener(event -> enabledSaveButton(
+//                event.getValue().length() > 2));
+//        binder.forField(pwdField)
+//                .withValidator(pwd -> pwd.isEmpty() || pwd.length() > 2, "Password must be greater then 2 characters")
+//                .bind("password");
+//
+//        saveChanges.addClickListener(e -> {
+//            updateUserProfile();
+//            leftContent.remove(profileDiv);
+//            leftContent.addComponentAtIndex(1, profileDiv());
+//            pwdField.setValue("");
+//        });
+//
+//        Button cancel = new Button("Cancel", e -> {
+//            binder.readBean(currentUser);
+//            profileBinder.readBean(currentUser.getProfile());
+//        });
+
+//        formLayout.getStyle()
+//                .set("width", "50%")
+//                .set("position", "relative")
+//                .set("left", "25%");
+//        formLayout.add(nameField, surnameField, email, pwdField);
+
+//        HorizontalLayout buttons = new HorizontalLayout(saveChanges, cancel);
+
+//        leftContent.add(profileDiv/*, formLayout, buttons*/);
+//        leftContent.setAlignItems(FlexComponent.Alignment.CENTER);
+//        leftContent.setSpacing(true);
+//        leftContent.setWidth("50%");
+
+//        Div containerFluid = new Div();
+//        containerFluid.addClassName("container-fluid");
+//
+//        Div rowClearFix = new Div();
+//        rowClearFix.addClassNames("row", "clearfix");
+//        containerFluid.add(rowClearFix);
+
+//        workspaces.forEach(workspace -> rowClearFix.add(createCardDiv(workspace)));
+
+//        rightContent.setSpacing(true);
+//        rightContent.add(containerFluid);
+//        rightContent.setWidth("50%");
+//        content.add(leftContent/*, rightContent*/);
+//        content.add(profileDiv);
+        profileDiv.getStyle().set("margin-top", "16px");
+        setContent(profileDiv);
+    }
+
+    private Div profilePage() {
+        Div container = new Div();
+        container.addClassName("container-fluid");
+        Div rowClearFix = new Div();
+        rowClearFix.addClassNames("row", "clearfix");
+        container.add(rowClearFix);
+        rowClearFix.add(profileDiv());
+        rowClearFix.add(settingsDiv());
+        return container;
+    }
+
+    private Div profileDiv() {
+
+        // TODO подсчёт задач
+
+        int totalTasks = 20;
+        int completed = 16;
+        int active = 4;
+        int expired = 2;
+
+        Div cols = new Div();
+        cols.addClassNames("col-xs-12", "col-sm-3");
+        Div profileCard = new Div();
+        profileCard.addClassNames("card", "profile-card");
+        cols.add(profileCard);
+        Div profileHeader = new Div();
+        profileHeader.addClassName("profile-header");
+        profileCard.add(profileHeader);
+        Div profileBody = new Div();
+        profileBody.addClassName("profile-body");
+        profileCard.add(profileBody);
+        Div imageArea = new Div();
+        imageArea.addClassName("image-area");
+        Image userAvatar = VaadinViewUtils.getUserAvatar(currentUser, false);
+        imageArea.add(userAvatar);
+        profileBody.add(imageArea);
+        Div contentArea = new Div();
+        contentArea.addClassName("content-area");
+        Html h3 = new Html("<h3>" + currentUser.getProfile().getSurname() + " " + currentUser.getProfile().getName() + "</h3>");
+        contentArea.add(h3);
+        Html p = new Html("<p>&nbsp</p>");
+        contentArea.add(p);
+        p = new Html("<p>" + getRolesAsString() + "</p>");
+        contentArea.add(p);
+        profileBody.add(contentArea);
+        Div profileFooter = new Div();
+        profileFooter.addClassName("profile-footer");
+
+        Html ul = new Html("<ul>" +
+                "<li>" +
+                "<span>Всего задач</span>" +
+                "<span>" + totalTasks + "</span>" +
+                "</li>" +
+                "<li>" +
+                "<span>Решённых</span>" +
+                "<span>" + completed + "</span>" +
+                "</li>" +
+                "<li>" +
+                "<span>Активных</span>" +
+                "<span>" + active + "</span>" +
+                "</li>" +
+                "<li>" +
+                "<span>Просроченных</span>" +
+                "<span>" + expired + "</span>" +
+                "</li>" +
+                "</ul>");
+
+        uploadAvatar = initUpload();
+        profileFooter.add(ul);
+        profileFooter.add(uploadAvatar);
+        profileCard.add(profileFooter);
+        return cols;
+    }
+
+    private Div settingsDiv() {
+        Div cols = new Div();
+        cols.addClassNames("col-xs-12", "col-sm-9");
+
+        Div card = new Div();
+        card.addClassName("card");
+        cols.add(card);
+
+        Div body = new Div();
+        body.addClassName("body");
+        card.add(body);
+
+//        Div empty = new Div();
+//        body.add(empty);
+
+//        Html ul = new Html(
+//                "<ul class=\"nav nav-tabs\" role=\"tablist\">" +
+//                            "<li role=\"presentation\" class=\"active\">" +
+//                                "<a href=\"#profile_settings\" aria-controls=\"settings\" role=\"tab\" data-toggle=\"tab\" aria-expanded=\"true\">" +
+//                                    "Настройки профиля" +
+//                                "</a>" +
+//                            "</li>" +
+//                            "<li role=\"presentation\">" +
+//                                "<a href=\"#change_password_settings\" aria-controls=\"settings\" role=\"tab\" data-toggle=\"tab\" aria-expanded=\"false\">" +
+//                                    "Изменить пароль" +
+//                                "</a>" +
+//                            "</li>" +
+//                        "</ul>");
+
+//        Tabs profileSettings = tabs();
+
+        body.add(tabs(settings()));
+//        empty.add(settings());
+//        Div tabContent = new Div();
+//        tabContent.addClassName("tab-content");
+//        empty.add(tabContent);
+//
+//        Div tabPane = new Div();
+//        tabPane.addClassNames("tab-pane", "fade", "in", "active");
+//        tabPane.setId("profile_settings");
+//        tabPane.getStyle().set("role", "tabpanel");
+//        tabPane.add(profileForm());
+//        tabContent.add(tabPane);
+        return cols;
+    }
+
+    private Map<Integer, Div> settings() {
+        Map<Integer, Div> divMap = new HashMap<>();
+        Div profilePage = new Div();
+        profilePage.add(profileForm());
+        Div changePassPage = new Div();
+        changePassPage.add(changePasswordForm());
+        changePassPage.setVisible(false);
+
+        divMap.put(1, profilePage);
+        divMap.put(2, changePassPage);
+
+        return divMap;
+    }
+
+    private Div tabs(Map<Integer, Div> divMap) {
+        Tab profileSettings = new Tab("Настройки профиля");
+        profileSettings.getStyle().set("color", "black");
+
+        Tab changePassword = new Tab("Изменить пароль");
+        changePassword.getStyle().set("color", "black");
+
+        Map<Tab, Component> tabsToPages = new HashMap<>();
+        tabsToPages.put(profileSettings, divMap.get(1));
+        tabsToPages.put(changePassword, divMap.get(2));
+        Tabs tabs = new Tabs(profileSettings, changePassword);
+        Set<Component> pagesShown = new HashSet<>(divMap.values());
+        tabs.addSelectedChangeListener(event -> {
+            pagesShown.forEach(page -> page.setVisible(false));
+            pagesShown.clear();
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
+            pagesShown.add(selectedPage);
+        });
+
+        Div pages = new Div();
+        pages.add(divMap.get(1));
+        pages.add(divMap.get(2));
+
+        return new Div(tabs, pages);
+    }
+
+    private VerticalLayout profileForm() {
+        VerticalLayout content = new VerticalLayout();
         FormLayout formLayout = new FormLayout();
 
-        TextField nameField = new TextField("Name");
+        TextField nameField = new TextField("Имя");
         nameField.setValue(currentUser.getProfile().getName());
         nameField.addValueChangeListener(event ->
                 enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getName())));
         profileBinder.forField(nameField)
                 .bind(UserProfile_.NAME);
 
-        TextField surnameField = new TextField("Surname");
+        TextField surnameField = new TextField("Фамилия");
         surnameField.setValue(currentUser.getProfile().getSurname());
         surnameField.addValueChangeListener(event -> {
             enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getSurname()));
@@ -110,48 +345,90 @@ public class ProfileView extends CustomAppLayout {
         email.addValueChangeListener(event ->
                 enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getEmail())));
         profileBinder.forField(email)
-                .withValidator(this::emailIsFree, "Email busy, input another email")
+                .withValidator(this::emailIsFree, "Email занят, введите другой email")
                 .bind(UserProfile_.EMAIL);
-
-        TextField pwdField = new TextField("Password");
-        pwdField.setValue("");
-        pwdField.addValueChangeListener(event -> enabledSaveButton(
-                event.getValue().length() > 2));
-        binder.forField(pwdField)
-                .withValidator(pwd -> pwd.isEmpty() || pwd.length() > 2, "Password must be greater then 2 characters")
-                .bind("password");
 
         saveChanges.addClickListener(e -> {
             updateUserProfile();
-            leftContent.remove(avatar);
-            leftContent.addComponentAtIndex(1, createAvatarDiv());
-            pwdField.setValue("");
+            init(); // TODO продумать обновление информации в блоке с аватаром пользователя
         });
 
-        Button cancel = new Button("Cancel", e -> {
-            binder.readBean(currentUser);
-            profileBinder.readBean(currentUser.getProfile());
+        saveChanges.addClassNames("btn", "bg-pink", "waves-effect");
+        saveChanges.getStyle().set("padding", "8px 0 25px 0");
+        saveChanges.setWidthFull();
+
+        HorizontalLayout buttons = new HorizontalLayout(saveChanges);
+        buttons.getStyle().set("width", "100px");
+        formLayout.add(nameField, surnameField, email);
+        content.add(formLayout, buttons);
+
+        return content;
+    }
+
+    private VerticalLayout changePasswordForm() {
+        VerticalLayout content = new VerticalLayout();
+        FormLayout formLayout = new FormLayout();
+
+        TextField oldPassField = new TextField("Старый пароль");
+
+        TextField newPassField = new TextField("Новый пароль");
+
+        TextField confirmNewPassField = new TextField("Подтвердите новый пароль");
+
+        Button submit = new Button("СОХРАНИТЬ");
+        submit.setEnabled(false);
+        submit.addClickListener(e -> {
+            updateUserPassword(oldPassField.getValue(), newPassField.getValue());
+            Notification.show("Пароль успешно изменён", 3000, Notification.Position.TOP_STRETCH);
+            oldPassField.setValue("");
+            newPassField.setValue("");
+            confirmNewPassField.setValue("");
         });
 
-        formLayout.getStyle()
-                .set("width", "50%")
-                .set("position", "relative")
-                .set("left", "25%");
-        formLayout.add(nameField, surnameField, email, pwdField);
+        confirmNewPassField.addValueChangeListener(event ->
+                submit.setEnabled(event.getValue().equals(newPassField.getValue())));
 
-        HorizontalLayout buttons = new HorizontalLayout(saveChanges, cancel);
+        submit.addClassNames("bg-red", "waves-effect");
 
-        leftContent.add(welcome, avatar, formLayout, buttons);
-        leftContent.setAlignItems(FlexComponent.Alignment.CENTER);
-        leftContent.setSpacing(true);
-        leftContent.setWidth("50%");
+        HorizontalLayout buttons = new HorizontalLayout(submit);
+        formLayout.add(oldPassField, newPassField, confirmNewPassField);
+        content.add(formLayout, buttons);
 
-        rightContent.setSpacing(true);
-        rightContent.add(workSpacesDiv());
-        rightContent.add(teamDiv());
-        rightContent.setWidth("50%");
-        content.add(leftContent, rightContent);
-        setContent(content);
+        return content;
+    }
+
+    private String getRolesAsString() {
+        return currentUser.getRoles()
+                .stream()
+                .map(Role::getTitle)
+                .collect(Collectors.joining(", "));
+    }
+
+    private Div createCardDiv(Workspace workspace) {
+        Div cardDiv = new Div();
+        cardDiv.addClassNames("col-lg-4", "col-md-4", "col-sm-6", "col-xs-12");
+
+        Div card = new Div();
+        card.addClassName("card");
+
+        cardDiv.add(card);
+
+        Div headerDiv = new Div();
+        headerDiv.addClassNames("header", "bg-green");
+
+        card.add(headerDiv);
+
+        Html h2 = new Html(
+                "<h2>" + workspace.getTitle() +
+                        "<small>" + workspace.getOwner().getLogin() + "</small>" +
+                        "</h2>");
+        headerDiv.add(h2);
+
+        Div body = new Div();
+        body.addClassName("body");
+        body.setText(workspace.getTitle());
+        card.add(body);
+        return cardDiv;
     }
 
     private void updateUserProfile() {
@@ -159,8 +436,14 @@ public class ProfileView extends CustomAppLayout {
                 profileBinder.writeBeanIfValid(currentUser.getProfile())) {
             userService.saveUserAvatar(currentUser, buffer);
             userService.save(currentUser);
-            Notification.show("Changes have been saved successfully", 3000, Notification.Position.TOP_STRETCH);
+            Notification.show("Изменения успешно сохранены", 3000, Notification.Position.TOP_STRETCH);
             reload();
+        }
+    }
+
+    private void updateUserPassword(String oldPass, String newPass) {
+        if (userService.matchesPasswords(oldPass, currentUser.getPasswordHash())) {
+            userService.changePassword(currentUser.getId(), newPass);
         }
     }
 

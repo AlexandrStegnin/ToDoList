@@ -32,17 +32,11 @@ public class CustomAppLayout extends AppLayout {
 
     private User currentDbUser;
 
-    public CustomAppLayout() {
-        init();
-    }
-
     private void init() {
         menu = createMenu();
         Image img = new Image("images/todo-list-logo.png", "ToDo List Logo");
         img.setHeight("44px");
         setBranding(img);
-
-        this.getElement().getStyle().set("margin-top", "10px");
 
         AppLayoutMenuItem workspacesItem = new AppLayoutMenuItem(VaadinIcon.TASKS.create(), "Workspaces",
                 e -> goToPage(MyWorkspacesView.class, SecurityUtils.getUsername()));
@@ -69,7 +63,7 @@ public class CustomAppLayout extends AppLayout {
     }
 
     private void logout() {
-        Notification.show("You have been Log Out successful!", 3000, Notification.Position.TOP_END);
+        Notification.show("Вы успешно вышли из системы!", 3000, Notification.Position.TOP_END);
         this.getUI().ifPresent(ui -> ui.navigate(Constants.LOGIN_PAGE));
         auth.logout();
     }
@@ -79,14 +73,17 @@ public class CustomAppLayout extends AppLayout {
     }
 
     private void goToPage(Class<? extends Component> clazz, String param) {
-        if (param == null) goToPage(clazz);
-        getUI().ifPresent(ui -> ui.navigate(MyWorkspacesView.class, param));
+        if (param == null) {
+            goToPage(clazz);
+        } else {
+            getUI().ifPresent(ui -> ui.navigate(MyWorkspacesView.class, param));
+        }
     }
 
     private Component createAvatarDiv() {
         Image userAvatar = VaadinViewUtils.getUserAvatar(userService.findByLogin(SecurityUtils.getUsername()), true);
-        userAvatar.setMaxHeight("24px");
-        userAvatar.getStyle().set("margin-bottom", "8px");
+        userAvatar.setMaxHeight("30px");
+        userAvatar.getStyle().set("margin-right", "8px");
         return userAvatar;
     }
 
