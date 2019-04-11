@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -25,6 +26,7 @@ import static com.teamdev.todolist.configuration.support.Constants.ROLE_USER;
  */
 
 @Service
+@Transactional(readOnly = true)
 public class UserService {
 
     @Value("${spring.config.file-upload-directory}")
@@ -46,6 +48,7 @@ public class UserService {
         this.roleService = roleService;
     }
 
+    @Transactional
     public User create(User user) {
         user.setPasswordHash(encoder.encode(user.getPassword()));
         if (Objects.equals(null, user.getRoles()) || user.getRoles().isEmpty())
@@ -65,14 +68,17 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public User update(User user) {
         return save(user);
     }
 
+    @Transactional
     public void delete(Long id) {
         userRepository.deleteById(id);
     }
 
+    @Transactional
     public void delete(User user) {
         delete(user.getId());
     }
@@ -96,6 +102,7 @@ public class UserService {
      * @param secUser - пользователь, которому надо поменять пароль
      * @return User
      */
+    @Transactional
     public User save(User secUser) {
         User dbUser = userRepository.findByLogin(secUser.getLogin());
         // Пароль не сохраняется (transient !), сохраняется только HASH
@@ -111,6 +118,7 @@ public class UserService {
         return userRepository.save(secUser);
     }
 
+    @Transactional
     public void registerNewUser(User newUser) {
         newUser.setPasswordHash(passwordToHash(newUser.getPassword()));
         newUser.setRoles(new HashSet<>(Collections.singletonList(roleService.getDefaultUserRole())));
@@ -121,6 +129,7 @@ public class UserService {
         return userRepository.getOne(useId);
     }
 
+    @Transactional
     public void changePassword(long userId, String passwordNew) {
         //TODO добавть проверок для пароля
         User userDb = getById(userId);
@@ -181,5 +190,8 @@ public class UserService {
         }
     }
 
+    public boolean matchesPasswords(String oldPass, String dbPass) {
+        return encoder.matches(oldPass, dbPass);
+    }
 
 }
