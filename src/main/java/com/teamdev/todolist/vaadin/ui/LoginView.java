@@ -3,22 +3,23 @@ package com.teamdev.todolist.vaadin.ui;
 
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.repository.AuthRepository;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.login.LoginForm;
-import com.vaadin.flow.component.login.LoginI18n;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Input;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.material.Material;
 
 import static com.teamdev.todolist.configuration.support.Constants.*;
 
 @PageTitle("Login page")
-@Route(LOGIN_PAGE)
-@Theme(value = Material.class, variant = Material.LIGHT)
-public class LoginView extends VerticalLayout {
+@Route(value = LOGIN_PAGE, layout = MainLayout.class)
+@HtmlImport("../VAADIN/shared-styles.html")
+public class LoginView extends Div {
+
+    // TODO Добавить кнопку для просмотра API
 
     private final AuthRepository authRepository;
 
@@ -28,9 +29,102 @@ public class LoginView extends VerticalLayout {
     }
 
     private void init() {
-        LoginForm loginForm = new LoginForm();
-        loginForm.addLoginListener(e -> {
-            if (authenticated(e.getUsername(), e.getPassword())) {
+        createSignInForm();
+    }
+
+    private boolean authenticated(String login, String password) {
+        return authRepository.authenticate(login, password).isAuthenticated();
+    }
+
+    private void createSignInForm() {
+        Div loginPage = new Div();
+        loginPage.addClassNames("login-page", "ls-closed");
+        Div loginBox = new Div();
+        loginBox.addClassName("login-box");
+        loginPage.add(loginBox);
+
+        Div logo = new Div();
+        logo.addClassName("logo");
+        Html link = new Html("<a href=\"javascript:void(0);\">TODO LIST</a>");
+
+        Html smallHtml = new Html("<small>Помогаем решать любые задачи</small>");
+        logo.add(link, smallHtml);
+        loginBox.add(logo);
+
+        Div card = new Div();
+        card.addClassName("card");
+        loginBox.add(card);
+
+        Div body = new Div();
+        body.addClassName("body");
+        card.add(body);
+
+        body.add(createForm());
+        add(loginPage);
+    }
+
+    private Div createForm() {
+
+        Div form = new Div();
+        Div msg = new Div();
+        msg.addClassName("msg");
+        msg.setText(" ");
+        form.add(msg);
+
+        Div usernameGroupDiv = new Div();
+        usernameGroupDiv.addClassName("input-group");
+        Span inputGroupAddon = new Span();
+        inputGroupAddon.addClassName("input-group-addon");
+        Html personIcon = new Html("<i class=\"material-icons\">person</i>");
+        inputGroupAddon.add(personIcon);
+        usernameGroupDiv.add(inputGroupAddon);
+
+        Div usernameInline = new Div();
+        usernameInline.addClassName("form-line");
+        usernameGroupDiv.add(usernameInline);
+
+        Input loginInput = new Input();
+        loginInput.setType("text");
+        loginInput.setPlaceholder("Имя пользователя");
+        loginInput.addClassName("form-control");
+        loginInput.isRequiredIndicatorVisible();
+
+        usernameInline.add(loginInput);
+
+        form.add(usernameGroupDiv);
+
+        Div passwordGroupDiv = new Div();
+        passwordGroupDiv.addClassName("input-group");
+        Span inputGroupAddonPass = new Span();
+        inputGroupAddonPass.addClassName("input-group-addon");
+        Html lockIcon = new Html("<i class=\"material-icons\">lock</i>");
+        inputGroupAddonPass.add(lockIcon);
+        passwordGroupDiv.add(inputGroupAddonPass);
+
+        Div passwordInline = new Div();
+        passwordInline.addClassName("form-line");
+        passwordGroupDiv.add(passwordInline);
+
+        Input passwordInput = new Input();
+        passwordInput.setType("password");
+        passwordInput.setPlaceholder("Пароль");
+        passwordInput.addClassName("form-control");
+        passwordInput.isRequiredIndicatorVisible();
+
+        passwordInline.add(passwordInput);
+
+        form.add(passwordGroupDiv);
+
+        Div rowSubmit = new Div();
+        rowSubmit.addClassName("row");
+        form.add(rowSubmit);
+
+        Div colSubmit = new Div();
+        colSubmit.addClassNames("col-xs-offset-8", "col-xs-4");
+        rowSubmit.add(colSubmit);
+
+        Button signIn = new Button("ВОЙТИ", e -> {
+            if (authenticated(loginInput.getValue(), passwordInput.getValue())) {
                 this.getUI().ifPresent(ui -> {
                     if (SecurityUtils.isUserInRole(ROLE_ADMIN)) {
                         ui.navigate(ADMIN_PAGE);
@@ -39,47 +133,29 @@ public class LoginView extends VerticalLayout {
                     }
                 });
             } else {
-                loginForm.setError(true);
+                System.out.println("ERROR");
             }
         });
-        loginForm.setForgotPasswordButtonVisible(false);
-        setJustifyContentMode(JustifyContentMode.CENTER);
-        setAlignItems(Alignment.CENTER);
-        setSizeFull();
-        add(loginForm);
 
-        Button registration = new Button("Registration", e -> getUI().ifPresent(ui -> ui.navigate(RegistrationView.class)));
-        add(registration);
+        signIn.addClassNames("btn", "btn-block", "bg-pink", "waves-effect");
+        signIn.getStyle().set("padding", "8px 0 25px 0");
+        colSubmit.add(signIn);
 
-        Button updateI18nButton = new Button("Switch to Russian",
-                event -> loginForm.setI18n(createRussianI18n()));
-        Anchor apiLink = new Anchor("." + API_INFO_URL, "API info");
-        add(updateI18nButton);
-        apiLink.getStyle().set("color", "green");
-        add(apiLink);
-    }
+        Div rowRegister = new Div();
+        rowRegister.addClassName("row");
+        form.add(rowRegister);
 
-    private boolean authenticated(String login, String password) {
-        return authRepository.authenticate(login, password).isAuthenticated();
-    }
+        Div colRegister = new Div();
+        colRegister.addClassNames("col-xs-offset-6", "col-xs-6");
+        rowRegister.add(colRegister);
 
-    private LoginI18n createRussianI18n() {
-        final LoginI18n i18n = LoginI18n.createDefault();
+        Button registration = new Button("РЕГИСТРАЦИЯ", e -> getUI().ifPresent(ui -> ui.navigate(RegistrationView.class)));
 
-        i18n.setHeader(new LoginI18n.Header());
-        i18n.getHeader().setTitle("Название приложения");
-        i18n.getHeader().setDescription("Описание приложения");
-        i18n.getForm().setUsername("Имя пользователя");
-        i18n.getForm().setTitle("Форма входа");
-        i18n.getForm().setSubmit("Войти");
-        i18n.getForm().setPassword("Пароль");
-        i18n.getForm().setForgotPassword("Забыли пароль?");
-        i18n.getErrorMessage().setTitle("Имя пользователя/пароль указаны неверно");
-        i18n.getErrorMessage()
-                .setMessage("Проверьте правильность ввода имени пользователя и пароля.");
-//        i18n.setAdditionalInformation(
-//                "Дополнительная информация.");
-        return i18n;
+        registration.addClassNames("btn", "btn-block", "bg-blue-grey", "waves-effect");
+        registration.getStyle().set("padding", "8px 0 25px 0");
+        colRegister.add(registration);
+
+        return form;
     }
 
 }
