@@ -8,6 +8,7 @@ import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TeamForm;
+import com.teamdev.todolist.vaadin.form.WorkspaceForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
@@ -29,7 +30,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,7 +46,7 @@ import static com.teamdev.todolist.configuration.support.Constants.*;
 @PageTitle("Profile")
 public class ProfileView extends CustomAppLayout {
     // TODO добавить создание нового РП/удаление/изменение
-    private final String MY_WORKSPACE =  WORKSPACES_PAGE + PATH_SEPARATOR + SecurityUtils.getUsername() + PATH_SEPARATOR;
+    private final String MY_WORKSPACE = WORKSPACES_PAGE + PATH_SEPARATOR + SecurityUtils.getUsername() + PATH_SEPARATOR;
 
     private final UserService userService;
     private final TeamService teamService;
@@ -52,10 +55,15 @@ public class ProfileView extends CustomAppLayout {
     private final Binder<UserProfile> profileBinder;
     private final Button saveChanges;
     private final WorkspaceService workspaceService;
+    private WorkspaceForm workspaceForm;
     private TeamForm teamForm;
     private List<Workspace> workspaces;
     private MemoryBuffer buffer;
     private Upload uploadAvatar;
+    private AtomicInteger totalTasks;
+    private AtomicInteger completedTasks;
+    private AtomicInteger activeTasks;
+    private AtomicInteger expiredTasks;
 
     public ProfileView(UserService userService, WorkspaceService workspaceService, TeamService teamService) {
         super(userService);
@@ -67,6 +75,10 @@ public class ProfileView extends CustomAppLayout {
         this.binder = new BeanValidationBinder<>(User.class);
         this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
         this.saveChanges = new Button("СОХРАНИТЬ");
+        this.totalTasks = new AtomicInteger(0);
+        this.completedTasks = new AtomicInteger(0);
+        this.activeTasks = new AtomicInteger(0);
+        this.expiredTasks = new AtomicInteger(0);
         init();
     }
 
@@ -91,14 +103,7 @@ public class ProfileView extends CustomAppLayout {
     }
 
     private Div profileDiv() {
-
-        // TODO подсчёт задач
-
-        int totalTasks = 20;
-        int completed = 16;
-        int active = 4;
-        int expired = 2;
-
+        calculateTasks();
         Div cols = new Div();
         cols.addClassNames("col-xs-12", "col-sm-3");
         Div profileCard = new Div();
@@ -117,7 +122,7 @@ public class ProfileView extends CustomAppLayout {
         profileBody.add(imageArea);
         Div contentArea = new Div();
         contentArea.addClassName("content-area");
-        Html h3 = new Html("<h3>" + currentUser.getProfile().getSurname() + " " + currentUser.getProfile().getName() + "</h3>");
+        Html h3 = new Html("<h3>" + currentUser.getProfile().getName() + " " + currentUser.getProfile().getSurname() + "</h3>");
         contentArea.add(h3);
         Html p = new Html("<p>&nbsp</p>");
         contentArea.add(p);
@@ -130,19 +135,19 @@ public class ProfileView extends CustomAppLayout {
         Html ul = new Html("<ul>" +
                 "<li>" +
                 "<span>Всего задач</span>" +
-                "<span>" + totalTasks + "</span>" +
+                "<span class=\"badge bg-blue\">" + totalTasks + "</span>" +
                 "</li>" +
                 "<li>" +
                 "<span>Решённых</span>" +
-                "<span>" + completed + "</span>" +
+                "<span class=\"badge bg-green\">" + completedTasks + "</span>" +
                 "</li>" +
                 "<li>" +
                 "<span>Активных</span>" +
-                "<span>" + active + "</span>" +
+                "<span class=\"badge bg-amber\">" + activeTasks + "</span>" +
                 "</li>" +
                 "<li>" +
                 "<span>Просроченных</span>" +
-                "<span>" + expired + "</span>" +
+                "<span class=\"badge bg-red\">" + expiredTasks + "</span>" +
                 "</li>" +
                 "</ul>");
 
@@ -308,7 +313,7 @@ public class ProfileView extends CustomAppLayout {
 
     private Div workspaceDiv() {
         Div row = new Div();
-        row.addClassName("row");
+        row.addClassNames("row", "animated", "fadeInRight");
         row.getStyle().set("padding-top", "10px");
 
         workspaces.forEach(workspace -> {
@@ -324,6 +329,7 @@ public class ProfileView extends CustomAppLayout {
 
             colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
             Div infoBox = new Div();
+            infoBox.getStyle().set("cursor", "pointer");
             infoBox.addClassNames("info-box-3", bgColor, "hover-zoom-effect");
             colDiv.add(infoBox);
             Div icon = new Div();
@@ -354,8 +360,44 @@ public class ProfileView extends CustomAppLayout {
             content.add(tasksCount);
             row.add(colDiv);
         });
-
+        row.add(addNewWorkspaceDiv());
         return row;
+    }
+
+    private Div addNewWorkspaceDiv() {
+
+        String iconType = "add";
+        String bgColor = "bg-green";
+
+        Div colDiv = new Div();
+
+        colDiv.addClickListener(onClick -> getUI().ifPresent(ui -> showWorkspaceForm(OperationEnum.CREATE, new Workspace())));
+
+        colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
+        Div infoBox = new Div();
+        infoBox.getStyle().set("cursor", "pointer");
+        infoBox.addClassNames("info-box-2", bgColor, "hover-zoom-effect");
+        colDiv.add(infoBox);
+        Div icon = new Div();
+        icon.addClassName("icon");
+        infoBox.add(icon);
+        Html i = new Html("<i class=\"material-icons\">" + iconType + "</i>");
+        icon.add(i);
+        Div content = new Div();
+        content.addClassName("content");
+        content.getStyle()
+                .set("display", "flex")
+                .set("align-items", "center");
+        infoBox.add(content);
+
+        Div wsTypeText = new Div();
+        wsTypeText.addClassName("text");
+        wsTypeText.setText("Добавить рабочую область");
+        wsTypeText.getStyle().set("font-size", "16px");
+        wsTypeText.getStyle().set("margin", "0");
+        content.add(wsTypeText);
+
+        return colDiv;
     }
 
     private void updateUserProfile() {
@@ -437,8 +479,34 @@ public class ProfileView extends CustomAppLayout {
         teamForm.open();
     }
 
+    private void showWorkspaceForm(final OperationEnum operation, final Workspace workspace) {
+        WorkspaceForm workspaceForm = new WorkspaceForm(workspaceService, workspace, teamService, operation, currentUser);
+        this.workspaceForm = workspaceForm;
+        workspaceForm.addOpenedChangeListener(event -> reload(!event.isOpened(), !this.workspaceForm.isCanceled()));
+        workspaceForm.open();
+    }
+
     private void reload(final boolean isClosed, final boolean isNotCanceled) {
         if (isClosed && isNotCanceled) init();
+    }
+
+    private void calculateTasks() {
+        workspaces.forEach(workspace -> workspace.getTasks().forEach(task -> {
+            totalTasks.incrementAndGet();
+            switch (task.getStatus().getTitle()) {
+                case TASK_STATUS_COMPLETED:
+                    completedTasks.incrementAndGet();
+                    break;
+                case "Новая":
+                case "Исполняемая":
+                    activeTasks.incrementAndGet();
+                    break;
+            }
+            if (!task.getStatus().getTitle().equalsIgnoreCase(TASK_STATUS_COMPLETED) &&
+                    task.getExecutionDate().toLocalDate().isBefore(LocalDate.now())) {
+                expiredTasks.incrementAndGet();
+            }
+        }));
     }
 
 }

@@ -13,6 +13,7 @@ import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.WorkspaceService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -40,11 +41,12 @@ public class WorkspaceForm extends Dialog {
     private final Button cancel;
     private final OperationEnum operation;
     private final HorizontalLayout buttons;
+    private final VerticalLayout content;
     private Button submit;
     private final User owner;
 
     private Select<Team> team;
-
+    private Select<String> privateOrTeam;
     private Workspace workspace;
 
     private Binder<Workspace> workspaceBinder;
@@ -59,7 +61,9 @@ public class WorkspaceForm extends Dialog {
         this.workspace = workspace;
         this.title = new TextField("Название");
         this.team = new Select<>();
+        this.privateOrTeam = new Select<>();
         this.buttons = new HorizontalLayout();
+        this.content = new VerticalLayout();
         this.cancel = new Button("Отменить", e -> {
             this.canceled = true;
             this.close();
@@ -72,6 +76,7 @@ public class WorkspaceForm extends Dialog {
 
     private void init() {
         prepareSubmitButton(operation);
+        stylizeForm();
         workspace.setOwner(owner);
         team.setItems(getMyTeams());
         team.setTextRenderer(Team::getTitle);
@@ -79,7 +84,6 @@ public class WorkspaceForm extends Dialog {
         team.setEmptySelectionCaption("Выберите команду");
         team.setVisible(false);
 
-        Select<String> privateOrTeam = new Select<>();
         privateOrTeam.setEmptySelectionAllowed(false);
         privateOrTeam.setItems(PRIVATE_WS, TEAM_WS);
         privateOrTeam.setValue(PRIVATE_WS);
@@ -98,7 +102,7 @@ public class WorkspaceForm extends Dialog {
         });
 
         buttons.add(submit, cancel);
-        VerticalLayout content = new VerticalLayout(title, privateOrTeam, team, buttons);
+        content.add(title, privateOrTeam, team, buttons);
         add(content);
         workspaceBinder.setBean(workspace);
         workspaceBinder.bindInstanceFields(this);
@@ -120,6 +124,29 @@ public class WorkspaceForm extends Dialog {
                 submit.addClickListener(e -> executeCommand(new DeleteWorkspaceCommand(workspaceService, workspace)));
                 break;
         }
+    }
+
+    private void stylizeForm() {
+        setWidth("400px");
+        setHeight("200px");
+        title.setPlaceholder("Введите название");
+        title.setRequiredIndicatorVisible(true);
+        title.setWidthFull();
+
+        privateOrTeam.setWidthFull();
+
+        team.setWidthFull();
+
+        submit.addClassNames("btn", "bg-green", "waves-effect");
+        submit.getStyle().set("padding", "8px 10px 25px");
+
+        cancel.addClassNames("btn", "bg-red", "waves-effect");
+        cancel.getStyle().set("padding", "8px 10px 25px");
+
+        buttons.setWidthFull();
+        buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+
+        content.setHeightFull();
     }
 
     private void executeCommand(Command command) {
