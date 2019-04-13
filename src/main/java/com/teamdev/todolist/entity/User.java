@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Set;
@@ -34,7 +35,8 @@ public class User implements UserDetails {
     private Long id;
 
     @Column
-    @Size(min = 3, max = 45, message = "Login must be greater than 3 and less than 45 characters")
+    @NotNull(message = "Необходимо указать имя пользователя")
+    @Size(min = 3, max = 45, message = "Имя пользователя должно быть от 3 до 45 символов")
     @ApiModelProperty(notes = "User login")
     private String login;
 

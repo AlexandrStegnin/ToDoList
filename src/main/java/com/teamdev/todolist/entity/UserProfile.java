@@ -35,12 +35,12 @@ public class UserProfile extends AbstractEntity {
     private User user;
 
     @Column
-    @NotNull
+    @NotNull(message = "Необходимо указать имя")
     @ApiModelProperty(notes = "User name")
     private String name;
 
     @Column
-    @NotNull
+    @NotNull(message = "Необходимо указать фамилию")
     @ApiModelProperty(notes = "User surname")
     private String surname;
 
@@ -50,6 +50,7 @@ public class UserProfile extends AbstractEntity {
 
     @Email
     @Column
+    @NotNull(message = "Необходимо указать email")
     @ApiModelProperty(notes = "User email")
     private String email;
 
