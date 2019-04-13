@@ -1,3 +1,3 @@
-UPDATE todo_list_db.seq_store
+UPDATE todo_list_db.SEQ_STORE
 SET SEQ_VALUE = 2
 WHERE SEQ_NAME = 'TEAM.ID.PK'

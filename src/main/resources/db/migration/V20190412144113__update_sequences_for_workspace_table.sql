@@ -1,3 +1,3 @@
-UPDATE todo_list_db.seq_store
+UPDATE todo_list_db.SEQ_STORE
 SET SEQ_VALUE = 3
 WHERE SEQ_NAME = 'WORKSPACE.ID.PK'
