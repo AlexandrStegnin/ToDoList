@@ -82,11 +82,11 @@ public class WorkspaceForm extends Dialog {
         team.setTextRenderer(Team::getTitle);
         team.setEmptySelectionAllowed(true);
         team.setEmptySelectionCaption("Выберите команду");
-        team.setVisible(false);
+        team.setVisible(workspace.getTeam() != null);
 
         privateOrTeam.setEmptySelectionAllowed(false);
         privateOrTeam.setItems(PRIVATE_WS, TEAM_WS);
-        privateOrTeam.setValue(PRIVATE_WS);
+        privateOrTeam.setValue(workspace.getTeam() == null ? PRIVATE_WS : TEAM_WS);
         privateOrTeam.setPlaceholder("Вид рабочей области");
         privateOrTeam.addValueChangeListener(event -> {
             if (PRIVATE_WS.equalsIgnoreCase(privateOrTeam.getValue())) {

@@ -323,12 +323,23 @@ public class ProfileView extends CustomAppLayout {
 
             Div colDiv = new Div();
 
-            colDiv.addClickListener(onClick -> getUI().ifPresent(
-                    ui -> ui.navigate(MY_WORKSPACE + workspace.getId()))
-            );
+            Button edit = new Button("Изменить");
+            edit.addClassNames("btn", "btn-xs", "bg-grey", "waves-effect");
+            edit.addClickListener(event -> showWorkspaceForm(OperationEnum.UPDATE, workspace));
+            edit.getStyle()
+                    .set("position", "absolute")
+                    .set("z-index", "1")
+                    .set("right", "0")
+                    .set("bottom", "0")
+                    .set("margin", "0 15px 30px 0")
+                    .set("box-shadow", "none")
+                    .set("border-radius", "0");
+            colDiv.add(edit);
 
             colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
             Div infoBox = new Div();
+            infoBox.addClickListener(onClick -> getUI().ifPresent(
+                    ui -> ui.navigate(MY_WORKSPACE + workspace.getId())));
             infoBox.getStyle().set("cursor", "pointer");
             infoBox.addClassNames("info-box-3", bgColor, "hover-zoom-effect");
             colDiv.add(infoBox);
