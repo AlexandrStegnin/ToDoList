@@ -12,6 +12,7 @@ import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -32,6 +33,7 @@ public class TeamForm extends Dialog {
     private final TextField title;
 
     private final MultiselectComboBox<User> members;
+    private final VerticalLayout content;
 
     private OperationEnum operation;
     private HorizontalLayout buttons;
@@ -46,12 +48,13 @@ public class TeamForm extends Dialog {
         this.userService = userService;
         this.teamService = teamService;
         this.teamBinder = new BeanValidationBinder<>(Team.class);
-        this.title = new TextField("Название");
+        this.title = new TextField("НАЗВАНИЕ");
         this.members = new MultiselectComboBox<>(this::getUserName);
+        this.content = new VerticalLayout();
         this.team = team;
         this.operation = operation;
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
-        this.cancel = new Button("Отменить", e -> {
+        this.cancel = new Button("ОТМЕНИТЬ", e -> {
             this.canceled = true;
             this.close();
         });
@@ -60,17 +63,14 @@ public class TeamForm extends Dialog {
     }
 
     private void init() {
-        setMinWidth("300px");
-        setMaxWidth("400px");
-
+        prepareSubmitButton();
+        stylizeForm();
         members.setItems(getAllUsers());
         members.setRequired(true);
         members.setRequiredIndicatorVisible(true);
 
-        prepareSubmitButton();
-
         buttons.add(submit, cancel);
-        VerticalLayout content = new VerticalLayout(title, members, buttons);
+        content.add(title, members, buttons);
         add(content);
         team.addMember(currentUser);
         teamBinder.setBean(team);
@@ -91,7 +91,7 @@ public class TeamForm extends Dialog {
     }
 
     private void prepareSubmitButton() {
-        this.submit = new Button(operation.name);
+        this.submit = new Button(operation.name.toUpperCase());
         switch (operation) {
             case CREATE:
                 submit.addClickListener(e -> executeCommand(new CreateTeamCommand(teamService, team), team));
@@ -114,6 +114,28 @@ public class TeamForm extends Dialog {
             command.execute();
             this.close();
         }
+    }
+
+    private void stylizeForm() {
+        setWidth("400px");
+        setHeight("150px");
+        title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
+        title.setRequiredIndicatorVisible(true);
+        title.setWidthFull();
+        title.getStyle().set("font-size", "11px");
+
+        members.getElement().getStyle().set("font-size", "11px");
+
+        submit.addClassNames("btn", "bg-green", "waves-effect");
+        submit.getStyle().set("padding", "8px 10px 25px");
+
+        cancel.addClassNames("btn", "bg-red", "waves-effect");
+        cancel.getStyle().set("padding", "8px 10px 25px");
+
+        buttons.setWidthFull();
+        buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+
+        content.setHeightFull();
     }
 
 }
