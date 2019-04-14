@@ -43,7 +43,7 @@ import static com.teamdev.todolist.configuration.support.Constants.*;
  */
 
 @Route(value = PROFILE_PAGE, layout = MainLayout.class)
-@PageTitle("Profile")
+@PageTitle("ПРОФИЛЬ")
 public class ProfileView extends CustomAppLayout {
     // TODO добавить удаление РО
     private final String MY_WORKSPACE = WORKSPACES_PAGE + PATH_SEPARATOR + SecurityUtils.getUsername() + PATH_SEPARATOR;
@@ -58,6 +58,7 @@ public class ProfileView extends CustomAppLayout {
     private WorkspaceForm workspaceForm;
     private TeamForm teamForm;
     private List<Workspace> workspaces;
+    private List<Team> teams;
     private MemoryBuffer buffer;
     private Upload uploadAvatar;
     private AtomicInteger totalTasks;
@@ -85,6 +86,7 @@ public class ProfileView extends CustomAppLayout {
     private void init() {
         saveChanges.setEnabled(false);
         workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
+        teams = getMyTeams();
         totalTasks.set(0);
         completedTasks.set(0);
         activeTasks.set(0);
@@ -187,6 +189,10 @@ public class ProfileView extends CustomAppLayout {
         Div myWorkspacesPage = new Div();
         myWorkspacesPage.add(workspaceDiv());
 
+        Div myTeamsPage = new Div();
+        myTeamsPage.add(teamDiv());
+        myTeamsPage.setVisible(false);
+
         Div profilePage = new Div();
         profilePage.add(profileForm());
         profilePage.setVisible(false);
@@ -196,8 +202,9 @@ public class ProfileView extends CustomAppLayout {
         changePassPage.setVisible(false);
 
         divMap.put(1, myWorkspacesPage);
-        divMap.put(2, profilePage);
-        divMap.put(3, changePassPage);
+        divMap.put(2, myTeamsPage);
+        divMap.put(3, profilePage);
+        divMap.put(4, changePassPage);
 
         return divMap;
     }
@@ -205,6 +212,9 @@ public class ProfileView extends CustomAppLayout {
     private Div tabs(Map<Integer, Div> divMap) {
         Tab myWorkspaces = new Tab("РАБОЧИЕ ОБЛАСТИ");
         myWorkspaces.getStyle().set("color", "black");
+
+        Tab myTeams = new Tab("КОМАНДЫ");
+        myTeams.getStyle().set("color", "black");
 
         Tab profileSettings = new Tab("НАСТРОЙКИ ПРОФИЛЯ");
         profileSettings.getStyle().set("color", "black");
@@ -215,9 +225,10 @@ public class ProfileView extends CustomAppLayout {
         Map<Tab, Component> tabsToPages = new HashMap<>();
 
         tabsToPages.put(myWorkspaces, divMap.get(1));
-        tabsToPages.put(profileSettings, divMap.get(2));
-        tabsToPages.put(changePassword, divMap.get(3));
-        Tabs tabs = new Tabs(myWorkspaces, profileSettings, changePassword);
+        tabsToPages.put(myTeams, divMap.get(2));
+        tabsToPages.put(profileSettings, divMap.get(3));
+        tabsToPages.put(changePassword, divMap.get(4));
+        Tabs tabs = new Tabs(myWorkspaces, myTeams, profileSettings, changePassword);
         Set<Component> pagesShown = new HashSet<>(divMap.values());
         tabs.addSelectedChangeListener(event -> {
             pagesShown.forEach(page -> page.setVisible(false));
@@ -231,6 +242,7 @@ public class ProfileView extends CustomAppLayout {
         pages.add(divMap.get(1));
         pages.add(divMap.get(2));
         pages.add(divMap.get(3));
+        pages.add(divMap.get(4));
 
         return new Div(tabs, pages);
     }
@@ -385,6 +397,56 @@ public class ProfileView extends CustomAppLayout {
         return row;
     }
 
+    private Div teamDiv() {
+        Div row = new Div();
+        row.addClassNames("row", "animated", "fadeInRight");
+        row.getStyle().set("padding-top", "10px");
+
+        teams.forEach(team -> {
+
+            String iconType = "people";
+            String bgColor = "bg-blue";
+
+            Div colDiv = new Div();
+
+            colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
+            Div infoBox = new Div();
+            infoBox.addClickListener(onClick -> showDialog(OperationEnum.UPDATE, team));
+            infoBox.getStyle().set("cursor", "pointer");
+            infoBox.addClassNames("info-box-2", bgColor, "hover-zoom-effect");
+            colDiv.add(infoBox);
+            Div icon = new Div();
+            icon.addClassName("icon");
+            infoBox.add(icon);
+            Html ic = new Html("<i class=\"material-icons\">" + iconType + "</i>");
+            icon.add(ic);
+            Div content = new Div();
+            content.addClassName("content");
+            infoBox.add(content);
+
+            Div wsTypeText = new Div();
+            wsTypeText.addClassName("text");
+            wsTypeText.setText(team.getTitle().toUpperCase());
+            wsTypeText.getStyle().set("font-size", "16px");
+            wsTypeText.getStyle().set("margin-top", "0");
+            content.add(wsTypeText);
+
+            Div wsText = new Div();
+            wsText.addClassName("text");
+            wsText.setText("УЧАСТНИКОВ");
+            wsText.getStyle().set("margin-top", "0");
+            content.add(wsText);
+
+            Div tasksCount = new Div();
+            tasksCount.addClassName("number");
+            tasksCount.setText(String.valueOf(team.getMembers().size()));
+            content.add(tasksCount);
+            row.add(colDiv);
+        });
+        row.add(addNewTeamDiv());
+        return row;
+    }
+
     private Div addNewWorkspaceDiv() {
 
         String iconType = "add";
@@ -414,6 +476,42 @@ public class ProfileView extends CustomAppLayout {
         Div wsTypeText = new Div();
         wsTypeText.addClassName("text");
         wsTypeText.setText("ДОБАВИТЬ РАБОЧУЮ ОБЛАСТЬ");
+        wsTypeText.getStyle().set("font-size", "16px");
+        wsTypeText.getStyle().set("margin", "0");
+        content.add(wsTypeText);
+
+        return colDiv;
+    }
+
+    private Div addNewTeamDiv() {
+
+        String iconType = "add";
+        String bgColor = "bg-green";
+
+        Div colDiv = new Div();
+
+        colDiv.addClickListener(onClick -> getUI().ifPresent(ui -> showDialog(OperationEnum.CREATE, new Team())));
+
+        colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
+        Div infoBox = new Div();
+        infoBox.getStyle().set("cursor", "pointer");
+        infoBox.addClassNames("info-box-2", bgColor, "hover-zoom-effect");
+        colDiv.add(infoBox);
+        Div icon = new Div();
+        icon.addClassName("icon");
+        infoBox.add(icon);
+        Html i = new Html("<i class=\"material-icons\">" + iconType + "</i>");
+        icon.add(i);
+        Div content = new Div();
+        content.addClassName("content");
+        content.getStyle()
+                .set("display", "flex")
+                .set("align-items", "center");
+        infoBox.add(content);
+
+        Div wsTypeText = new Div();
+        wsTypeText.addClassName("text");
+        wsTypeText.setText("ДОБАВИТЬ КОМАНДУ");
         wsTypeText.getStyle().set("font-size", "16px");
         wsTypeText.getStyle().set("margin", "0");
         content.add(wsTypeText);
