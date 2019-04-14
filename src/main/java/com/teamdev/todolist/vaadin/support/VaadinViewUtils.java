@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 import static com.teamdev.todolist.configuration.support.Constants.DEFAULT_SRC;
 import static com.teamdev.todolist.configuration.support.Constants.PATH_SEPARATOR;
@@ -98,7 +99,7 @@ public class VaadinViewUtils {
         StreamResource sr = new StreamResource("", (InputStreamFactory) () -> {
             try {
                 if (!Files.exists(file.toPath())) {
-                    return new FileInputStream(getDefaultAvatar());
+                    return new FileInputStream(Objects.requireNonNull(getDefaultAvatar()));
                 } else {
                     return new FileInputStream(file);
                 }

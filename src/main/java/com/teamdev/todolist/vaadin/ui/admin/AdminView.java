@@ -15,7 +15,7 @@ import com.vaadin.flow.router.Route;
 import static com.teamdev.todolist.configuration.support.Constants.ADMIN_PAGE;
 
 @Route(value = ADMIN_PAGE, layout = MainLayout.class)
-@PageTitle("Administration")
+@PageTitle("АДМИНИСТРИРОВАНИЕ")
 public class AdminView extends CustomAppLayout {
         
     public AdminView(UserService userService) {
@@ -28,10 +28,10 @@ public class AdminView extends CustomAppLayout {
         content.setAlignItems(FlexComponent.Alignment.CENTER);
         content.setSizeFull();
 
-        Image usersImg = createImage("images/users-png.png", "Manage users");
-        Image rolesImg = createImage("images/manage-roles.png", "Manage roles");
-        Image statusesImg = createImage("images/users-png.png", "Manage task statuses");
-        Image tagImg = createImage("images/users-png.png", "Manage tags");
+        Image usersImg = createImage("images/users-png.png", "ПОЛЬЗОВАТЕЛИ");
+        Image rolesImg = createImage("images/manage-roles.png", "РОЛИ");
+        Image statusesImg = createImage("images/users-png.png", "СТАТУСЫ ЗАДАЧ");
+        Image tagImg = createImage("images/users-png.png", "ТЭГИ");
 
         HorizontalLayout btnLayout = new HorizontalLayout();
         btnLayout.setSizeFull();
@@ -39,10 +39,10 @@ public class AdminView extends CustomAppLayout {
         btnLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         btnLayout.setSpacing(true);
 
-        Button usersBtn = new Button(" Users", usersImg, e -> goToPage(UserView.class));
-        Button rolesBtn = new Button("Roles", rolesImg, e -> goToPage(RoleView.class));
-        Button taskStatusesBtn = new Button("Task statuses", statusesImg, e -> goToPage(TaskStatusView.class));
-        Button tagsBtn = new Button("Tags", tagImg, e -> goToPage(TagView.class));
+        Button usersBtn = new Button(" ПОЛЬЗОВАТЕЛИ", usersImg, e -> goToPage(UserView.class));
+        Button rolesBtn = new Button("РОЛИ", rolesImg, e -> goToPage(RoleView.class));
+        Button taskStatusesBtn = new Button("СТАТУСЫ ЗАДАЧ", statusesImg, e -> goToPage(TaskStatusView.class));
+        Button tagsBtn = new Button("ТЭГИ", tagImg, e -> goToPage(TagView.class));
 
         btnLayout.add(usersBtn, rolesBtn, taskStatusesBtn, tagsBtn);
         setContent(btnLayout);

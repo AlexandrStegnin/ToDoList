@@ -27,7 +27,7 @@ import static com.teamdev.todolist.configuration.support.Constants.REGISTRATION_
  * @author Alexandr Stegnin
  */
 
-@PageTitle("Registration page")
+@PageTitle("СТРАНИЦА РЕГИСТРАЦИИ")
 @Route(value = REGISTRATION_PAGE, layout = MainLayout.class)
 @HtmlImport("../VAADIN/shared-styles.html")
 public class RegistrationView extends Div {

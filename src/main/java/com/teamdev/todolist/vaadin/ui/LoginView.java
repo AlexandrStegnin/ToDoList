@@ -14,7 +14,7 @@ import com.vaadin.flow.router.Route;
 
 import static com.teamdev.todolist.configuration.support.Constants.*;
 
-@PageTitle("Login page")
+@PageTitle("СТРАНИЦА АВТОРИЗАЦИИ")
 @Route(value = LOGIN_PAGE, layout = MainLayout.class)
 @HtmlImport("../VAADIN/shared-styles.html")
 public class LoginView extends Div {
