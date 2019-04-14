@@ -13,4 +13,6 @@ public interface TaskStatusRepository extends JpaRepository<TaskStatus, Long> {
 
     TaskStatus findByTitle(String title);
 
+    long count();
+
 }

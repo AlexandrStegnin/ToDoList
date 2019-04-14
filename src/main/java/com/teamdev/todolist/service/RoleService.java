@@ -52,4 +52,8 @@ public class RoleService {
     public Role getDefaultUserRole() {
         return findByTitle(ROLE_USER);
     }
+
+    public Long count() {
+        return roleRepository.count();
+    }
 }

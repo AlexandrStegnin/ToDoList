@@ -1,5 +1,8 @@
 package com.teamdev.todolist.vaadin.ui.admin;
 
+import com.teamdev.todolist.service.RoleService;
+import com.teamdev.todolist.service.TagService;
+import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.ui.MainLayout;
@@ -16,8 +19,18 @@ import static com.teamdev.todolist.configuration.support.Constants.ADMIN_PAGE;
 @PageTitle("АДМИНИСТРИРОВАНИЕ")
 public class AdminView extends CustomAppLayout {
 
-    public AdminView(UserService userService) {
+    private final TaskStatusService taskStatusService;
+    private final RoleService roleService;
+    private final UserService userService;
+    private final TagService tagService;
+
+    public AdminView(TaskStatusService taskStatusService, RoleService roleService,
+                     UserService userService, TagService tagService) {
         super(userService);
+        this.taskStatusService = taskStatusService;
+        this.roleService = roleService;
+        this.userService = userService;
+        this.tagService = tagService;
         init();
     }
 
@@ -38,10 +51,10 @@ public class AdminView extends CustomAppLayout {
         row.getStyle()
                 .set("margin", "15%");
 
-        row.add(createDiv("people", "bg-indigo", "ПОЛЬЗОВАТЕЛИ", "10", UserView.class));
-        row.add(createDiv("security", "bg-deep-orange", "РОЛИ", "3", RoleView.class));
-        row.add(createDiv("assignment", "bg-green", "СТАТУСЫ ЗАДАЧ", "3", TaskStatusView.class));
-        row.add(createDiv("label", "bg-amber", "ТЭГИ", "3", TagView.class));
+        row.add(createDiv("people", "bg-indigo", "ПОЛЬЗОВАТЕЛИ", userService.count().toString(), UserView.class));
+        row.add(createDiv("security", "bg-deep-orange", "РОЛИ", roleService.count().toString(), RoleView.class));
+        row.add(createDiv("assignment", "bg-green", "СТАТУСЫ ЗАДАЧ", taskStatusService.count().toString(), TaskStatusView.class));
+        row.add(createDiv("label", "bg-amber", "ТЭГИ", tagService.count().toString(), TagView.class));
         container.add(row);
         /*verified_user*/
         return container;

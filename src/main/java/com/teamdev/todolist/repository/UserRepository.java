@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     void deleteById(Long id);
 
+    long count();
+
 }

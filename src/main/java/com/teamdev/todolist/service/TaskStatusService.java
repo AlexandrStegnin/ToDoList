@@ -50,4 +50,7 @@ public class TaskStatusService {
         return taskStatusRepository.findByTitle(DEFAULT_TASK_STATUS);
     }
 
+    public Long count() {
+        return taskStatusRepository.count();
+    }
 }

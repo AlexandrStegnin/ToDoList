@@ -41,4 +41,8 @@ public class TagService {
         tagRepository.deleteById(id);
     }
 
+    public Long count() {
+        return tagRepository.count();
+    }
+
 }

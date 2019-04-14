@@ -60,10 +60,6 @@ public class UserService {
         return userRepository.getOne(id);
     }
 
-    public Long getIdByLogin(String login) {
-        return userRepository.findByLogin(login).getId();
-    }
-
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -192,6 +188,10 @@ public class UserService {
 
     public boolean matchesPasswords(String oldPass, String dbPass) {
         return encoder.matches(oldPass, dbPass);
+    }
+
+    public Long count() {
+        return userRepository.count();
     }
 
 }
