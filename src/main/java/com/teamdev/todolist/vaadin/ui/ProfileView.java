@@ -45,7 +45,7 @@ import static com.teamdev.todolist.configuration.support.Constants.*;
 @Route(value = PROFILE_PAGE, layout = MainLayout.class)
 @PageTitle("Profile")
 public class ProfileView extends CustomAppLayout {
-    // TODO добавить создание нового РП/удаление/изменение
+    // TODO добавить удаление РО
     private final String MY_WORKSPACE = WORKSPACES_PAGE + PATH_SEPARATOR + SecurityUtils.getUsername() + PATH_SEPARATOR;
 
     private final UserService userService;
@@ -85,7 +85,10 @@ public class ProfileView extends CustomAppLayout {
     private void init() {
         saveChanges.setEnabled(false);
         workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
-
+        totalTasks.set(0);
+        completedTasks.set(0);
+        activeTasks.set(0);
+        expiredTasks.set(0);
         Div profileDiv = profilePage();
         profileDiv.getStyle().set("margin-top", "16px");
         setContent(profileDiv);

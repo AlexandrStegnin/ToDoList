@@ -13,14 +13,17 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +33,7 @@ import static com.teamdev.todolist.configuration.support.Constants.PATH_SEPARATO
 
 @Component
 public class VaadinViewUtils {
-
+    private static Logger LOGGER = LoggerFactory.getLogger(VaadinViewUtils.class);
     private static String FILE_UPLOAD_DIRECTORY;
 
     @Value("${spring.config.file-upload-directory}")
@@ -111,9 +114,15 @@ public class VaadinViewUtils {
     // если у пользователя нет аватара
     private static File getDefaultAvatar() {
         try {
-            return ResourceUtils.getFile("classpath:static/images/no-avatar2.png");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Изображение по умолчанию не найдено!", e);
+            ClassPathResource classPathResource = new ClassPathResource("static/images/no-avatar2.png");
+            File file = File.createTempFile("tmp", ".png");
+            file.deleteOnExit();
+            InputStream inputStream = classPathResource.getInputStream();
+            FileUtils.copyInputStreamToFile(inputStream, file);
+            return file;
+        } catch (IOException e) {
+            LOGGER.error("Изображение по умолчанию не найдено!", e);
+            return null;
         }
     }
 
