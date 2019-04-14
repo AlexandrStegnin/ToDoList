@@ -20,6 +20,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.dom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Objects;
+
 import static com.teamdev.todolist.configuration.support.Constants.ROLE_ADMIN;
 
 public class CustomAppLayout extends AppLayout {
@@ -42,10 +44,11 @@ public class CustomAppLayout extends AppLayout {
 
         AppLayoutMenuItem workspacesItem = new AppLayoutMenuItem(VaadinIcon.TASKS.create(), "Workspaces",
                 e -> goToPage(MyWorkspacesView.class, SecurityUtils.getUsername()));
-        AppLayoutMenuItem logoutItem = new AppLayoutMenuItem(VaadinIcon.SIGN_OUT.create(), "Logout", e -> logout());
-        AppLayoutMenuItem loginItem = new AppLayoutMenuItem(VaadinIcon.SIGN_IN.create(), "Login", e -> goToPage(LoginView.class, null));
-        AppLayoutMenuItem adminItem = new AppLayoutMenuItem(VaadinIcon.COGS.create(), "Admin", e -> goToPage(AdminView.class, null));
-        AppLayoutMenuItem profileItem = new AppLayoutMenuItem(createAvatarDiv(), SecurityUtils.getUsername() + " / profile",
+        AppLayoutMenuItem logoutItem = new AppLayoutMenuItem(VaadinIcon.SIGN_OUT.create(), "ВЫЙТИ", e -> logout());
+        AppLayoutMenuItem loginItem = new AppLayoutMenuItem(VaadinIcon.SIGN_IN.create(), "ВОЙТИ", e -> goToPage(LoginView.class, null));
+        AppLayoutMenuItem adminItem = new AppLayoutMenuItem(VaadinIcon.COGS.create(), "АДМИНИСТРИРОВАНИЕ", e -> goToPage(AdminView.class, null));
+        AppLayoutMenuItem profileItem = new AppLayoutMenuItem(createAvatarDiv(),
+                Objects.requireNonNull(SecurityUtils.getUsername()).toUpperCase() + " / ПРОФИЛЬ",
                 e -> goToPage(ProfileView.class, null));
 
         if (SecurityUtils.isUserInRole(ROLE_ADMIN)) menu.addMenuItems(adminItem);
@@ -74,7 +77,7 @@ public class CustomAppLayout extends AppLayout {
     }
 
     private void logout() {
-        Notification.show("Вы успешно вышли из системы!", 3000, Notification.Position.TOP_END);
+        Notification.show("ВЫ УСПЕШНО ВЫШЛИ ИЗ СИСТЕМЫ!", 3000, Notification.Position.TOP_END);
         this.getUI().ifPresent(ui -> ui.navigate(Constants.LOGIN_PAGE));
         auth.logout();
     }

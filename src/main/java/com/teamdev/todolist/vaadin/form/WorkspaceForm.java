@@ -30,8 +30,8 @@ import java.util.Objects;
  */
 public class WorkspaceForm extends Dialog {
 
-    private static final String PRIVATE_WS = "Личная";
-    private static final String TEAM_WS = "Командная";
+    private static final String PRIVATE_WS = "ЛИЧНАЯ";
+    private static final String TEAM_WS = "КОМАНДНАЯ";
 
     private final WorkspaceService workspaceService;
 
@@ -59,16 +59,16 @@ public class WorkspaceForm extends Dialog {
         this.workspaceService = workspaceService;
         this.teamService = teamService;
         this.workspace = workspace;
-        this.title = new TextField("Название");
+        this.title = new TextField("НАЗВАНИЕ");
         this.team = new Select<>();
         this.privateOrTeam = new Select<>();
         this.buttons = new HorizontalLayout();
         this.content = new VerticalLayout();
-        this.cancel = new Button("Отменить", e -> {
+        this.cancel = new Button("ОТМЕНИТЬ", e -> {
             this.canceled = true;
             this.close();
         });
-        this.submit = new Button(operation.name);
+        this.submit = new Button(operation.name.toUpperCase());
         this.operation = operation;
         this.owner = owner;
         init();
@@ -81,13 +81,13 @@ public class WorkspaceForm extends Dialog {
         team.setItems(getMyTeams());
         team.setTextRenderer(Team::getTitle);
         team.setEmptySelectionAllowed(true);
-        team.setEmptySelectionCaption("Выберите команду");
+        team.setEmptySelectionCaption("ВЫБЕРИТЕ КОМАНДУ");
         team.setVisible(workspace.getTeam() != null);
 
         privateOrTeam.setEmptySelectionAllowed(false);
         privateOrTeam.setItems(PRIVATE_WS, TEAM_WS);
         privateOrTeam.setValue(workspace.getTeam() == null ? PRIVATE_WS : TEAM_WS);
-        privateOrTeam.setPlaceholder("Вид рабочей области");
+        privateOrTeam.setPlaceholder("ВИД РАБОЧЕЙ ОБЛАСТИ");
         privateOrTeam.addValueChangeListener(event -> {
             if (PRIVATE_WS.equalsIgnoreCase(privateOrTeam.getValue())) {
                 team.setVisible(false);
@@ -96,7 +96,7 @@ public class WorkspaceForm extends Dialog {
                 team.setVisible(true);
                 workspaceBinder.forField(team)
                         .withValidator(t -> !team.isVisible() || !Objects.equals(null, t),
-                                "Для командной РО необходимо выбрать команду")
+                                "ДЛЯ КОМАНДНОЙ РАБОЧЕЙ ОБЛАСТИ НАДО ВЫБРАТЬ КОМАНДУ")
                         .bind(Workspace_.TEAM);
             }
         });
@@ -129,7 +129,7 @@ public class WorkspaceForm extends Dialog {
     private void stylizeForm() {
         setWidth("400px");
         setHeight("200px");
-        title.setPlaceholder("Введите название");
+        title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
         title.setRequiredIndicatorVisible(true);
         title.setWidthFull();
 

@@ -125,7 +125,7 @@ public class ProfileView extends CustomAppLayout {
         profileBody.add(imageArea);
         Div contentArea = new Div();
         contentArea.addClassName("content-area");
-        Html h3 = new Html("<h3>" + currentUser.getProfile().getName() + " " + currentUser.getProfile().getSurname() + "</h3>");
+        Html h3 = new Html("<h3>" + getUserFullName() + "</h3>");
         contentArea.add(h3);
         Html p = new Html("<p>&nbsp</p>");
         contentArea.add(p);
@@ -137,19 +137,19 @@ public class ProfileView extends CustomAppLayout {
 
         Html ul = new Html("<ul>" +
                 "<li>" +
-                "<span>Всего задач</span>" +
+                "<span>ВСЕГО ЗАДАЧ</span>" +
                 "<span class=\"badge bg-blue\">" + totalTasks + "</span>" +
                 "</li>" +
                 "<li>" +
-                "<span>Решённых</span>" +
+                "<span>РЕШЁННЫХ</span>" +
                 "<span class=\"badge bg-green\">" + completedTasks + "</span>" +
                 "</li>" +
                 "<li>" +
-                "<span>Активных</span>" +
+                "<span>АКТИВНЫХ</span>" +
                 "<span class=\"badge bg-amber\">" + activeTasks + "</span>" +
                 "</li>" +
                 "<li>" +
-                "<span>Просроченных</span>" +
+                "<span>ПРОСРОЧЕННЫХ</span>" +
                 "<span class=\"badge bg-red\">" + expiredTasks + "</span>" +
                 "</li>" +
                 "</ul>");
@@ -159,6 +159,10 @@ public class ProfileView extends CustomAppLayout {
         profileFooter.add(uploadAvatar);
         profileCard.add(profileFooter);
         return cols;
+    }
+
+    private String getUserFullName() {
+        return (currentUser.getProfile().getName() + " " + currentUser.getProfile().getSurname()).toUpperCase();
     }
 
     private Div settingsDiv() {
@@ -199,13 +203,13 @@ public class ProfileView extends CustomAppLayout {
     }
 
     private Div tabs(Map<Integer, Div> divMap) {
-        Tab myWorkspaces = new Tab("Рабочие области");
+        Tab myWorkspaces = new Tab("РАБОЧИЕ ОБЛАСТИ");
         myWorkspaces.getStyle().set("color", "black");
 
-        Tab profileSettings = new Tab("Настройки профиля");
+        Tab profileSettings = new Tab("НАСТРОЙКИ ПРОФИЛЯ");
         profileSettings.getStyle().set("color", "black");
 
-        Tab changePassword = new Tab("Изменить пароль");
+        Tab changePassword = new Tab("ИЗМЕНИТЬ ПАРОЛЬ");
         changePassword.getStyle().set("color", "black");
 
         Map<Tab, Component> tabsToPages = new HashMap<>();
@@ -235,22 +239,21 @@ public class ProfileView extends CustomAppLayout {
         VerticalLayout content = new VerticalLayout();
         FormLayout formLayout = new FormLayout();
 
-        TextField nameField = new TextField("Имя");
+        TextField nameField = new TextField("ИМЯ");
         nameField.setValue(currentUser.getProfile().getName());
         nameField.addValueChangeListener(event ->
                 enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getName())));
         profileBinder.forField(nameField)
                 .bind(UserProfile_.NAME);
 
-        TextField surnameField = new TextField("Фамилия");
+        TextField surnameField = new TextField("ФАМИЛИЯ");
         surnameField.setValue(currentUser.getProfile().getSurname());
-        surnameField.addValueChangeListener(event -> {
-            enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getSurname()));
-        });
+        surnameField.addValueChangeListener(event ->
+                enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getSurname())));
         profileBinder.forField(surnameField)
                 .bind(UserProfile_.SURNAME);
 
-        TextField email = new TextField("Email");
+        TextField email = new TextField("EMAIL");
         email.setValue(currentUser.getProfile().getEmail());
         email.addValueChangeListener(event ->
                 enabledSaveButton(!event.getValue().equals(currentUser.getProfile().getEmail())));
@@ -279,17 +282,17 @@ public class ProfileView extends CustomAppLayout {
         VerticalLayout content = new VerticalLayout();
         FormLayout formLayout = new FormLayout();
 
-        TextField oldPassField = new TextField("Старый пароль");
+        TextField oldPassField = new TextField("СТАРЫЙ ПАРОЛЬ");
 
-        TextField newPassField = new TextField("Новый пароль");
+        TextField newPassField = new TextField("НОВЫЙ ПАРОЛЬ");
 
-        TextField confirmNewPassField = new TextField("Подтвердите новый пароль");
+        TextField confirmNewPassField = new TextField("ПОДТВЕРДИТЕ НОВЫЙ ПАРОЛЬ");
 
         Button submit = new Button("СОХРАНИТЬ");
         submit.setEnabled(false);
         submit.addClickListener(e -> {
             updateUserPassword(oldPassField.getValue(), newPassField.getValue());
-            Notification.show("Пароль успешно изменён", 3000, Notification.Position.TOP_STRETCH);
+            Notification.show("ПАРОЛЬ УСПЕШНО ИЗМЕНЁН", 3000, Notification.Position.TOP_STRETCH);
             oldPassField.setValue("");
             newPassField.setValue("");
             confirmNewPassField.setValue("");
@@ -326,7 +329,11 @@ public class ProfileView extends CustomAppLayout {
 
             Div colDiv = new Div();
 
-            Button edit = new Button("Изменить");
+            Button edit = new Button();
+            Html i = new Html("<i class=\"material-icons\" style=\"\n" +
+                    "top: 2px;\n" +
+                    "\">settings</i>");
+            edit.setIcon(i);
             edit.addClassNames("btn", "btn-xs", "bg-grey", "waves-effect");
             edit.addClickListener(event -> showWorkspaceForm(OperationEnum.UPDATE, workspace));
             edit.getStyle()
@@ -349,22 +356,22 @@ public class ProfileView extends CustomAppLayout {
             Div icon = new Div();
             icon.addClassName("icon");
             infoBox.add(icon);
-            Html i = new Html("<i class=\"material-icons\">" + iconType + "</i>");
-            icon.add(i);
+            Html ic = new Html("<i class=\"material-icons\">" + iconType + "</i>");
+            icon.add(ic);
             Div content = new Div();
             content.addClassName("content");
             infoBox.add(content);
 
             Div wsTypeText = new Div();
             wsTypeText.addClassName("text");
-            wsTypeText.setText(workspace.getTitle());
+            wsTypeText.setText(workspace.getTitle().toUpperCase());
             wsTypeText.getStyle().set("font-size", "16px");
             wsTypeText.getStyle().set("margin-top", "0");
             content.add(wsTypeText);
 
             Div wsText = new Div();
             wsText.addClassName("text");
-            wsText.setText("Активных задач");
+            wsText.setText("АКТИВНЫХ ЗАДАЧ");
             wsText.getStyle().set("margin-top", "0");
             content.add(wsText);
 
@@ -406,7 +413,7 @@ public class ProfileView extends CustomAppLayout {
 
         Div wsTypeText = new Div();
         wsTypeText.addClassName("text");
-        wsTypeText.setText("Добавить рабочую область");
+        wsTypeText.setText("ДОБАВИТЬ РАБОЧУЮ ОБЛАСТЬ");
         wsTypeText.getStyle().set("font-size", "16px");
         wsTypeText.getStyle().set("margin", "0");
         content.add(wsTypeText);
@@ -419,7 +426,7 @@ public class ProfileView extends CustomAppLayout {
                 profileBinder.writeBeanIfValid(currentUser.getProfile())) {
             userService.saveUserAvatar(currentUser, buffer);
             userService.save(currentUser);
-            Notification.show("Изменения успешно сохранены", 3000, Notification.Position.TOP_STRETCH);
+            Notification.show("ИЗМЕНЕНИЯ УСПЕШНО СОХРАНЕНЫ", 3000, Notification.Position.TOP_STRETCH);
             reload();
         }
     }
@@ -448,34 +455,34 @@ public class ProfileView extends CustomAppLayout {
         UploadI18N i18n = new UploadI18N();
         i18n.setDropFiles(
                 new UploadI18N.DropFiles()
-                        .setOne("Или перетащи его сюда...")
-                        .setMany("Или перетащи их сюда..."))
+                        .setOne("ИЛИ ПЕРЕТАЩИ ЕГО СЮДА...")
+                        .setMany("ИЛИ ПЕРЕТАЩИ ИХ СЮДА..."))
                 .setAddFiles(new UploadI18N.AddFiles()
-                        .setOne("Выбрать файл")
-                        .setMany("Добавить файлы"))
-                .setCancel("Отменить")
+                        .setOne("ВЫБЕРИ ФАЙЛ")
+                        .setMany("ДОБАВЬ ФАЙЛ"))
+                .setCancel("ОМЕНИТЬ")
                 .setError(new UploadI18N.Error()
-                        .setTooManyFiles("Слишком много файлов.")
-                        .setFileIsTooBig("Слишком большой файл.")
-                        .setIncorrectFileType("Некорректный тип файла."))
+                        .setTooManyFiles("СЛИШКОМ МНОГО ФАЙЛОВ.")
+                        .setFileIsTooBig("СЛИШКОМ БОЛЬШОЙ ФАЙЛ.")
+                        .setIncorrectFileType("НЕКОРРЕКТНЫЙ ТИП ФАЙЛА."))
                 .setUploading(new UploadI18N.Uploading()
                         .setStatus(new UploadI18N.Uploading.Status()
-                                .setConnecting("Соединение...")
-                                .setStalled("Загрузка застопорилась.")
-                                .setProcessing("Обработка файла..."))
+                                .setConnecting("СОЕДИНЕНИЕ...")
+                                .setStalled("ЗАГРУЗКА ЗАСТОПОРИЛАСЬ.")
+                                .setProcessing("ОБРАБОТКА ФАЙЛА..."))
                         .setRemainingTime(
                                 new UploadI18N.Uploading.RemainingTime()
-                                        .setPrefix("оставшееся время: ")
+                                        .setPrefix("ОСТАВШЕЕСЯ ВРЕМЯ: ")
                                         .setUnknown(
-                                                "оставшееся время неизвестно"))
+                                                "ОСТАВШЕЕСЯ ВРЕМЯ НЕИЗВЕСТНО"))
                         .setError(new UploadI18N.Uploading.Error()
-                                .setServerUnavailable("Сервер недоступен")
+                                .setServerUnavailable("СЕРВЕР НЕДОСТУПЕН")
                                 .setUnexpectedServerError(
-                                        "Неожиданная ошибка сервера")
-                                .setForbidden("Загрузка запрещена")))
+                                        "НЕОЖИДАННАЯ ОШИБКА СЕРВЕРА")
+                                .setForbidden("ЗАГРУЗКА ЗАПРЕЩЕНА")))
                 .setUnits(Stream
-                        .of("Б", "Кбайт", "Мбайт", "Гбайт", "Тбайт", "Пбайт",
-                                "Эбайт", "Збайт", "Ибайт")
+                        .of("Б", "КБАЙТ", "МБАЙТ", "ГБАЙТ", "ТБАЙТ", "ПБАЙТ",
+                                "ЭБАЙТ", "ЗБАЙТ", "ИБАЙТ")
                         .collect(Collectors.toList()));
 
         upload.setI18n(i18n);

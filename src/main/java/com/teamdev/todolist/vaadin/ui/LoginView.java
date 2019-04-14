@@ -47,7 +47,7 @@ public class LoginView extends Div {
         logo.addClassName("logo");
         Html link = new Html("<a href=\"javascript:void(0);\">TODO LIST</a>");
 
-        Html smallHtml = new Html("<small>Помогаем решать любые задачи</small>");
+        Html smallHtml = new Html("<small>ПОМОГАЕМ РЕШАТЬ ЛЮБЫЕ ЗАДАЧИ</small>");
         logo.add(link, smallHtml);
         loginBox.add(logo);
 
@@ -85,7 +85,7 @@ public class LoginView extends Div {
 
         Input loginInput = new Input();
         loginInput.setType("text");
-        loginInput.setPlaceholder("Имя пользователя");
+        loginInput.setPlaceholder("ИМЯ ПОЛЬЗОВАТЕЛЯ");
         loginInput.addClassName("form-control");
         loginInput.isRequiredIndicatorVisible();
 
@@ -107,7 +107,7 @@ public class LoginView extends Div {
 
         Input passwordInput = new Input();
         passwordInput.setType("password");
-        passwordInput.setPlaceholder("Пароль");
+        passwordInput.setPlaceholder("ПАРОЛЬ");
         passwordInput.addClassName("form-control");
         passwordInput.isRequiredIndicatorVisible();
 
