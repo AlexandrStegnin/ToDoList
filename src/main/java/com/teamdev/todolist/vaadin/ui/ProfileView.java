@@ -411,7 +411,7 @@ public class ProfileView extends CustomAppLayout {
 
             colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
             Div infoBox = new Div();
-            infoBox.addClickListener(onClick -> showDialog(OperationEnum.UPDATE, team));
+            infoBox.addClickListener(onClick -> showTeamForm(OperationEnum.UPDATE, team));
             infoBox.getStyle().set("cursor", "pointer");
             infoBox.addClassNames("info-box-2", bgColor, "hover-zoom-effect");
             colDiv.add(infoBox);
@@ -424,23 +424,23 @@ public class ProfileView extends CustomAppLayout {
             content.addClassName("content");
             infoBox.add(content);
 
-            Div wsTypeText = new Div();
-            wsTypeText.addClassName("text");
-            wsTypeText.setText(team.getTitle().toUpperCase());
-            wsTypeText.getStyle().set("font-size", "16px");
-            wsTypeText.getStyle().set("margin-top", "0");
-            content.add(wsTypeText);
+            Div teamTypeText = new Div();
+            teamTypeText.addClassName("text");
+            teamTypeText.setText(team.getTitle().toUpperCase());
+            teamTypeText.getStyle().set("font-size", "16px");
+            teamTypeText.getStyle().set("margin-top", "0");
+            content.add(teamTypeText);
 
-            Div wsText = new Div();
-            wsText.addClassName("text");
-            wsText.setText("УЧАСТНИКОВ");
-            wsText.getStyle().set("margin-top", "0");
-            content.add(wsText);
+            Div teamText = new Div();
+            teamText.addClassName("text");
+            teamText.setText("УЧАСТНИКОВ");
+            teamText.getStyle().set("margin-top", "0");
+            content.add(teamText);
 
-            Div tasksCount = new Div();
-            tasksCount.addClassName("number");
-            tasksCount.setText(String.valueOf(team.getMembers().size()));
-            content.add(tasksCount);
+            Div membersCount = new Div();
+            membersCount.addClassName("number");
+            membersCount.setText(String.valueOf(team.getMembers().size()));
+            content.add(membersCount);
             row.add(colDiv);
         });
         row.add(addNewTeamDiv());
@@ -490,7 +490,7 @@ public class ProfileView extends CustomAppLayout {
 
         Div colDiv = new Div();
 
-        colDiv.addClickListener(onClick -> getUI().ifPresent(ui -> showDialog(OperationEnum.CREATE, new Team())));
+        colDiv.addClickListener(onClick -> getUI().ifPresent(ui -> showTeamForm(OperationEnum.CREATE, new Team())));
 
         colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
         Div infoBox = new Div();
@@ -591,7 +591,7 @@ public class ProfileView extends CustomAppLayout {
         return teamService.findByMember(Collections.singletonList(currentUser));
     }
 
-    private void showDialog(final OperationEnum operation, final Team team) {
+    private void showTeamForm(final OperationEnum operation, final Team team) {
         TeamForm teamForm = new TeamForm(userService, teamService, team, operation);
         this.teamForm = teamForm;
         teamForm.addOpenedChangeListener(event -> reload(!event.isOpened(), !this.teamForm.isCanceled()));

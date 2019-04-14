@@ -5,10 +5,8 @@ import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.ui.MainLayout;
 import com.teamdev.todolist.vaadin.ui.TaskStatusView;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -17,46 +15,78 @@ import static com.teamdev.todolist.configuration.support.Constants.ADMIN_PAGE;
 @Route(value = ADMIN_PAGE, layout = MainLayout.class)
 @PageTitle("АДМИНИСТРИРОВАНИЕ")
 public class AdminView extends CustomAppLayout {
-        
+
     public AdminView(UserService userService) {
         super(userService);
         init();
     }
 
     private void init() {
-        HorizontalLayout content = new HorizontalLayout();
-        content.setAlignItems(FlexComponent.Alignment.CENTER);
-        content.setSizeFull();
-
-        Image usersImg = createImage("images/users-png.png", "ПОЛЬЗОВАТЕЛИ");
-        Image rolesImg = createImage("images/manage-roles.png", "РОЛИ");
-        Image statusesImg = createImage("images/users-png.png", "СТАТУСЫ ЗАДАЧ");
-        Image tagImg = createImage("images/users-png.png", "ТЭГИ");
-
-        HorizontalLayout btnLayout = new HorizontalLayout();
-        btnLayout.setSizeFull();
-        btnLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        btnLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        btnLayout.setSpacing(true);
-
-        Button usersBtn = new Button(" ПОЛЬЗОВАТЕЛИ", usersImg, e -> goToPage(UserView.class));
-        Button rolesBtn = new Button("РОЛИ", rolesImg, e -> goToPage(RoleView.class));
-        Button taskStatusesBtn = new Button("СТАТУСЫ ЗАДАЧ", statusesImg, e -> goToPage(TaskStatusView.class));
-        Button tagsBtn = new Button("ТЭГИ", tagImg, e -> goToPage(TagView.class));
-
-        btnLayout.add(usersBtn, rolesBtn, taskStatusesBtn, tagsBtn);
-        setContent(btnLayout);
+        setContent(createAdminDiv());
     }
 
     private void goToPage(Class<? extends Component> clazz) {
         getUI().ifPresent(ui -> ui.navigate(clazz));
     }
 
-    private Image createImage(String src, String alt) {
-        Image image = new Image(src, alt);
-        image.setHeight("150px");
-        image.setWidth("150px");
-        return image;
+    private Div createAdminDiv() {
+        Div container = new Div();
+        container.addClassName("container-fluid");
+
+        Div row = new Div();
+        row.addClassNames("row", "animated", "flipInX");
+        row.getStyle()
+                .set("margin", "15%");
+
+        row.add(createDiv("people", "bg-indigo", "ПОЛЬЗОВАТЕЛИ", "10", UserView.class));
+        row.add(createDiv("security", "bg-deep-orange", "РОЛИ", "3", RoleView.class));
+        row.add(createDiv("assignment", "bg-green", "СТАТУСЫ ЗАДАЧ", "3", TaskStatusView.class));
+        row.add(createDiv("label", "bg-amber", "ТЭГИ", "3", TagView.class));
+        container.add(row);
+        /*verified_user*/
+        return container;
+    }
+
+    private Div createDiv(String iconType, String bgColor, String text, String number,
+                          Class<? extends Component> clazz) {
+
+
+        Div colDiv = new Div();
+
+        colDiv.addClassNames("col-lg-6", "col-md-6", "col-sm-6", "col-xs-12");
+        Div infoBox = new Div();
+        infoBox.addClickListener(onClick -> goToPage(clazz));
+        infoBox.getStyle().set("cursor", "pointer");
+        infoBox.addClassNames("info-box", bgColor, "hover-expand-effect");
+        colDiv.add(infoBox);
+        Div icon = new Div();
+        icon.addClassName("icon");
+        infoBox.add(icon);
+        Html ic = new Html("<i class=\"material-icons\">" + iconType + "</i>");
+        icon.add(ic);
+        Div content = new Div();
+        content.addClassName("content");
+        infoBox.add(content);
+
+        Div wsTypeText = new Div();
+        wsTypeText.addClassName("text");
+        wsTypeText.setText(text);
+        wsTypeText.getStyle().set("font-size", "16px");
+        wsTypeText.getStyle().set("margin-top", "0");
+        content.add(wsTypeText);
+
+        Div wsText = new Div();
+        wsText.addClassName("text");
+        wsText.setText("КОЛИЧЕСТВО");
+        wsText.getStyle().set("margin-top", "0");
+        content.add(wsText);
+
+        Div tasksCount = new Div();
+        tasksCount.addClassName("number");
+        tasksCount.setText(number);
+        content.add(tasksCount);
+
+        return colDiv;
     }
 
 }
