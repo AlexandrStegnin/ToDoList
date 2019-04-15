@@ -24,7 +24,7 @@ import java.util.List;
 
 import static com.teamdev.todolist.configuration.support.Constants.ADMIN_ROLES_PAGE;
 
-@PageTitle("Roles")
+@PageTitle("АДМИНИСТРИРОВАНИЕ РОЛЕЙ")
 @Route(value = ADMIN_ROLES_PAGE, layout = MainLayout.class)
 @HtmlImport("../VAADIN/grid-style.html")
 //@Theme(value = Material.class, variant = Material.LIGHT)
@@ -47,8 +47,6 @@ public class RoleView extends CustomAppLayout {
     }
 
     private void init() {
-        grid.setId("material");
-        addNewBtn.setIconAfterText(true);
 
         grid.setDataProvider(dataProvider);
 

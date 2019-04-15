@@ -9,6 +9,7 @@ import com.teamdev.todolist.entity.Role;
 import com.teamdev.todolist.service.RoleService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -30,30 +31,32 @@ public class RoleForm extends Dialog {
     private final OperationEnum operation;
     private final Button cancel;
     private final HorizontalLayout buttons;
-
+    private final VerticalLayout content;
     private Button submit;
     private boolean canceled = false;
 
     public RoleForm(OperationEnum operation, Role role, RoleService roleService) {
-        this.title = new TextField("Title");
-        this.description = new TextField("Description");
+        this.title = new TextField("НАЗВАНИЕ");
+        this.description = new TextField("ОПИСАНИЕ");
         this.roleBinder = new BeanValidationBinder<>(Role.class);
         this.roleService = roleService;
         this.operation = operation;
-        this.submit = new Button(operation.name);
-        this.cancel = new Button("Отменить", e -> {
+        this.submit = new Button(operation.name.toUpperCase());
+        this.cancel = new Button("ОТМЕНИТЬ", e -> {
             this.canceled = true;
             this.close();
         });
         this.buttons = new HorizontalLayout();
+        this.content = new VerticalLayout();
         this.role = role;
         init();
     }
 
     private void init() {
         prepareSubmitButton(operation);
+        stylizeForm();
         buttons.add(submit, cancel);
-        VerticalLayout content = new VerticalLayout(title, description, buttons);
+        content.add(title, description, buttons);
         add(content);
         roleBinder.setBean(role);
         roleBinder.bindInstanceFields(this);
@@ -87,4 +90,26 @@ public class RoleForm extends Dialog {
         return canceled;
     }
 
+    private void stylizeForm() {
+        setWidth("400px");
+        setHeight("200px");
+        title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
+        title.setRequiredIndicatorVisible(true);
+        title.setWidthFull();
+        title.getStyle().set("font-size", "11px");
+
+        description.getStyle().set("font-size", "11px");
+        description.setWidthFull();
+
+        submit.addClassNames("btn", "bg-green", "waves-effect");
+        submit.getStyle().set("padding", "8px 10px 25px");
+
+        cancel.addClassNames("btn", "bg-red", "waves-effect");
+        cancel.getStyle().set("padding", "8px 10px 25px");
+
+        buttons.setWidthFull();
+        buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+
+        content.setHeightFull();
+    }
 }

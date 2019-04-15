@@ -1,12 +1,14 @@
 <dom-module id="my-grid" theme-for="vaadin-grid">
     <template>
         <style>
-            [part~="header-cell"] ::slotted(vaadin-grid-cell-content) {
-                font-size: 14px;
-                font-weight: bold;
+            vaadin-grid {
+                font-family: 'Roboto', Arial, Tahoma, sans-serif;
             }
             [part~="cell"] ::slotted(vaadin-grid-cell-content) {
                 font-size: 14px;
+            }
+            [part~="header-cell"] ::slotted(vaadin-grid-cell-content) {
+                font-weight: bold;
             }
         </style>
     </template>
