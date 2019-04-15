@@ -10,13 +10,19 @@ import com.teamdev.todolist.service.*;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.CalendarForm;
 import com.teamdev.todolist.vaadin.form.TaskForm;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -25,11 +31,16 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.xml.soap.Detail;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.teamdev.todolist.configuration.support.Constants.WORKSPACES_PAGE;
 
@@ -39,6 +50,7 @@ import static com.teamdev.todolist.configuration.support.Constants.WORKSPACES_PA
 
 @Route(WORKSPACES_PAGE)
 @PageTitle("Work space")
+@HtmlImport("../VAADIN/grid-style.html")
 @Theme(value = Material.class, variant = Material.LIGHT)
 public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<String> {
 
@@ -89,44 +101,105 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         createAuthorGrid();
         createPerformerGrid();
 
-        VerticalLayout authorLayout = new VerticalLayout();
-        authorLayout.add(new Span("Созданные мной"));
-        authorLayout.add(authorGrid);
-        authorLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        authorLayout.setWidth("85%");
+        Tab authorTab = new Tab("Созданные мной задачи");
+        Div authorPage = new Div();
+        authorPage.setText("Author");
+        Tab performerTab = new Tab("Назначенные мне задачи");
+        Div performerPage = new Div();
+        performerPage.setText("Performer");
 
-        HorizontalLayout authorZoneLayout = new HorizontalLayout();
-        authorZoneLayout.add(authorLayout);
-        VerticalLayout authorRightPane = new VerticalLayout();
-        authorRightPane.setWidth("15%");
-        authorRightPane.add(addNewBtn);
-        authorRightPane.add(update);
-        authorRightPane.add(delete);
+//        HorizontalLayout authorBtnGroup = new HorizontalLayout();
+//        authorBtnGroup.add(addNewBtn);
+//        authorBtnGroup.add(delete);
+//        authorBtnGroup.add(update);
+//        authorBtnGroup.setAlignItems(FlexComponent.Alignment.STRETCH);
+//        authorPage.add(authorBtnGroup);
+//        authorPage.add(authorGrid);
+//        authorPage.setVisible(false);
+//
+//        HorizontalLayout performerBtnGroup = new HorizontalLayout();
+//        performerBtnGroup.add(calendarBtn);
+//        performerBtnGroup.setAlignItems(FlexComponent.Alignment.STRETCH);
+//        performerPage.add(performerBtnGroup);
+//        performerPage.add(performerGrid);
 
-        authorRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
-        authorZoneLayout.add(authorRightPane);
-        authorZoneLayout.setWidthFull();
+     //   tabs.setSelectedTab(performerTab);
 
-        VerticalLayout performerLayout = new VerticalLayout();
-        performerLayout.add(new Span("Назначенные мне"));
-        performerLayout.add(performerGrid);
-        performerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        performerLayout.setWidth("85%");
 
-        HorizontalLayout performerZoneLayout = new HorizontalLayout();
-        performerZoneLayout.add(performerLayout);
-        VerticalLayout performerRightPane = new VerticalLayout();
-        performerRightPane.setWidth("15%");
-        performerRightPane.add(calendarBtn);
-        performerRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
-        performerZoneLayout.add(performerRightPane);
-        performerZoneLayout.setWidthFull();
+        Map<Tab, Component> tabsToPages = new HashMap<>();
+        tabsToPages.put(authorTab, authorPage);
+        tabsToPages.put(performerTab, performerPage);
+        Tabs tabs = new Tabs(authorTab, performerTab);
+        Div pages = new Div(authorPage, performerPage);
+        Set<Component> pagesShown = Stream.of(performerPage)
+                .collect(Collectors.toSet());
 
-        VerticalLayout mainLayout = new VerticalLayout();
-        mainLayout.add(authorZoneLayout);
-        mainLayout.add(performerZoneLayout);
+        tabs.addSelectedChangeListener(event -> {
+            pagesShown.forEach(page -> page.setVisible(false));
+            pagesShown.clear();
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
+            pagesShown.add(selectedPage);
+        });
 
-        setContent(mainLayout);
+//        Details authorZone = new Details();
+//        authorZone.setSummaryText("Созданные мной задачи");
+//        HorizontalLayout authorBtnGroup = new HorizontalLayout();
+//        authorBtnGroup.add(addNewBtn);
+//        authorBtnGroup.add(delete);
+//        authorBtnGroup.add(update);
+//        authorBtnGroup.setAlignItems(FlexComponent.Alignment.STRETCH);
+//        authorZone.addContent(new VerticalLayout(authorBtnGroup, authorGrid));
+////        authorZone.addContent(update);
+////        authorZone.addContent(delete);
+////        authorZone.addContent(authorGrid);
+//        authorZone.setOpened(true);
+//
+//        Details performerZone = new Details();
+//        performerZone.setSummaryText("Назначенные мне задачи");
+//        performerZone.addContent(calendarBtn);
+//        performerZone.addContent(performerGrid);
+//        performerZone.setOpened(true);
+
+
+//        VerticalLayout authorLayout = new VerticalLayout();
+//        authorLayout.add(new Span("Созданные мной"));
+//        authorLayout.add(authorGrid);
+//        authorLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+//        authorLayout.setWidth("85%");
+//
+//        HorizontalLayout authorZoneLayout = new HorizontalLayout();
+//        authorZoneLayout.add(authorLayout);
+//        VerticalLayout authorRightPane = new VerticalLayout();
+//        authorRightPane.setWidth("15%");
+//        authorRightPane.add(addNewBtn);
+//        authorRightPane.add(update);
+//        authorRightPane.add(delete);
+//
+//        authorRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
+//        authorZoneLayout.add(authorRightPane);
+//        authorZoneLayout.setWidthFull();
+//
+//        VerticalLayout performerLayout = new VerticalLayout();
+//        performerLayout.add(new Span("Назначенные мне"));
+//        performerLayout.add(performerGrid);
+//        performerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+//        performerLayout.setWidth("85%");
+//
+//        HorizontalLayout performerZoneLayout = new HorizontalLayout();
+//        performerZoneLayout.add(performerLayout);
+//        VerticalLayout performerRightPane = new VerticalLayout();
+//        performerRightPane.setWidth("15%");
+//        performerRightPane.add(calendarBtn);
+//        performerRightPane.setAlignItems(FlexComponent.Alignment.CENTER);
+//        performerZoneLayout.add(performerRightPane);
+//        performerZoneLayout.setWidthFull();
+//
+//        VerticalLayout mainLayout = new VerticalLayout();
+//        mainLayout.add(authorZone);
+//        mainLayout.add(performerZone);
+
+        setContent(tabs);
     }
 
     private void showTaskForm(final OperationEnum operation, final Task task) {
