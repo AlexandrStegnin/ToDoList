@@ -9,7 +9,9 @@ import com.teamdev.todolist.entity.Tag;
 import com.teamdev.todolist.service.TagService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -28,6 +30,7 @@ public class TagForm extends Dialog {
     private final OperationEnum operation;
     private final HorizontalLayout buttons;
     private final Binder<Tag> tagBinder;
+    private final VerticalLayout content;
 
     private boolean canceled = false;
 
@@ -35,12 +38,13 @@ public class TagForm extends Dialog {
 
     public TagForm(TagService tagService, OperationEnum operation, Tag tag) {
         this.tagBinder = new BeanValidationBinder<>(Tag.class);
-        this.title = new TextField("Название");
-        this.cancel = new Button("Отменить", e -> {
+        this.title = new TextField("НАЗВАНИЕ");
+        this.cancel = new Button("ОТМЕНИТЬ", e -> {
             this.canceled = true;
             this.close();
         });
-        this.submit = new Button(operation.name);
+        this.submit = new Button(operation.name.toUpperCase());
+        this.content = new VerticalLayout();
         this.buttons = new HorizontalLayout();
         this.tagService = tagService;
         this.operation = operation;
@@ -49,6 +53,7 @@ public class TagForm extends Dialog {
     }
 
     private void init() {
+        stylizeForm();
         prepareSubmitButton(operation);
         buttons.add(submit, cancel);
         add(title, buttons);
@@ -71,7 +76,10 @@ public class TagForm extends Dialog {
     }
 
     private void executeCommand(Command command) {
-        if (tagBinder.writeBeanIfValid(tag)) {
+        if (command instanceof DeleteTagCommand) {
+            command.execute();
+            this.close();
+        } else if (tagBinder.writeBeanIfValid(tag)) {
             command.execute();
             this.close();
         }
@@ -79,6 +87,24 @@ public class TagForm extends Dialog {
 
     public boolean isCanceled() {
         return canceled;
+    }
+
+    private void stylizeForm() {
+        setWidth("200px");
+        setHeight("100px");
+
+        title.setWidthFull();
+
+        submit.addClassNames("btn", "bg-green", "waves-effect");
+        submit.getStyle().set("padding", "8px 10px 25px");
+
+        cancel.addClassNames("btn", "bg-red", "waves-effect");
+        cancel.getStyle().set("padding", "8px 10px 25px");
+
+        buttons.setWidthFull();
+        buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.AROUND);
+
+        content.setHeightFull();
     }
 
 }

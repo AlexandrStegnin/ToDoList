@@ -7,7 +7,9 @@ import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TagForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
+import com.teamdev.todolist.vaadin.ui.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
@@ -16,8 +18,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.material.Material;
 
 import java.util.List;
 
@@ -27,9 +27,10 @@ import static com.teamdev.todolist.configuration.support.Constants.ADMIN_TAGS_PA
  * @author Alexandr Stegnin
  */
 
-@PageTitle("Tags")
-@Route(ADMIN_TAGS_PAGE)
-@Theme(value = Material.class, variant = Material.LIGHT)
+@PageTitle("ТЭГИ")
+@Route(value = ADMIN_TAGS_PAGE, layout = MainLayout.class)
+@HtmlImport("../VAADIN/grid-style.html")
+@HtmlImport("../VAADIN/form-elements-style.html")
 public class TagView extends CustomAppLayout {
 
     private final TagService tagService;
