@@ -1,0 +1,63 @@
+<dom-module id="my-checkbox" theme-for="vaadin-checkbox">
+    <template>
+        <style>
+            :host([checked]) [part="checkbox"] {
+                background-color: #26a69a;
+            }
+            [part="label"] {
+                font-size: 14px;
+            }
+            [part="checkbox"] {
+                font-size: 14px;
+            }
+        </style>
+    </template>
+</dom-module>
+
+<dom-module id="my-text-field" theme-for="vaadin-text-field">
+    <template>
+        <style>
+            :host([focused]:not([readonly])) [part="label"] {
+                color: #26a69a;
+            }
+            [part="label"] {
+                font-size: 14px;
+            }
+            [part="value"], [part="input-field"] ::slotted(input) {
+                font-size: 14px;
+            }
+            :host(.multiselect) [part="input-field"] {
+                font-size: 14px;
+            }
+        </style>
+    </template>
+</dom-module>
+
+<dom-module id="my-multiselect-combobox-style" theme-for="multiselect-combo-box">
+    <template>
+        <style>
+            :host([focused]:not([readonly])) [part="label"] {
+                color: #26a69a;
+            }
+            [part="label"] {
+                font-size: 14px;
+            }
+            [part="combo-box"] {
+                font-size: 14px;
+            }
+        </style>
+    </template>
+</dom-module>
+
+<dom-module id="my-multiselect-combobox-input-style" theme-for="multiselect-combo-box-input">
+    <template>
+        <style>
+            [part="token-label"] {
+                font-size: 14px;
+            }
+            [part="input-field"] {
+                font-size: 14px;
+            }
+        </style>
+    </template>
+</dom-module>
