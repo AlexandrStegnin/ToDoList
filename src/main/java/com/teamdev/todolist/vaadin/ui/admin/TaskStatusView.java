@@ -7,7 +7,9 @@ import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
+import com.teamdev.todolist.vaadin.ui.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -22,8 +24,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.material.Material;
 
 import java.util.List;
 
@@ -34,9 +34,10 @@ import static com.teamdev.todolist.configuration.support.Constants.ADMIN_TASK_ST
  */
 
 
-@Route(ADMIN_TASK_STATUSES_PAGE)
-@PageTitle("Task statuses")
-@Theme(value = Material.class, variant = Material.LIGHT)
+@PageTitle("СТАТУСЫ ЗАДАЧ")
+@HtmlImport("../VAADIN/grid-style.html")
+@HtmlImport("../VAADIN/form-elements-style.html")
+@Route(value = ADMIN_TASK_STATUSES_PAGE, layout = MainLayout.class)
 public class TaskStatusView extends CustomAppLayout {
 
     private final TaskStatusService taskStatusService;
@@ -47,10 +48,11 @@ public class TaskStatusView extends CustomAppLayout {
 
     public TaskStatusView(TaskStatusService taskStatusService, UserService userService) {
         super(userService);
-        this.addNewBtn = new Button("Add new task status", e -> showDialog(new TaskStatus(), OperationEnum.CREATE));
+
+        this.addNewBtn = new Button("СОЗДАТЬ НОВЫЙ СТАТУС", e -> showDialog(new TaskStatus(), OperationEnum.CREATE));
         this.taskStatusService = taskStatusService;
         this.grid = new Grid<>();
-        this.dataProvider = new ListDataProvider<>(getAll());
+        this.dataProvider = new ListDataProvider<>(getAllTaskStatuses());
         this.binder = new BeanValidationBinder<>(TaskStatus.class);
         init(); // инициализируем форму
     }
@@ -59,12 +61,12 @@ public class TaskStatusView extends CustomAppLayout {
         grid.setDataProvider(dataProvider);
         /* Создаём колонки */
         grid.addColumn(TaskStatus::getTitle)
-                .setHeader("Title")
+                .setHeader("НАЗВАНИЕ")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
         grid.addColumn(TaskStatus::getDescription)
-                .setHeader("Description")
+                .setHeader("ОПИСАНИЕ")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
@@ -72,7 +74,7 @@ public class TaskStatusView extends CustomAppLayout {
                 e -> showDialog(taskStatus, OperationEnum.UPDATE), e -> showDialog(taskStatus, OperationEnum.DELETE)))
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setEditorComponent(new Div())
-                .setHeader("Actions")
+                .setHeader("ДЕЙСТВИЯ")
                 .setFlexGrow(2);
 
         VerticalLayout verticalLayout = new VerticalLayout(addNewBtn, grid);
@@ -80,18 +82,18 @@ public class TaskStatusView extends CustomAppLayout {
         setContent(verticalLayout);
     }
 
-    private List<TaskStatus> getAll() {
+    private List<TaskStatus> getAllTaskStatuses() {
         return taskStatusService.findAll();
     }
 
     private void showDialog(TaskStatus taskStatus, OperationEnum operation) {
         FormLayout formLayout = new FormLayout();
-        TextField title = new TextField("Title");
+        TextField title = new TextField("НАЗВАНИЕ");
         title.setValue(taskStatus.getTitle() == null ? "" : taskStatus.getTitle());
         binder.forField(title)
                 .bind(TaskStatus_.TITLE);
 
-        TextField description = new TextField("Description");
+        TextField description = new TextField("ОПИСАНИЕ");
         description.setValue(taskStatus.getDescription() == null ? "" : taskStatus.getDescription());
         binder.forField(description)
                 .bind(TaskStatus_.DESCRIPTION);
@@ -99,9 +101,9 @@ public class TaskStatusView extends CustomAppLayout {
         formLayout.add(title, description);
 
         Dialog dialog = VaadinViewUtils.initDialog();
-        Button save = new Button("Save");
+        Button save = new Button("СОХРАНИТЬ");
 
-        Button cancel = new Button("Cancel", e -> dialog.close());
+        Button cancel = new Button("ОТМЕНИТЬ", e -> dialog.close());
         HorizontalLayout actions = new HorizontalLayout();
         actions.add(save, cancel);
 
@@ -129,9 +131,9 @@ public class TaskStatusView extends CustomAppLayout {
                 break;
             case DELETE:
                 Div contentText = new Div();
-                contentText.setText("Confirm delete task status: " + taskStatus.getTitle() + "?");
+                contentText.setText("ПОДТВЕРДИТЕ УДАЛЕНИЕ СТАТУСА: " + taskStatus.getTitle().toUpperCase() + "?");
                 content.add(contentText, actions);
-                save.setText("Yes");
+                save.setText("ДА");
                 save.addClickListener(e -> {
                     deleteTaskStatus(taskStatus);
                     dialog.close();
