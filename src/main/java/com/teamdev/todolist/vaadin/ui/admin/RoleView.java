@@ -42,7 +42,7 @@ public class RoleView extends CustomAppLayout {
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());
         this.addNewBtn = new Button("СОЗДАТЬ РОЛЬ",
-                e -> showDialog(OperationEnum.CREATE, new Role()));
+                e -> showRoleForm(OperationEnum.CREATE, new Role()));
         init();
     }
 
@@ -61,8 +61,8 @@ public class RoleView extends CustomAppLayout {
                 .setFlexGrow(1);
 
         grid.addComponentColumn(role -> VaadinViewUtils.makeEditorColumnActions(
-                e -> showDialog(OperationEnum.UPDATE, role),
-                e -> showDialog(OperationEnum.DELETE, role)))
+                e -> showRoleForm(OperationEnum.UPDATE, role),
+                e -> showRoleForm(OperationEnum.DELETE, role)))
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setEditorComponent(new Div())
                 .setFlexGrow(2)
@@ -82,7 +82,7 @@ public class RoleView extends CustomAppLayout {
         return roleService.findAll();
     }
 
-    private void showDialog(final OperationEnum operation, final Role role) {
+    private void showRoleForm(final OperationEnum operation, final Role role) {
         RoleForm roleForm = new RoleForm(operation, role, roleService);
         this.roleForm = roleForm;
         roleForm.addOpenedChangeListener(e -> refreshDataProvider(e.isOpened(), operation, role));

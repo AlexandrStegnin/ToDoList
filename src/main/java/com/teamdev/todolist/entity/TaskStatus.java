@@ -29,7 +29,7 @@ public class TaskStatus extends AbstractEntity {
     private Long id;
 
     @Column
-    @Size(min = 4, message = "Task status must be greater than 3 characters")
+    @Size(min = 4, message = "Статус задачи должен быть от 4 символов")
     @ApiModelProperty(notes = "Task status title")
     private String title;
 

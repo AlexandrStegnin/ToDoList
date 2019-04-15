@@ -84,8 +84,6 @@ public class TaskStatusForm extends Dialog {
         }
     }
 
-
-
     public boolean isCanceled() {
         return canceled;
     }
