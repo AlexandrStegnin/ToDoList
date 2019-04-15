@@ -24,9 +24,10 @@ import java.util.List;
 
 import static com.teamdev.todolist.configuration.support.Constants.ADMIN_ROLES_PAGE;
 
-@PageTitle("АДМИНИСТРИРОВАНИЕ РОЛЕЙ")
+@PageTitle("РОЛИ")
 @Route(value = ADMIN_ROLES_PAGE, layout = MainLayout.class)
 @HtmlImport("../VAADIN/grid-style.html")
+@HtmlImport("../VAADIN/form-elements-style.html")
 public class RoleView extends CustomAppLayout {
 
     private final RoleService roleService;
