@@ -18,7 +18,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
-import de.wathoserver.vaadin.MultiselectComboBox;
+import org.vaadin.gatanaso.MultiselectComboBox;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class TeamForm extends Dialog {
         this.teamService = teamService;
         this.teamBinder = new BeanValidationBinder<>(Team.class);
         this.title = new TextField("НАЗВАНИЕ");
-        this.members = new MultiselectComboBox<>(this::getUserName);
+        this.members = new MultiselectComboBox<>();
         this.content = new VerticalLayout();
         this.team = team;
         this.operation = operation;
@@ -68,6 +68,7 @@ public class TeamForm extends Dialog {
         members.setItems(getAllUsers());
         members.setRequired(true);
         members.setRequiredIndicatorVisible(true);
+        members.setItemLabelGenerator(User::getLogin);
 
         buttons.add(submit, cancel);
         content.add(title, members, buttons);
@@ -75,7 +76,6 @@ public class TeamForm extends Dialog {
         team.addMember(currentUser);
         teamBinder.setBean(team);
         teamBinder.bindInstanceFields(this);
-
     }
 
     private String getUserName(User user) {

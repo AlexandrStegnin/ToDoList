@@ -96,9 +96,6 @@ public class RoleForm extends Dialog {
         title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
         title.setRequiredIndicatorVisible(true);
         title.setWidthFull();
-        title.getStyle().set("font-size", "11px");
-
-        description.getStyle().set("font-size", "11px");
         description.setWidthFull();
 
         submit.addClassNames("btn", "bg-green", "waves-effect");

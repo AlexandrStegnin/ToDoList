@@ -27,7 +27,6 @@ import static com.teamdev.todolist.configuration.support.Constants.ADMIN_ROLES_P
 @PageTitle("АДМИНИСТРИРОВАНИЕ РОЛЕЙ")
 @Route(value = ADMIN_ROLES_PAGE, layout = MainLayout.class)
 @HtmlImport("../VAADIN/grid-style.html")
-//@Theme(value = Material.class, variant = Material.LIGHT)
 public class RoleView extends CustomAppLayout {
 
     private final RoleService roleService;

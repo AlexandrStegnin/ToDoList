@@ -7,7 +7,10 @@ import com.teamdev.todolist.command.task.UpdateTaskCommand;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.*;
-import com.teamdev.todolist.service.*;
+import com.teamdev.todolist.service.TagService;
+import com.teamdev.todolist.service.TaskService;
+import com.teamdev.todolist.service.TaskStatusService;
+import com.teamdev.todolist.service.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -17,7 +20,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
-import de.wathoserver.vaadin.MultiselectComboBox;
+import org.vaadin.gatanaso.MultiselectComboBox;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -77,8 +80,8 @@ public class TaskForm extends Dialog {
         this.status = new Select<>();
         this.creationDate = new DatePicker("Дата создания");
         this.expirationDate = new DatePicker("Дата окончания");
-        this.performers = new MultiselectComboBox<>(this::getUserName);
-        this.tags = new MultiselectComboBox<>(Tag::getTitle);
+        this.performers = new MultiselectComboBox<>();
+        this.tags = new MultiselectComboBox<>();
         this.comment = new TextField("Комментарий");
         this.cancel = new Button("Отменить", e -> this.close());
         this.delegateTask = new Button("Делегировать задачу");
@@ -106,10 +109,12 @@ public class TaskForm extends Dialog {
         performers.setItems(getAllPerformers());
         performers.setRequired(true);
         performers.setRequiredIndicatorVisible(true);
+        performers.setItemLabelGenerator(User::getLogin);
 
         tags.setItems(getAllTags());
         tags.setRequired(true);
         tags.setRequiredIndicatorVisible(true);
+        tags.setItemLabelGenerator(Tag::getTitle);
 
         addCreationDateValueChangeListener();
         addExpirationDateValueChangeListener();
