@@ -4,6 +4,7 @@ import com.teamdev.todolist.entity.Role;
 import com.teamdev.todolist.entity.User;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -46,7 +47,10 @@ public class VaadinViewUtils {
     public static Div makeEditorColumnActions(ComponentEventListener<ClickEvent<Button>> editListener,
                                               ComponentEventListener<ClickEvent<Button>> deleteListener) {
         Div actions = new Div();
-        Button edit = new Button("", VaadinIcon.EDIT.create());
+        Button edit = new Button();
+        Html editIcon = new Html("<i class=\"material-icons\">mode_edit</i>");
+        edit.addClassNames("btn", "btn-xs", "bg-blue");
+        edit.setIcon(editIcon);
         edit.addClickListener(editListener);
         Button delete = new Button("", VaadinIcon.TRASH.create());
         delete.addClickListener(deleteListener);

@@ -7,7 +7,10 @@ import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.RoleForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
+import com.teamdev.todolist.vaadin.ui.MainLayout;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
@@ -16,16 +19,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.material.Material;
 
 import java.util.List;
 
 import static com.teamdev.todolist.configuration.support.Constants.ADMIN_ROLES_PAGE;
 
 @PageTitle("Roles")
-@Route(ADMIN_ROLES_PAGE)
-@Theme(value = Material.class, variant = Material.LIGHT)
+@Route(value = ADMIN_ROLES_PAGE, layout = MainLayout.class)
+@HtmlImport("../VAADIN/grid-style.html")
+//@Theme(value = Material.class, variant = Material.LIGHT)
 public class RoleView extends CustomAppLayout {
 
     private final RoleService roleService;
@@ -39,23 +41,24 @@ public class RoleView extends CustomAppLayout {
         this.roleService = roleService;
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());
-        this.addNewBtn = new Button("Создать роль",
+        this.addNewBtn = new Button("СОЗДАТЬ РОЛЬ",
                 e -> showDialog(OperationEnum.CREATE, new Role()));
         init();
     }
 
     private void init() {
+        grid.setId("material");
         addNewBtn.setIconAfterText(true);
 
         grid.setDataProvider(dataProvider);
 
         grid.addColumn(Role::getTitle)
-                .setHeader("Role name")
+                .setHeader("НАЗВАНИЕ")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
         grid.addColumn(Role::getDescription)
-                .setHeader("Description")
+                .setHeader("ОПИСАНИЕ")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFlexGrow(1);
 
@@ -65,10 +68,13 @@ public class RoleView extends CustomAppLayout {
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setEditorComponent(new Div())
                 .setFlexGrow(2)
-                .setHeader("Actions");
+                .setHeader("ДЕЙСТВИЯ");
 
         VerticalLayout verticalLayout = new VerticalLayout();
-
+        addNewBtn.addClassNames("btn", "btn-lg", "bg-green", "waves-effect");
+        addNewBtn.getStyle().set("padding", "8px 10px 25px 10px");
+        Html icon = new Html("<i class=\"material-icons\">add</i>");
+        addNewBtn.setIcon(icon);
         verticalLayout.add(addNewBtn, grid);
         verticalLayout.setAlignItems(FlexComponent.Alignment.END);
         setContent(verticalLayout);
