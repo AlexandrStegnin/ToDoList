@@ -7,7 +7,6 @@ import com.teamdev.todolist.repository.AuthRepository;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.teamdev.todolist.vaadin.ui.LoginView;
-import com.teamdev.todolist.vaadin.ui.MyWorkspacesView;
 import com.teamdev.todolist.vaadin.ui.ProfileView;
 import com.teamdev.todolist.vaadin.ui.admin.AdminView;
 import com.vaadin.flow.component.Component;
@@ -42,18 +41,15 @@ public class CustomAppLayout extends AppLayout {
         img.setHeight("44px");
         setBranding(img);
 
-        AppLayoutMenuItem workspacesItem = new AppLayoutMenuItem(VaadinIcon.TASKS.create(), "Workspaces",
-                e -> goToPage(MyWorkspacesView.class, SecurityUtils.getUsername()));
         AppLayoutMenuItem logoutItem = new AppLayoutMenuItem(VaadinIcon.SIGN_OUT.create(), "ВЫЙТИ", e -> logout());
-        AppLayoutMenuItem loginItem = new AppLayoutMenuItem(VaadinIcon.SIGN_IN.create(), "ВОЙТИ", e -> goToPage(LoginView.class, null));
-        AppLayoutMenuItem adminItem = new AppLayoutMenuItem(VaadinIcon.COGS.create(), "АДМИНИСТРИРОВАНИЕ", e -> goToPage(AdminView.class, null));
+        AppLayoutMenuItem loginItem = new AppLayoutMenuItem(VaadinIcon.SIGN_IN.create(), "ВОЙТИ", e -> goToPage(LoginView.class));
+        AppLayoutMenuItem adminItem = new AppLayoutMenuItem(VaadinIcon.COGS.create(), "АДМИНИСТРИРОВАНИЕ", e -> goToPage(AdminView.class));
         AppLayoutMenuItem profileItem = new AppLayoutMenuItem(createAvatarDiv(),
                 Objects.requireNonNull(SecurityUtils.getUsername()).toUpperCase() + " / ПРОФИЛЬ",
-                e -> goToPage(ProfileView.class, null));
+                e -> goToPage(ProfileView.class));
 
         if (SecurityUtils.isUserInRole(ROLE_ADMIN)) menu.addMenuItems(adminItem);
         if (SecurityUtils.isUserLoggedIn()) {
-            menu.addMenuItem(workspacesItem);
             menu.addMenuItem(profileItem);
             menu.addMenuItem(logoutItem);
         } else {
@@ -84,14 +80,6 @@ public class CustomAppLayout extends AppLayout {
 
     private void goToPage(Class<? extends Component> clazz) {
         getUI().ifPresent(ui -> ui.navigate(clazz));
-    }
-
-    private void goToPage(Class<? extends Component> clazz, String param) {
-        if (param == null) {
-            goToPage(clazz);
-        } else {
-            getUI().ifPresent(ui -> ui.navigate(MyWorkspacesView.class, param));
-        }
     }
 
     private Component createAvatarDiv() {
