@@ -6,7 +6,6 @@ import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.ui.MainLayout;
-import com.teamdev.todolist.vaadin.ui.TaskStatusView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.html.Div;

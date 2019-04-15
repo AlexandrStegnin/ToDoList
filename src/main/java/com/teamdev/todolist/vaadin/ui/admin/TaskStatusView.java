@@ -1,4 +1,4 @@
-package com.teamdev.todolist.vaadin.ui;
+package com.teamdev.todolist.vaadin.ui.admin;
 
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.TaskStatus;
