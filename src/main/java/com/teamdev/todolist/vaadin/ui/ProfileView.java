@@ -615,19 +615,24 @@ public class ProfileView extends CustomAppLayout {
 
     private void calculateTasks() {
         workspaces.forEach(workspace -> workspace.getTasks().forEach(task -> {
-            totalTasks.incrementAndGet();
-            switch (task.getStatus().getTitle()) {
-                case TASK_STATUS_COMPLETED:
-                    completedTasks.incrementAndGet();
-                    break;
-                case "Новая":
-                case "Исполняемая":
-                    activeTasks.incrementAndGet();
-                    break;
-            }
-            if (!task.getStatus().getTitle().equalsIgnoreCase(TASK_STATUS_COMPLETED) &&
-                    task.getExecutionDate().toLocalDate().isBefore(LocalDate.now())) {
-                expiredTasks.incrementAndGet();
+            if (task.getAuthor().getId().compareTo(currentUser.getId()) == 0 ||
+                    task.getPerformers()
+                            .stream()
+                            .anyMatch(user -> user.getId().compareTo(currentUser.getId()) == 0)) {
+                totalTasks.incrementAndGet();
+                switch (task.getStatus().getTitle()) {
+                    case TASK_STATUS_COMPLETED:
+                        completedTasks.incrementAndGet();
+                        break;
+                    case TASK_STATUS_NEW:
+                    case TASK_STATUS_IN_PROGRESS:
+                        activeTasks.incrementAndGet();
+                        break;
+                }
+                if (!task.getStatus().getTitle().equalsIgnoreCase(TASK_STATUS_COMPLETED) &&
+                        task.getExecutionDate().toLocalDate().isBefore(LocalDate.now())) {
+                    expiredTasks.incrementAndGet();
+                }
             }
         }));
     }

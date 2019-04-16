@@ -49,6 +49,9 @@ public class Constants {
 
     public static final String PATH_SEPARATOR = "/";
     public static final String TASK_STATUS_COMPLETED = "Решенная";
+    public static final String TASK_STATUS_NEW = "Новая";
+    public static final String TASK_STATUS_IN_PROGRESS = "Исполняемая";
+
 
     /* Application pages constants */
     public static final String LOGIN_PAGE = "login";
