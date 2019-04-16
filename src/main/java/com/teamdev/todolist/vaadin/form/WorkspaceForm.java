@@ -98,7 +98,7 @@ public class WorkspaceForm extends Dialog {
                         .withValidator(t -> !team.isVisible() || !Objects.equals(null, t),
                                 "ДЛЯ КОМАНДНОЙ РАБОЧЕЙ ОБЛАСТИ НАДО ВЫБРАТЬ КОМАНДУ")
                         .bind(Workspace_.TEAM);
-                setHeight("200px");
+                setHeight("220px");
             }
         });
 
@@ -133,7 +133,7 @@ public class WorkspaceForm extends Dialog {
 
     private void stylizeForm() {
         setWidth("400px");
-        setHeight(team.isVisible() ? "200px" : "150px");
+        setHeight(team.isVisible() ? "220px" : "150px");
         title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
         title.setRequiredIndicatorVisible(true);
         title.setWidthFull();

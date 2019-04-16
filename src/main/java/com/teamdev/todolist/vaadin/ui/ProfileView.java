@@ -3,6 +3,7 @@ package com.teamdev.todolist.vaadin.ui;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.*;
+import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.service.WorkspaceService;
@@ -52,6 +53,7 @@ public class ProfileView extends CustomAppLayout {
 
     private final UserService userService;
     private final TeamService teamService;
+    private final TaskService taskService;
     private final User currentUser;
     private final Binder<User> binder; // отвечает за привязку данных с полей формы
     private final Binder<UserProfile> profileBinder;
@@ -68,12 +70,14 @@ public class ProfileView extends CustomAppLayout {
     private AtomicInteger activeTasks;
     private AtomicInteger expiredTasks;
 
-    public ProfileView(UserService userService, WorkspaceService workspaceService, TeamService teamService) {
+    public ProfileView(UserService userService, WorkspaceService workspaceService, TeamService teamService,
+                       TaskService taskService) {
         super(userService);
         this.buffer = new MemoryBuffer();
         this.teamService = teamService;
         this.userService = userService;
         this.workspaceService = workspaceService;
+        this.taskService = taskService;
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
         this.binder = new BeanValidationBinder<>(User.class);
         this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
@@ -88,6 +92,11 @@ public class ProfileView extends CustomAppLayout {
     private void init() {
         saveChanges.setEnabled(false);
         workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
+        workspaces.addAll(taskService.findAllByPerformer(currentUser)
+                .stream()
+                .map(Task::getWorkspace)
+                .distinct()
+                .collect(Collectors.toList()));
         teams = getMyTeams();
         totalTasks.set(0);
         completedTasks.set(0);
@@ -341,24 +350,24 @@ public class ProfileView extends CustomAppLayout {
             String bgColor = workspace.getTeam() != null ? "bg-blue" : "bg-deep-orange";
 
             Div colDiv = new Div();
-
-            Button edit = new Button();
-            Html i = new Html("<i class=\"material-icons\" style=\"\n" +
-                    "top: 2px;\n" +
-                    "\">settings</i>");
-            edit.setIcon(i);
-            edit.addClassNames("btn", "btn-xs", "bg-grey", "waves-effect");
-            edit.addClickListener(event -> showWorkspaceForm(OperationEnum.UPDATE, workspace));
-            edit.getStyle()
-                    .set("position", "absolute")
-                    .set("z-index", "1")
-                    .set("right", "0")
-                    .set("bottom", "0")
-                    .set("margin", "0 15px 30px 0")
-                    .set("box-shadow", "none")
-                    .set("border-radius", "0");
-            colDiv.add(edit);
-
+            if (workspace.getOwner().getId().compareTo(currentUser.getId()) == 0) {
+                Button edit = new Button();
+                Html i = new Html("<i class=\"material-icons\" style=\"\n" +
+                        "top: 2px;\n" +
+                        "\">settings</i>");
+                edit.setIcon(i);
+                edit.addClassNames("btn", "btn-xs", "bg-grey", "waves-effect");
+                edit.addClickListener(event -> showWorkspaceForm(OperationEnum.UPDATE, workspace));
+                edit.getStyle()
+                        .set("position", "absolute")
+                        .set("z-index", "1")
+                        .set("right", "0")
+                        .set("bottom", "0")
+                        .set("margin", "0 15px 30px 0")
+                        .set("box-shadow", "none")
+                        .set("border-radius", "0");
+                colDiv.add(edit);
+            }
             colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
             Div infoBox = new Div();
             infoBox.addClickListener(onClick -> getUI().ifPresent(
