@@ -586,6 +586,7 @@ public class ProfileView extends CustomAppLayout {
 
         upload.setI18n(i18n);
         upload.addSucceededListener(e -> enabledSaveButton(true));
+        upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
         return upload;
     }
 
