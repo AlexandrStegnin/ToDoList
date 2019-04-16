@@ -74,3 +74,36 @@
         </style>
     </template>
 </dom-module>
+
+<dom-module id="my-text-area" theme-for="vaadin-text-area">
+    <template>
+        <style>
+            :host([focused]:not([readonly])) [part="label"] {
+                color: #26a69a;
+            }
+            [part="label"] {
+                font-size: 14px;
+            }
+            [part="value"], [part="input-field"] ::slotted(input) {
+                font-size: 14px;
+            }
+            :host(.multiselect) [part="input-field"] {
+                font-size: 14px;
+            }
+            [part="input-field"] {
+                font-size: 14px;
+            }
+        </style>
+    </template>
+</dom-module>
+
+<dom-module id="my-combo-box-item-style" theme-for="vaadin-combo-box-item">
+    <template>
+        <style>
+            :host(.multiselect) [part="item-template"] {
+                font-size: 14px;
+            }
+        </style>
+    </template>
+</dom-module>
+
