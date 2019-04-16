@@ -4,6 +4,7 @@ import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.repository.TaskRepository;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,13 +47,21 @@ public class TaskService {
         return taskRepository.findAllByPerformersAndWorkspace(Collections.singletonList(performer), workspace);
     }
 
+    public List<Task> findAllByPerformer(User performer) {
+        List<Task> tasks = taskRepository.findDistinctByPerformers(Collections.singletonList(performer));
+        tasks.forEach(task -> Hibernate.initialize(task.getWorkspace().getTasks()));
+        return tasks;
+    }
+
     @Transactional
     public Task create(Task task) {
         return taskRepository.save(task);
     }
 
     public Task findOne(Long taskId) {
-        return taskRepository.getOne(taskId);
+        Task task = taskRepository.getOne(taskId);
+        Hibernate.initialize(task.getWorkspace());
+        return task;
     }
 
     @Transactional

@@ -21,6 +21,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findAllByPerformersAndWorkspace(List<User> performers, Workspace workspace);
 
+    List<Task> findDistinctByPerformers(List<User> performers);
+
     @Query("SELECT t FROM Task t WHERE t.workspace.owner.id = :ownerId AND t.workspace.id = :workspaceId")
     List<Task> getTasksByOwnerIdAndWorkspaceId(@Param("ownerId") Long ownerId, @Param("workspaceId") Long workspaceId);
 
