@@ -22,7 +22,7 @@ import java.util.Set;
 @Entity
 @Table(name = "task")
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true, of = "id")
+@EqualsAndHashCode(callSuper = false, of = "id")
 public class Task extends AbstractEntity {
 
     @Id

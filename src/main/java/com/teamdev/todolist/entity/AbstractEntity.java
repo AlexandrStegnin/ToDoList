@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.io.Serializable;
@@ -18,18 +17,15 @@ import java.util.Objects;
  */
 
 @Data
-@MappedSuperclass
 public abstract class AbstractEntity implements Serializable {
 
     @Column
-    @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of creation")
     private LocalDateTime created;
 
     @Column
-    @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @ApiModelProperty(notes = "Date and time of update")
     private LocalDateTime updated;
 

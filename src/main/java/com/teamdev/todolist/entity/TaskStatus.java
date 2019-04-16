@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "task_status")
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class TaskStatus extends AbstractEntity {
 
     @Id

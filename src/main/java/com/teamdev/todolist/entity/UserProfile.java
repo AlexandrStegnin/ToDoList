@@ -23,7 +23,7 @@ import java.util.Set;
 @Entity
 @ToString(of = {"id", "email"})
 @Table(name = "user_profile")
-@EqualsAndHashCode(callSuper = true, exclude = "user")
+@EqualsAndHashCode(callSuper = false, exclude = "user")
 public class UserProfile extends AbstractEntity {
 
     @Id
