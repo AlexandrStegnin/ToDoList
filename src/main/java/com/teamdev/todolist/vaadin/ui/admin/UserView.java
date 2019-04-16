@@ -9,7 +9,6 @@ import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.UserForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.teamdev.todolist.vaadin.ui.MainLayout;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -37,7 +36,6 @@ public class UserView extends CustomAppLayout {
     private final Button addNewBtn; // кнопка добавить нового пользователя
     private ListDataProvider<User> dataProvider; // провайдер для Grid, он управляет данными
     private UserForm userForm;
-    private final VerticalLayout content;
 
     public UserView(UserService userService, RoleService roleService) {
         super(userService);
@@ -45,16 +43,12 @@ public class UserView extends CustomAppLayout {
         this.roleService = roleService;
         this.grid = new Grid<>(); // инициализация Grid'a
         this.dataProvider = new ListDataProvider<>(getAllUsers()); // инициализация провайдера с вставкой в него данных
-        this.addNewBtn = VaadinViewUtils.createSubmitButton("СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ", "add"); /*new Button(
-                "СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ", // текст на кнопке
-                e -> showUserForm(new User(), OperationEnum.CREATE) // ButtonClickEventListener, что делаем при нажатии на кнопку
-        );*/
-        this.content =  new VerticalLayout();
+        this.addNewBtn = VaadinViewUtils.createButton(
+                "СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ", "add", "submit", "8px 13px 28px 7px");
         init(); // инициализируем форму
     }
 
     private void init() {
-//        stylize();
         addNewBtn.addClickListener(e -> showUserForm(new User(), OperationEnum.CREATE));
         grid.setDataProvider(dataProvider); // говорим grid'у, что за его данные отвечает провайдер
         /* Создаём колонки */
@@ -118,14 +112,6 @@ public class UserView extends CustomAppLayout {
         this.userForm = userForm;
         userForm.addOpenedChangeListener(event -> reload(!event.isOpened(), !this.userForm.isCanceled()));
         userForm.open();
-    }
-
-    private void stylize() {
-        addNewBtn.addClassNames("btn", "btn-lg", "bg-green", "waves-effect");
-        addNewBtn.getStyle().set("padding", "8px 10px 25px 10px");
-        Html icon = new Html("<i class=\"material-icons\">add</i>");
-        addNewBtn.setIcon(icon);
-        content.setHeightFull();
     }
 
     private void reload(final boolean isClosed, final boolean isNotCanceled) {

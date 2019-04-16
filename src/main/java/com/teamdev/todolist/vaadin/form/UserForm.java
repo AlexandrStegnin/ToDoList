@@ -10,6 +10,7 @@ import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.entity.UserProfile;
 import com.teamdev.todolist.service.RoleService;
 import com.teamdev.todolist.service.UserService;
+import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -63,11 +64,8 @@ public class UserForm extends Dialog {
         this.userBinder = new BeanValidationBinder<>(User.class);
         this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
         this.operation = operation;
-        this.submit = new Button(operation.name.toUpperCase());
-        this.cancel = new Button("ОТМЕНИТЬ", e -> {
-            this.canceled = true;
-            this.close();
-        });
+        this.submit = VaadinViewUtils.createButton(operation.name.toUpperCase(), "", "submit", "8px 10px 22px 8px");
+        this.cancel = VaadinViewUtils.createButton("ОТМЕНИТЬ", "", "cancel", "8px 10px 22px 8px");
         this.buttons = new HorizontalLayout();
         this.content = new VerticalLayout();
         this.user = user;
@@ -76,7 +74,7 @@ public class UserForm extends Dialog {
 
     private void init() {
         accountNonLocked.setVisible(true);
-        prepareSubmitButton(operation);
+        prepareButtons(operation);
         stylizeForm();
         roles.setItems(getAllRoles());
         if (operation.compareTo(OperationEnum.CREATE) == 0) accountNonLocked.setVisible(false);
@@ -89,7 +87,7 @@ public class UserForm extends Dialog {
         profileBinder.bindInstanceFields(this);
     }
 
-    private void prepareSubmitButton(OperationEnum operation) {
+    private void prepareButtons(OperationEnum operation) {
         switch (operation) {
             case CREATE:
                 submit.addClickListener(e -> executeCommand(new CreateUserCommand(userService, user)));
@@ -101,6 +99,10 @@ public class UserForm extends Dialog {
                 submit.addClickListener(e -> executeCommand(new DeleteUserCommand(userService, user)));
                 break;
         }
+        cancel.addClickListener(e -> {
+            this.canceled = true;
+            this.close();
+        });
     }
 
     private void executeCommand(Command command) {
@@ -148,12 +150,6 @@ public class UserForm extends Dialog {
         password.setRequired(true);
         password.setRequiredIndicatorVisible(true);
         password.setWidthFull();
-
-        submit.addClassNames("btn", "bg-green", "waves-effect");
-        submit.getStyle().set("padding", "8px 10px 25px");
-
-        cancel.addClassNames("btn", "bg-red", "waves-effect");
-        cancel.getStyle().set("padding", "8px 10px 25px");
 
         buttons.setWidthFull();
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);

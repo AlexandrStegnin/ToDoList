@@ -44,13 +44,12 @@ public class TagView extends CustomAppLayout {
         this.tagService = tagService;
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());
-        this.addNewBtn = new Button("Создать тэг",
-                e -> showDialog(OperationEnum.CREATE, new Tag()));
+        this.addNewBtn = VaadinViewUtils.createButton("Создать тэг", "add", "submit", "");
         init();
     }
 
     private void init() {
-        addNewBtn.setIconAfterText(true);
+        addNewBtn.addClickListener(e -> showDialog(OperationEnum.CREATE, new Tag()));
 
         grid.setDataProvider(dataProvider);
 

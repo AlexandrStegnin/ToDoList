@@ -8,7 +8,6 @@ import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.RoleForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.teamdev.todolist.vaadin.ui.MainLayout;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -41,13 +40,12 @@ public class RoleView extends CustomAppLayout {
         this.roleService = roleService;
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAll());
-        this.addNewBtn = new Button("СОЗДАТЬ РОЛЬ",
-                e -> showRoleForm(OperationEnum.CREATE, new Role()));
+        this.addNewBtn = VaadinViewUtils.createButton("СОЗДАТЬ РОЛЬ", "add", "submit", "8px 13px 28px 7px");
         init();
     }
 
     private void init() {
-
+        addNewBtn.addClickListener(e -> showRoleForm(OperationEnum.CREATE, new Role()));
         grid.setDataProvider(dataProvider);
 
         grid.addColumn(Role::getTitle)
@@ -69,10 +67,6 @@ public class RoleView extends CustomAppLayout {
                 .setHeader("ДЕЙСТВИЯ");
 
         VerticalLayout verticalLayout = new VerticalLayout();
-        addNewBtn.addClassNames("btn", "btn-lg", "bg-green", "waves-effect");
-        addNewBtn.getStyle().set("padding", "8px 10px 25px 10px");
-        Html icon = new Html("<i class=\"material-icons\">add</i>");
-        addNewBtn.setIcon(icon);
         verticalLayout.add(addNewBtn, grid);
         verticalLayout.setAlignItems(FlexComponent.Alignment.END);
         setContent(verticalLayout);

@@ -11,6 +11,7 @@ import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.entity.Workspace_;
 import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.WorkspaceService;
+import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -64,25 +65,23 @@ public class WorkspaceForm extends Dialog {
         this.privateOrTeam = new Select<>();
         this.buttons = new HorizontalLayout();
         this.content = new VerticalLayout();
-        this.cancel = new Button("ОТМЕНИТЬ", e -> {
-            this.canceled = true;
-            this.close();
-        });
-        this.submit = new Button(operation.name.toUpperCase());
+        this.cancel = VaadinViewUtils.createButton("ОТМЕНИТЬ", "", "cancel", "8px 10px 21px 8px");
+        this.submit = VaadinViewUtils.createButton(
+                operation.name.toUpperCase(), "", "submit", "8px 10px 21px 8px");
         this.operation = operation;
         this.owner = owner;
         init();
     }
 
     private void init() {
-        prepareSubmitButton(operation);
-        stylizeForm();
+        prepareButtons(operation);
         workspace.setOwner(owner);
         team.setItems(getMyTeams());
         team.setTextRenderer(Team::getTitle);
         team.setEmptySelectionAllowed(true);
         team.setEmptySelectionCaption("ВЫБЕРИТЕ КОМАНДУ");
         team.setVisible(workspace.getTeam() != null);
+        stylizeForm();
 
         privateOrTeam.setEmptySelectionAllowed(false);
         privateOrTeam.setItems(PRIVATE_WS, TEAM_WS);
@@ -92,12 +91,14 @@ public class WorkspaceForm extends Dialog {
             if (PRIVATE_WS.equalsIgnoreCase(privateOrTeam.getValue())) {
                 team.setVisible(false);
                 workspace.setTeam(null);
+                setHeight("150px");
             } else {
                 team.setVisible(true);
                 workspaceBinder.forField(team)
                         .withValidator(t -> !team.isVisible() || !Objects.equals(null, t),
                                 "ДЛЯ КОМАНДНОЙ РАБОЧЕЙ ОБЛАСТИ НАДО ВЫБРАТЬ КОМАНДУ")
                         .bind(Workspace_.TEAM);
+                setHeight("200px");
             }
         });
 
@@ -112,7 +113,7 @@ public class WorkspaceForm extends Dialog {
         return teamService.findByMember(Collections.singletonList(owner));
     }
 
-    private void prepareSubmitButton(OperationEnum operation) {
+    private void prepareButtons(OperationEnum operation) {
         switch (operation) {
             case CREATE:
                 submit.addClickListener(e -> executeCommand(new CreateWorkspaceCommand(workspaceService, workspace)));
@@ -124,11 +125,15 @@ public class WorkspaceForm extends Dialog {
                 submit.addClickListener(e -> executeCommand(new DeleteWorkspaceCommand(workspaceService, workspace)));
                 break;
         }
+        cancel.addClickListener(e -> {
+            this.canceled = true;
+            this.close();
+        });
     }
 
     private void stylizeForm() {
         setWidth("400px");
-        setHeight("200px");
+        setHeight(team.isVisible() ? "200px" : "150px");
         title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
         title.setRequiredIndicatorVisible(true);
         title.setWidthFull();
@@ -136,12 +141,6 @@ public class WorkspaceForm extends Dialog {
         privateOrTeam.setWidthFull();
 
         team.setWidthFull();
-
-        submit.addClassNames("btn", "bg-green", "waves-effect");
-        submit.getStyle().set("padding", "8px 10px 25px");
-
-        cancel.addClassNames("btn", "bg-red", "waves-effect");
-        cancel.getStyle().set("padding", "8px 10px 25px");
 
         buttons.setWidthFull();
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);

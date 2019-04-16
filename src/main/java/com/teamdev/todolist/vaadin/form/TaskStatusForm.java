@@ -7,6 +7,7 @@ import com.teamdev.todolist.command.taskstatus.UpdateTaskStatusCommand;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.TaskStatus;
 import com.teamdev.todolist.service.TaskStatusService;
+import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -40,18 +41,16 @@ public class TaskStatusForm extends Dialog {
         this.title = new TextField("НАЗВАНИЕ");
         this.description = new TextField("ОПИСАНИЕ");
         this.taskStatusBinder = new BeanValidationBinder<>(TaskStatus.class);
-        this.submit = new Button(operation.name.toUpperCase());
-        this.cancel = new Button("ОТМЕНИТЬ", e -> {
-            this.canceled = true;
-            this.close();
-        });
+        this.submit = VaadinViewUtils.createButton(
+                operation.name.toUpperCase(), "", "submit", "8px 10px 19px 6px");
+        this.cancel = VaadinViewUtils.createButton("ОТМЕНИТЬ", "", "cancel", "8px 10px 19px 6px");
         this.buttons = new HorizontalLayout();
         this.content = new VerticalLayout();
         init();
     }
 
     private void init() {
-        prepareSubmitButton(operation);
+        prepareButtons(operation);
         stylizeForm();
         buttons.add(submit, cancel);
         content.add(title, description, buttons);
@@ -60,7 +59,7 @@ public class TaskStatusForm extends Dialog {
         taskStatusBinder.bindInstanceFields(this);
     }
 
-    private void prepareSubmitButton(OperationEnum operation) {
+    private void prepareButtons(OperationEnum operation) {
         switch (operation) {
             case CREATE:
                 submit.addClickListener(e -> executeCommand(new CreateTaskStatusCommand(taskStatusService, taskStatus)));
@@ -72,6 +71,10 @@ public class TaskStatusForm extends Dialog {
                 submit.addClickListener(e -> executeCommand(new DeleteTaskStatusCommand(taskStatusService, taskStatus)));
                 break;
         }
+        cancel.addClickListener(e -> {
+            this.canceled = true;
+            this.close();
+        });
     }
 
     private void executeCommand(Command command) {
@@ -95,12 +98,6 @@ public class TaskStatusForm extends Dialog {
         title.setRequiredIndicatorVisible(true);
         title.setWidthFull();
         description.setWidthFull();
-
-        submit.addClassNames("btn", "bg-green", "waves-effect");
-        submit.getStyle().set("padding", "8px 10px 25px");
-
-        cancel.addClassNames("btn", "bg-red", "waves-effect");
-        cancel.getStyle().set("padding", "8px 10px 25px");
 
         buttons.setWidthFull();
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);

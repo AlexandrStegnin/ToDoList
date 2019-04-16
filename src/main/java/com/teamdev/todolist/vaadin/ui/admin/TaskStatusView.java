@@ -8,7 +8,6 @@ import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.TaskStatusForm;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.teamdev.todolist.vaadin.ui.MainLayout;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -43,7 +42,8 @@ public class TaskStatusView extends CustomAppLayout {
 
     public TaskStatusView(TaskStatusService taskStatusService, UserService userService) {
         super(userService);
-        this.addNewBtn = new Button("СОЗДАТЬ НОВЫЙ СТАТУС", e -> showTaskStatusForm(new TaskStatus(), OperationEnum.CREATE));
+        this.addNewBtn = VaadinViewUtils.createButton(
+                "СОЗДАТЬ НОВЫЙ СТАТУС", "add", "submit", "8px 13px 27px 8px");
         this.taskStatusService = taskStatusService;
         this.grid = new Grid<>();
         this.dataProvider = new ListDataProvider<>(getAllTaskStatuses());
@@ -51,7 +51,7 @@ public class TaskStatusView extends CustomAppLayout {
     }
 
     private void init() {
-        stylizeButtons();
+        addNewBtn.addClickListener(e -> showTaskStatusForm(new TaskStatus(), OperationEnum.CREATE));
         grid.setDataProvider(dataProvider);
         /* Создаём колонки */
         grid.addColumn(TaskStatus::getTitle)
@@ -89,13 +89,6 @@ public class TaskStatusView extends CustomAppLayout {
 
     private void reload(final boolean isClosed, final boolean isNotCanceled) {
         if (isClosed && isNotCanceled) dataProvider.refreshAll();
-    }
-
-    private void stylizeButtons() {
-        addNewBtn.addClassNames("btn", "btn-lg", "bg-green", "waves-effect");
-        addNewBtn.getStyle().set("padding", "8px 10px 25px 10px");
-        Html icon = new Html("<i class=\"material-icons\">add</i>");
-        addNewBtn.setIcon(icon);
     }
 
 }

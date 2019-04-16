@@ -13,6 +13,7 @@ import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -42,8 +43,9 @@ import static com.teamdev.todolist.configuration.support.Constants.*;
  * @author stegnin
  */
 
-@Route(value = PROFILE_PAGE, layout = MainLayout.class)
 @PageTitle("ПРОФИЛЬ")
+@HtmlImport("../VAADIN/form-elements-style.html")
+@Route(value = PROFILE_PAGE, layout = MainLayout.class)
 public class ProfileView extends CustomAppLayout {
     // TODO добавить удаление РО
     private final String MY_WORKSPACE = WORKSPACES_PAGE + PATH_SEPARATOR + SecurityUtils.getUsername() + PATH_SEPARATOR;
@@ -75,7 +77,7 @@ public class ProfileView extends CustomAppLayout {
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
         this.binder = new BeanValidationBinder<>(User.class);
         this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
-        this.saveChanges = new Button("СОХРАНИТЬ");
+        this.saveChanges = VaadinViewUtils.createButton("СОХРАНИТЬ", "", "submit", "8px 12px 21px 8px");
         this.totalTasks = new AtomicInteger(0);
         this.completedTasks = new AtomicInteger(0);
         this.activeTasks = new AtomicInteger(0);
@@ -278,8 +280,6 @@ public class ProfileView extends CustomAppLayout {
             init(); // TODO продумать обновление информации в блоке с аватаром пользователя
         });
 
-        saveChanges.addClassNames("btn", "bg-pink", "waves-effect");
-        saveChanges.getStyle().set("padding", "8px 0 25px 0");
         saveChanges.setWidthFull();
 
         HorizontalLayout buttons = new HorizontalLayout(saveChanges);
@@ -300,7 +300,7 @@ public class ProfileView extends CustomAppLayout {
 
         TextField confirmNewPassField = new TextField("ПОДТВЕРДИТЕ НОВЫЙ ПАРОЛЬ");
 
-        Button submit = new Button("СОХРАНИТЬ");
+        Button submit = VaadinViewUtils.createButton("СОХРАНИТЬ", "", "submit", "8px 12px 21px 8px");
         submit.setEnabled(false);
         submit.addClickListener(e -> {
             updateUserPassword(oldPassField.getValue(), newPassField.getValue());
@@ -313,9 +313,10 @@ public class ProfileView extends CustomAppLayout {
         confirmNewPassField.addValueChangeListener(event ->
                 submit.setEnabled(event.getValue().equals(newPassField.getValue())));
 
-        submit.addClassNames("bg-red", "waves-effect");
+        submit.setWidthFull();
 
         HorizontalLayout buttons = new HorizontalLayout(submit);
+        buttons.setWidth("100px");
         formLayout.add(oldPassField, newPassField, confirmNewPassField);
         content.add(formLayout, buttons);
 
@@ -584,6 +585,7 @@ public class ProfileView extends CustomAppLayout {
                         .collect(Collectors.toList()));
 
         upload.setI18n(i18n);
+        upload.addSucceededListener(e -> enabledSaveButton(true));
         return upload;
     }
 

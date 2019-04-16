@@ -7,6 +7,7 @@ import com.teamdev.todolist.command.tag.UpdateTagCommand;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Tag;
 import com.teamdev.todolist.service.TagService;
+import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -39,11 +40,8 @@ public class TagForm extends Dialog {
     public TagForm(TagService tagService, OperationEnum operation, Tag tag) {
         this.tagBinder = new BeanValidationBinder<>(Tag.class);
         this.title = new TextField("НАЗВАНИЕ");
-        this.cancel = new Button("ОТМЕНИТЬ", e -> {
-            this.canceled = true;
-            this.close();
-        });
-        this.submit = new Button(operation.name.toUpperCase());
+        this.cancel = VaadinViewUtils.createButton("ОТМЕНИТЬ", "", "cancel", "8px 10px 19px 6px");
+        this.submit = VaadinViewUtils.createButton(operation.name.toUpperCase(), "", "submit", "8px 10px 19px 6px");
         this.content = new VerticalLayout();
         this.buttons = new HorizontalLayout();
         this.tagService = tagService;
@@ -54,14 +52,14 @@ public class TagForm extends Dialog {
 
     private void init() {
         stylizeForm();
-        prepareSubmitButton(operation);
+        prepareButtons(operation);
         buttons.add(submit, cancel);
         add(title, buttons);
         tagBinder.setBean(tag);
         tagBinder.bindInstanceFields(this);
     }
 
-    private void prepareSubmitButton(OperationEnum operation) {
+    private void prepareButtons(OperationEnum operation) {
         switch (operation) {
             case CREATE:
                 submit.addClickListener(e -> executeCommand(new CreateTagCommand(tagService, tag)));
@@ -73,6 +71,10 @@ public class TagForm extends Dialog {
                 submit.addClickListener(e -> executeCommand(new DeleteTagCommand(tagService, tag)));
                 break;
         }
+        cancel.addClickListener(e -> {
+            this.canceled = true;
+            this.close();
+        });
     }
 
     private void executeCommand(Command command) {
@@ -95,15 +97,9 @@ public class TagForm extends Dialog {
 
         title.setWidthFull();
 
-        submit.addClassNames("btn", "bg-green", "waves-effect");
-        submit.getStyle().set("padding", "8px 10px 25px");
-
-        cancel.addClassNames("btn", "bg-red", "waves-effect");
-        cancel.getStyle().set("padding", "8px 10px 25px");
-
         buttons.setWidthFull();
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.AROUND);
-
+        buttons.getStyle().set("padding", "10px 4px 0 0");
         content.setHeightFull();
     }
 

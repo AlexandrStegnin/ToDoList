@@ -164,13 +164,15 @@ public class VaadinViewUtils {
         return div;
     }
 
-    public static Button createSubmitButton(String text, String iconType) {
-        Button submit = new Button(text);
-        submit.addClassNames("btn", "btn-lg", "bg-green", "waves-effect");
-        submit.getStyle().set("padding", "8px 10px 25px 10px");
+    public static Button createButton(String text, String iconType, String buttonType, String padding) {
+        if (padding.isEmpty()) padding = "8px 10px 25px 10px";
+        Button button = new Button(text);
+        String bgColor = "submit".equalsIgnoreCase(buttonType) ? "bg-green" : "bg-red";
+        button.addClassNames("btn", "btn-lg", bgColor, "waves-effect");
+        button.getStyle().set("padding", padding);
         Html icon = new Html("<i class=\"material-icons\">" + iconType + "</i>");
-        submit.setIcon(icon);
-        return submit;
+        button.setIcon(icon);
+        return button;
     }
 
 }
