@@ -24,7 +24,9 @@ public class WorkspaceService {
     }
 
     public Workspace findById(Long id) {
-        return workspaceRepository.getOne(id);
+        Workspace workspace = workspaceRepository.getOne(id);
+        Hibernate.initialize(workspace.getTeam());
+        return workspace;
     }
 
     public List<Workspace> getMyWorkspaces(String login) {

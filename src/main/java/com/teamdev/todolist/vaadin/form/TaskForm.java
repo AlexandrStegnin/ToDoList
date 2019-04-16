@@ -174,7 +174,7 @@ public class TaskForm extends Dialog {
     }
 
     private Set<User> getAllPerformers() {
-        return new HashSet<>(userService.findAll());
+        return new HashSet<>(userService.findByTeam(workspace.getTeam()));
     }
 
     private Set<Tag> getAllTags() {

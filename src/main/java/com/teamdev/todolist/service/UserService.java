@@ -1,5 +1,6 @@
 package com.teamdev.todolist.service;
 
+import com.teamdev.todolist.entity.Team;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.repository.UserRepository;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
@@ -62,6 +63,10 @@ public class UserService {
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public List<User> findByTeam(Team team) {
+        return userRepository.findByTeam(team);
     }
 
     @Transactional
