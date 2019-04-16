@@ -45,16 +45,17 @@ public class UserView extends CustomAppLayout {
         this.roleService = roleService;
         this.grid = new Grid<>(); // инициализация Grid'a
         this.dataProvider = new ListDataProvider<>(getAllUsers()); // инициализация провайдера с вставкой в него данных
-        this.addNewBtn = new Button(
+        this.addNewBtn = VaadinViewUtils.createSubmitButton("СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ", "add"); /*new Button(
                 "СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ", // текст на кнопке
                 e -> showUserForm(new User(), OperationEnum.CREATE) // ButtonClickEventListener, что делаем при нажатии на кнопку
-        );
+        );*/
         this.content =  new VerticalLayout();
         init(); // инициализируем форму
     }
 
     private void init() {
-        stylize();
+//        stylize();
+        addNewBtn.addClickListener(e -> showUserForm(new User(), OperationEnum.CREATE));
         grid.setDataProvider(dataProvider); // говорим grid'у, что за его данные отвечает провайдер
         /* Создаём колонки */
         grid.addColumn(User::getLogin)
