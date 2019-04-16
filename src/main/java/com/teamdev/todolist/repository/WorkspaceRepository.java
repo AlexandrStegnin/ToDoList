@@ -1,5 +1,6 @@
 package com.teamdev.todolist.repository;
 
+import com.teamdev.todolist.entity.Team;
 import com.teamdev.todolist.entity.Workspace;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,5 +23,6 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
             "WHERE ws.owner.login = :login AND ws.id = :workspaceId")
     Workspace findByOwnerLoginAndWorkspaceId(@Param("login") String login, @Param("workspaceId") Long workspaceId);
 
+    List<Workspace> findDistinctByTeam(Team team);
 
 }

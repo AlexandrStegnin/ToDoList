@@ -23,8 +23,9 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Alexandr Stegnin
@@ -109,8 +110,8 @@ public class WorkspaceForm extends Dialog {
         workspaceBinder.bindInstanceFields(this);
     }
 
-    private List<Team> getMyTeams() {
-        return teamService.findByMember(Collections.singletonList(owner));
+    private Set<Team> getMyTeams() {
+        return new HashSet<>(teamService.findByMember(Collections.singletonList(owner)));
     }
 
     private void prepareButtons(OperationEnum operation) {

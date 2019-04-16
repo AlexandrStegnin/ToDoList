@@ -3,7 +3,6 @@ package com.teamdev.todolist.vaadin.ui;
 import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.*;
-import com.teamdev.todolist.service.TaskService;
 import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.service.WorkspaceService;
@@ -53,7 +52,6 @@ public class ProfileView extends CustomAppLayout {
 
     private final UserService userService;
     private final TeamService teamService;
-    private final TaskService taskService;
     private final User currentUser;
     private final Binder<User> binder; // отвечает за привязку данных с полей формы
     private final Binder<UserProfile> profileBinder;
@@ -61,8 +59,8 @@ public class ProfileView extends CustomAppLayout {
     private final WorkspaceService workspaceService;
     private WorkspaceForm workspaceForm;
     private TeamForm teamForm;
-    private List<Workspace> workspaces;
-    private List<Team> teams;
+    private Set<Workspace> workspaces;
+    private Set<Team> teams;
     private MemoryBuffer buffer;
     private Upload uploadAvatar;
     private AtomicInteger totalTasks;
@@ -70,14 +68,12 @@ public class ProfileView extends CustomAppLayout {
     private AtomicInteger activeTasks;
     private AtomicInteger expiredTasks;
 
-    public ProfileView(UserService userService, WorkspaceService workspaceService, TeamService teamService,
-                       TaskService taskService) {
+    public ProfileView(UserService userService, WorkspaceService workspaceService, TeamService teamService) {
         super(userService);
         this.buffer = new MemoryBuffer();
         this.teamService = teamService;
         this.userService = userService;
         this.workspaceService = workspaceService;
-        this.taskService = taskService;
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
         this.binder = new BeanValidationBinder<>(User.class);
         this.profileBinder = new BeanValidationBinder<>(UserProfile.class);
@@ -91,13 +87,9 @@ public class ProfileView extends CustomAppLayout {
 
     private void init() {
         saveChanges.setEnabled(false);
-        workspaces = workspaceService.getMyWorkspaces(SecurityUtils.getUsername());
-        workspaces.addAll(taskService.findAllByPerformer(currentUser)
-                .stream()
-                .map(Task::getWorkspace)
-                .distinct()
-                .collect(Collectors.toList()));
+        workspaces = new HashSet<>(workspaceService.getMyWorkspaces(SecurityUtils.getUsername()));
         teams = getMyTeams();
+        teams.forEach(team -> workspaces.addAll(workspaceService.findByTeam(team)));
         totalTasks.set(0);
         completedTasks.set(0);
         activeTasks.set(0);
@@ -599,8 +591,8 @@ public class ProfileView extends CustomAppLayout {
         return upload;
     }
 
-    private List<Team> getMyTeams() {
-        return teamService.findByMember(Collections.singletonList(currentUser));
+    private Set<Team> getMyTeams() {
+        return new HashSet<>(teamService.findByMember(Collections.singletonList(currentUser)));
     }
 
     private void showTeamForm(final OperationEnum operation, final Team team) {

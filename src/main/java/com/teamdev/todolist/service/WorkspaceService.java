@@ -1,5 +1,6 @@
 package com.teamdev.todolist.service;
 
+import com.teamdev.todolist.entity.Team;
 import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.repository.WorkspaceRepository;
 import org.hibernate.Hibernate;
@@ -34,6 +35,12 @@ public class WorkspaceService {
 
     public Workspace getMyWorkspaceTasks(String ownerLogin, Long workspaceId) {
         return workspaceRepository.findByOwnerLoginAndWorkspaceId(ownerLogin, workspaceId);
+    }
+
+    public List<Workspace> findByTeam(Team team) {
+        List<Workspace> workspaces = workspaceRepository.findDistinctByTeam(team);
+        workspaces.forEach(workspace -> Hibernate.initialize(workspace.getTasks()));
+        return workspaces;
     }
 
     @Transactional
