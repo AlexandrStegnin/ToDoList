@@ -1,10 +1,7 @@
 package com.teamdev.todolist.entity;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -16,10 +13,11 @@ import java.util.Set;
 
 @Data
 @Entity
+@ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "work_space")
-@ToString(exclude = "tasks")
-@EqualsAndHashCode(callSuper = false, of = "id")
+@EqualsAndHashCode(callSuper = true, of = "id")
 public class Workspace extends AbstractEntity {
 
     @Id
@@ -46,7 +44,10 @@ public class Workspace extends AbstractEntity {
     @ApiModelProperty(notes = "Workspace team")
     private Team team;
 
-    @OneToMany(mappedBy = "workspace")
+    @OneToMany(mappedBy = "workspace", fetch = FetchType.EAGER)
     private Set<Task> tasks;
+
+    @OneToMany(mappedBy = "workspace", fetch = FetchType.EAGER)
+    private Set<Tag> tags;
 
 }

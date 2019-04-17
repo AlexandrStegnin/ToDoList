@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -22,7 +23,8 @@ import java.util.Set;
 @Entity
 @Table(name = "task")
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false, of = "id")
+@ToString(exclude = "workspace")
+@EqualsAndHashCode(callSuper = true, of = {"id", "title", "description"})
 public class Task extends AbstractEntity {
 
     @Id

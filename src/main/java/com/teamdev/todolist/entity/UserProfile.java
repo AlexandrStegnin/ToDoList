@@ -21,9 +21,9 @@ import java.util.Set;
 
 @Data
 @Entity
-@ToString(of = {"id", "email"})
+@ToString(exclude = {"user", "workspaces", "teams"})
 @Table(name = "user_profile")
-@EqualsAndHashCode(callSuper = false, exclude = "user")
+@EqualsAndHashCode(callSuper = true, exclude = {"user", "workspaces", "teams"})
 public class UserProfile extends AbstractEntity {
 
     @Id
