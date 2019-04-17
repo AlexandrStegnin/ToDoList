@@ -10,6 +10,7 @@ import com.teamdev.todolist.service.*;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
 import com.teamdev.todolist.vaadin.form.CalendarForm;
 import com.teamdev.todolist.vaadin.form.TaskForm;
+import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.HtmlImport;
@@ -44,10 +45,10 @@ import static com.teamdev.todolist.configuration.support.Constants.WORKSPACES_PA
  * @author Alexandr Stegnin
  */
 
-@Route(WORKSPACES_PAGE)
 @PageTitle("Work space")
 @HtmlImport("../VAADIN/grid-style.html")
 @HtmlImport("../VAADIN/form-elements-style.html")
+@Route(value = WORKSPACES_PAGE, layout = MainLayout.class)
 public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<String> {
 
     private Long workspaceId;
@@ -80,32 +81,33 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         this.workspaceService = workspaceService;
         this.currentUser = this.userService.findByLogin(SecurityUtils.getUsername());
         this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
-        this.update = new Button("Обновить", e -> buttonsListener(OperationEnum.UPDATE));
-        this.delete = new Button("Удалить", e -> buttonsListener(OperationEnum.DELETE));
-        this.addNewBtn = new Button("Создать задачу", e -> showTaskForm(OperationEnum.CREATE, new Task()));
-        this.calendarBtn = new Button("Календарь задач", e -> showCalendarForm());
+        this.update = VaadinViewUtils.createButton("ОБНОВИТЬ", "", "submit", "8px 10px 20px 8px");
+        this.delete = VaadinViewUtils.createButton("УДАЛИТЬ", "", "cancel", "8px 10px 20px 8px");
+        this.addNewBtn = VaadinViewUtils.createButton("СОЗДАТЬ ЗАДАЧУ", "", "submit", "8px 10px 20px 8px");
+        this.calendarBtn = VaadinViewUtils.createButton("КАЛЕНДАРЬ ЗАДАЧ","", "submit", "8px 10px 20px 8px");
         this.colorPredicate = (task) -> getFormattedDate(task.getExecutionDate()).compareTo(getFormattedDate(LocalDateTime.now())) < 0;
     }
 
     private void init() {
+        prepareButtons();
         this.authorDataProvider = new ListDataProvider<>(getByAuthor());
         this.performerDataProvider = new ListDataProvider<>(getByPerformerAndWorkspace());
         this.workspace = workspaceService.findById(workspaceId);
-        delete.setEnabled(false);
-        update.setEnabled(false);
 
         createAuthorGrid();
         createPerformerGrid();
 
-        Tab authorTab = new Tab("Созданные мной задачи");
+        Tab authorTab = new Tab("СОЗДАННЫЕ МНОЙ ЗАДАЧИ");
+        authorTab.getStyle().set("color", "black");
         Div authorPage = new Div();
-        Tab performerTab = new Tab("Назначенные мне задачи");
+        Tab performerTab = new Tab("НАЗНАЧЕННЫЕ МНЕ ЗАДАЧИ");
+        performerTab.getStyle().set("color", "black");
         Div performerPage = new Div();
 
         HorizontalLayout authorBtnGroup = new HorizontalLayout();
         authorBtnGroup.add(addNewBtn);
-        authorBtnGroup.add(delete);
         authorBtnGroup.add(update);
+        authorBtnGroup.add(delete);
         authorBtnGroup.setAlignItems(FlexComponent.Alignment.STRETCH);
         authorPage.add(authorBtnGroup);
         authorPage.add(authorGrid);
@@ -391,4 +393,18 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         workspaceId = Long.valueOf(location.getSegments().get(2));
         init();
     }
+
+    private void prepareButtons() {
+        update.setEnabled(false);
+        update.addClickListener(e -> buttonsListener(OperationEnum.UPDATE));
+        update.getStyle().set("margin-bottom", "5px");
+        delete.setEnabled(false);
+        delete.addClickListener(e -> buttonsListener(OperationEnum.DELETE));
+        delete.getStyle().set("margin-bottom", "5px");
+        addNewBtn.addClickListener(e -> showTaskForm(OperationEnum.CREATE, new Task()));
+        addNewBtn.getStyle().set("margin-bottom", "5px");
+        calendarBtn.addClickListener(e -> showCalendarForm());
+        calendarBtn.getStyle().set("margin-bottom", "5px");
+    }
 }
+
