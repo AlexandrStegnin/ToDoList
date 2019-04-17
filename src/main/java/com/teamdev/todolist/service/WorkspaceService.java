@@ -25,7 +25,11 @@ public class WorkspaceService {
 
     public Workspace findById(Long id) {
         Workspace workspace = workspaceRepository.getOne(id);
-        Hibernate.initialize(workspace.getTeam());
+        workspace.getTasks().forEach(task -> {
+            Hibernate.initialize(task.getPerformers());
+            Hibernate.initialize(task.getTags());
+        });
+        Hibernate.initialize(workspace.getTags());
         return workspace;
     }
 
@@ -33,10 +37,6 @@ public class WorkspaceService {
         List<Workspace> workspaces = workspaceRepository.findByOwnerLogin(login);
         workspaces.forEach(workspace -> Hibernate.initialize(workspace.getTasks()));
         return workspaces;
-    }
-
-    public Workspace getMyWorkspaceTasks(String ownerLogin, Long workspaceId) {
-        return workspaceRepository.findByOwnerLoginAndWorkspaceId(ownerLogin, workspaceId);
     }
 
     public List<Workspace> findByTeam(Team team) {
