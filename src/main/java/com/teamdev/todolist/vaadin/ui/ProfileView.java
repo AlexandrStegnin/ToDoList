@@ -413,7 +413,8 @@ public class ProfileView extends CustomAppLayout {
 
             colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
             Div infoBox = new Div();
-            infoBox.addClickListener(onClick -> showTeamForm(OperationEnum.UPDATE, team));
+            infoBox.addClickListener(onClick ->
+                    showTeamForm(OperationEnum.UPDATE, team, team.getOwner().getId().compareTo(currentUser.getId()) == 0));
             infoBox.getStyle().set("cursor", "pointer");
             infoBox.addClassNames("info-box-2", bgColor, "hover-zoom-effect");
             colDiv.add(infoBox);
@@ -492,7 +493,7 @@ public class ProfileView extends CustomAppLayout {
 
         Div colDiv = new Div();
 
-        colDiv.addClickListener(onClick -> getUI().ifPresent(ui -> showTeamForm(OperationEnum.CREATE, new Team())));
+        colDiv.addClickListener(onClick -> getUI().ifPresent(ui -> showTeamForm(OperationEnum.CREATE, new Team(), true)));
 
         colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
         Div infoBox = new Div();
@@ -595,8 +596,9 @@ public class ProfileView extends CustomAppLayout {
         return new HashSet<>(teamService.findByMember(Collections.singletonList(currentUser)));
     }
 
-    private void showTeamForm(final OperationEnum operation, final Team team) {
+    private void showTeamForm(final OperationEnum operation, final Team team, final boolean allowEdit) {
         TeamForm teamForm = new TeamForm(userService, teamService, team, operation);
+        teamForm.allowEditForm(allowEdit);
         this.teamForm = teamForm;
         teamForm.addOpenedChangeListener(event -> reload(!event.isOpened(), !this.teamForm.isCanceled()));
         teamForm.open();

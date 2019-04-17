@@ -138,4 +138,10 @@ public class TeamForm extends Dialog {
         content.setHeightFull();
     }
 
+    public void allowEditForm(final boolean allowEdit) {
+        title.setReadOnly(!allowEdit);
+        members.setReadOnly(!allowEdit);
+        submit.setEnabled(allowEdit);
+    }
+
 }

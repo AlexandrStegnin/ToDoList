@@ -45,7 +45,7 @@ import static com.teamdev.todolist.configuration.support.Constants.WORKSPACES_PA
  * @author Alexandr Stegnin
  */
 
-@PageTitle("Work space")
+@PageTitle("ЗАДАЧИ")
 @HtmlImport("../VAADIN/grid-style.html")
 @HtmlImport("../VAADIN/form-elements-style.html")
 @Route(value = WORKSPACES_PAGE, layout = MainLayout.class)
