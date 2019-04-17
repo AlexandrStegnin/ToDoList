@@ -61,7 +61,8 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
     private final TagService tagService;
     private final User currentUser;
     private final DateTimeFormatter formatter;
-    private final Button update;
+    private final Button updatePerformer;
+    private final Button updateAuthor;
     private final Button delete;
     private final Button addNewBtn;
     private final Button calendarBtn;
@@ -81,7 +82,8 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         this.workspaceService = workspaceService;
         this.currentUser = this.userService.findByLogin(SecurityUtils.getUsername());
         this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
-        this.update = VaadinViewUtils.createButton("ОБНОВИТЬ", "", "submit", "8px 10px 20px 8px");
+        this.updatePerformer = VaadinViewUtils.createButton("ОБНОВИТЬ", "", "submit", "8px 10px 20px 8px");
+        this.updateAuthor = VaadinViewUtils.createButton("ОБНОВИТЬ", "", "submit", "8px 10px 20px 8px");
         this.delete = VaadinViewUtils.createButton("УДАЛИТЬ", "", "cancel", "8px 10px 20px 8px");
         this.addNewBtn = VaadinViewUtils.createButton("СОЗДАТЬ ЗАДАЧУ", "", "submit", "8px 10px 20px 8px");
         this.calendarBtn = VaadinViewUtils.createButton("КАЛЕНДАРЬ ЗАДАЧ","", "submit", "8px 10px 20px 8px");
@@ -106,7 +108,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
 
         HorizontalLayout authorBtnGroup = new HorizontalLayout();
         authorBtnGroup.add(addNewBtn);
-        authorBtnGroup.add(update);
+        authorBtnGroup.add(updateAuthor);
         authorBtnGroup.add(delete);
         authorBtnGroup.setAlignItems(FlexComponent.Alignment.STRETCH);
         authorPage.add(authorBtnGroup);
@@ -115,6 +117,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
 
         HorizontalLayout performerBtnGroup = new HorizontalLayout();
         performerBtnGroup.add(calendarBtn);
+        performerBtnGroup.add(updatePerformer);
         performerBtnGroup.setAlignItems(FlexComponent.Alignment.STRETCH);
         performerPage.add(performerBtnGroup);
         performerPage.add(performerGrid);
@@ -122,7 +125,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         Map<Tab, Component> tabsToPages = new HashMap<>();
         tabsToPages.put(authorTab, authorPage);
         tabsToPages.put(performerTab, performerPage);
-        Tabs tabs = new Tabs(authorTab, performerTab);
+        Tabs tabs = new Tabs(performerTab, authorTab);
         Div pages = new Div(authorPage, performerPage);
         pages.setWidthFull();
         Set<Component> pagesShown = Stream.of(performerPage)
@@ -383,7 +386,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
     }
 
     private void enableButtons(final boolean isAuthor) {
-        update.setEnabled(true);
+        updatePerformer.setEnabled(true);
         delete.setEnabled(isAuthor);
     }
 
@@ -395,9 +398,12 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
     }
 
     private void prepareButtons() {
-        update.setEnabled(false);
-        update.addClickListener(e -> buttonsListener(OperationEnum.UPDATE));
-        update.getStyle().set("margin-bottom", "5px");
+        updatePerformer.setEnabled(false);
+        updatePerformer.addClickListener(e -> buttonsListener(OperationEnum.UPDATE));
+        updatePerformer.getStyle().set("margin-bottom", "5px");
+        updateAuthor.setEnabled(false);
+        updateAuthor.addClickListener(e -> buttonsListener(OperationEnum.UPDATE));
+        updateAuthor.getStyle().set("margin-bottom", "5px");
         delete.setEnabled(false);
         delete.addClickListener(e -> buttonsListener(OperationEnum.DELETE));
         delete.getStyle().set("margin-bottom", "5px");
