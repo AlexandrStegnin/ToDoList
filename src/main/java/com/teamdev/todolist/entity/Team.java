@@ -46,6 +46,10 @@ public class Team extends AbstractEntity {
     @ApiModelProperty(notes = "Collection of team members")
     private Set<User> members;
 
+    @OneToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
     public void addMember(User member) {
         if (this.members == null) this.members = new HashSet<>();
         this.members.add(member);
