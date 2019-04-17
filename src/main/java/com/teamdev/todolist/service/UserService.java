@@ -1,5 +1,6 @@
 package com.teamdev.todolist.service;
 
+import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.entity.Team;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.repository.UserRepository;
@@ -66,6 +67,7 @@ public class UserService {
     }
 
     public List<User> findByTeam(Team team) {
+        if (team == null) return Collections.singletonList(userRepository.findByLogin(SecurityUtils.getUsername()));
         return userRepository.findByTeam(team);
     }
 
