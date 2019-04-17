@@ -103,4 +103,8 @@ public class TagForm extends Dialog {
         content.setHeightFull();
     }
 
+    public Tag getTag() {
+        return tag;
+    }
+
 }

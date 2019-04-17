@@ -28,10 +28,7 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -62,6 +59,7 @@ public class TaskForm extends Dialog {
     private Binder<Task> taskBinder;
     private final Button cancel;
     private final Button delegateTask;
+    private final Button addNewTagBtn;
     private final TaskStatus defaultStatus;
     private Button submit;
     private boolean canceled = false;
@@ -89,6 +87,7 @@ public class TaskForm extends Dialog {
         this.submit = VaadinViewUtils.createButton(operation.name.toUpperCase(), "", "submit", "8px 10px 20px 8px");
         this.cancel = VaadinViewUtils.createButton("ОТМЕНИТЬ", "", "cancel", "8px 10px 20px 8px");
         this.delegateTask = VaadinViewUtils.createButton("ДЕЛЕГИРОВАТЬ ЗАДАЧУ", "call_split", "delegate", "8px 10px 20px 8px");
+        this.addNewTagBtn = VaadinViewUtils.createButton("СОЗДАТЬ НОВЫЙ ТЭГ", "add", "submit", "");
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
         this.defaultStatus = taskStatusService.getDefaultStatus();
         this.buttons = new HorizontalLayout();
@@ -178,11 +177,7 @@ public class TaskForm extends Dialog {
     }
 
     private Set<Tag> getAllTags() {
-        return new HashSet<>(tagService.findAll());
-    }
-
-    private String getUserName(User user) {
-        return user.getProfile().getName() + " " + user.getProfile().getSurname();
+        return new HashSet<>(workspace.getTags());
     }
 
     private void prepareForm(Task task) {
@@ -234,10 +229,10 @@ public class TaskForm extends Dialog {
 
         if (operation.compareTo(OperationEnum.CREATE) == 0) {
             description.setHeight("30%");
-            right.add(description, performers, tags);
+            right.add(description, performers, tags, addNewTagBtn);
         } else {
             comment.setHeight("30%");
-            right.add(description, performers, tags, comment);
+            right.add(description, performers, tags, addNewTagBtn, comment);
         }
         second.add(left, right);
         content.add(second, buttons);
@@ -265,6 +260,28 @@ public class TaskForm extends Dialog {
             this.close();
         });
         buttons.getStyle().set("padding-right", "10px");
+        addNewTagBtn.setWidthFull();
+        addNewTagBtn.addClickListener(e -> showAddTagForm());
+        addNewTagBtn.setVisible(task.getAuthor().getId().compareTo(currentUser.getId()) == 0);
+    }
+
+    private void showAddTagForm() {
+        TagForm tagForm = new TagForm(tagService, OperationEnum.CREATE, new Tag(workspace));
+        tagForm.addOpenedChangeListener(event -> {
+            if (!event.isOpened()) {
+                refreshTags(tagForm.getTag());
+            }
+        });
+        tagForm.open();
+    }
+
+    private void refreshTags(Tag tag) {
+        Set<Tag> tagsSet = getAllTags();
+        Set<Tag> selectedTags = new HashSet<>(tags.getSelectedItems());
+        tagsSet.add(tag);
+        tags.setItems(tagsSet);
+        selectedTags.add(tag);
+        tags.setValue(selectedTags);
     }
 
     private void executeCommand(Command command, Task task) {
