@@ -37,8 +37,8 @@ public class CustomAppLayout extends AppLayout {
     private void init() {
         menu = createMenu();
         menu.getElement().getStyle().set("padding", "10px");
-        Image img = new Image("images/todo-list-logo.png", "ToDo List Logo");
-        img.setHeight("44px");
+        Image img = new Image("images/logo.jpg", "ToDo List Logo");
+        img.setHeight("35px");
         setBranding(img);
 
         AppLayoutMenuItem logoutItem = new AppLayoutMenuItem(VaadinIcon.SIGN_OUT.create(), "ВЫЙТИ", e -> logout());
