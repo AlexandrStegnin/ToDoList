@@ -44,10 +44,10 @@ public class Workspace extends AbstractEntity {
     @ApiModelProperty(notes = "Workspace team")
     private Team team;
 
-    @OneToMany(mappedBy = "workspace", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "workspace", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Task> tasks;
 
-    @OneToMany(mappedBy = "workspace", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "workspace", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Tag> tags;
 
 }
