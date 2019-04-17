@@ -1,0 +1,1 @@
+ALTER TABLE todo_list_db.team ADD owner_id INT NOT NULL COMMENT 'ID владельца команды'
