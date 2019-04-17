@@ -81,7 +81,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         this.tagService = tagService;
         this.workspaceService = workspaceService;
         this.currentUser = this.userService.findByLogin(SecurityUtils.getUsername());
-        this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
+        this.formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         this.updatePerformer = VaadinViewUtils.createButton("ОБНОВИТЬ", "", "submit", "8px 10px 20px 8px");
         this.updateAuthor = VaadinViewUtils.createButton("ОБНОВИТЬ", "", "submit", "8px 10px 20px 8px");
         this.delete = VaadinViewUtils.createButton("УДАЛИТЬ", "", "cancel", "8px 10px 20px 8px");

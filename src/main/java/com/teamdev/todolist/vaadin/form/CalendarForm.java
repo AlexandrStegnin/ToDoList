@@ -2,6 +2,7 @@ package com.teamdev.todolist.vaadin.form;
 
 import com.teamdev.todolist.entity.*;
 
+import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,7 +26,8 @@ public class CalendarForm extends Dialog {
 
     public CalendarForm(List<Task> tasks) {
         this.tasks = tasks;
-        this.exitBtn = new Button("Закрыть", e -> this.close());
+        this.exitBtn = VaadinViewUtils.createButton("ЗАКРЫТЬ", "", "cancel", "8px 10px 20px 8px");
+        this.exitBtn.addClickListener(e -> this.close());
         init();
     }
 
@@ -42,7 +44,7 @@ public class CalendarForm extends Dialog {
             Entry entry = new Entry();
             entry.setTitle(task.getTitle());
             entry.setStart(task.getCreationDate());
-            entry.setEnd(task.getExecutionDate());
+            entry.setEnd(task.getExecutionDate().plusDays(1));
             entry.setAllDay(true);
             entry.setColor(generateColor());
             calendar.addEntries(entry);
