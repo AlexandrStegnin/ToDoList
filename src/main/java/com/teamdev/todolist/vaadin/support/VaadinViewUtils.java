@@ -138,7 +138,7 @@ public class VaadinViewUtils {
     public static Image getUserAvatar(final User user, final boolean isNavBarAvatar) {
         String src = user.getProfile().getAvatar() == null ? DEFAULT_SRC :
                 (FILE_UPLOAD_DIRECTORY + user.getLogin() +
-                PATH_SEPARATOR + user.getProfile().getAvatar());
+                        PATH_SEPARATOR + user.getProfile().getAvatar());
 
         File file = new File(src);
         StreamResource streamResource = createFileResource(file);
@@ -169,8 +169,9 @@ public class VaadinViewUtils {
         String iconPadding = "";
         Button button = new Button(text);
         String bgColor = "submit".equalsIgnoreCase(buttonType) ? "bg-green" :
-                "delegate".equalsIgnoreCase(buttonType) ? "bg-deep-orange" : "bg-red";
-        if ("delegate".equalsIgnoreCase(buttonType)) iconPadding = "padding-bottom: 10px";
+                "delegate".equalsIgnoreCase(buttonType) ? "bg-deep-orange" :
+                        "regular".equalsIgnoreCase(buttonType) ? "bg-blue" : "bg-red";
+        if ("delegate".equalsIgnoreCase(buttonType) || "regular".equalsIgnoreCase(buttonType)) iconPadding = "padding-bottom: 10px";
         button.addClassNames("btn", "btn-lg", bgColor, "waves-effect");
         button.getStyle().set("padding", padding);
         Html icon = new Html("<i class=\"material-icons\" style=\"" + iconPadding + "\">" + iconType + "</i>");

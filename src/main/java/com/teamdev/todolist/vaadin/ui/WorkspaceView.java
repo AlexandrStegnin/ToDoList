@@ -148,14 +148,14 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         setContent(mainLayout);
     }
 
-    private void showTaskForm(final OperationEnum operation, final Task task) {
+    public void showTaskForm(final OperationEnum operation, final Task task) {
         TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, tagService, workspace, operation, task);
         taskForm.addOpenedChangeListener(event -> refreshDataProviders(event.isOpened(), taskForm.getOperation(), taskForm.getTask()));
         taskForm.open();
     }
 
     private void showCalendarForm() {
-        CalendarForm calendarForm = new CalendarForm(getByPerformerAndWorkspace());
+        CalendarForm calendarForm = new CalendarForm(getByPerformerAndWorkspace(), this);
         calendarForm.open();
     }
 
