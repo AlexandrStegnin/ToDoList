@@ -359,6 +359,23 @@ public class ProfileView extends CustomAppLayout {
                         .set("box-shadow", "none")
                         .set("border-radius", "0");
                 colDiv.add(edit);
+
+                Button delete = new Button();
+                Html iDel = new Html("<i class=\"material-icons\" style=\"\n" +
+                        "top: 2px;\n" +
+                        "\">delete_forever</i>");
+                delete.setIcon(iDel);
+                delete.addClassNames("btn", "btn-xs", "bg-indigo", "waves-effect");
+                delete.addClickListener(event -> showWorkspaceForm(OperationEnum.DELETE, workspace));
+                delete.getStyle()
+                        .set("position", "absolute")
+                        .set("z-index", "1")
+                        .set("right", "40px")
+                        .set("bottom", "0")
+                        .set("margin", "0 15px 30px 0")
+                        .set("box-shadow", "none")
+                        .set("border-radius", "0");
+                colDiv.add(delete);
             }
             colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
             Div infoBox = new Div();

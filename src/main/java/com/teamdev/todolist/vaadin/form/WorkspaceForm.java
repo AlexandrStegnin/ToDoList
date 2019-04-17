@@ -14,6 +14,7 @@ import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -36,7 +37,6 @@ public class WorkspaceForm extends Dialog {
     private static final String TEAM_WS = "КОМАНДНАЯ";
 
     private final WorkspaceService workspaceService;
-
     private final TeamService teamService;
 
     private final TextField title;
@@ -102,9 +102,20 @@ public class WorkspaceForm extends Dialog {
                 setHeight("220px");
             }
         });
-
+        Div alert = new Div();
+        alert.setText("ВНИМАНИЕ! ВСЕ СВЯЗАННЫЕ ЗАДАЧИ БУДУТ БЕЗВОЗВРАТНО УДАЛЕНЫ!");
+        alert.getStyle()
+                .set("color", "red")
+                .set("text-align", "center")
+                .set("font-size", "14px");
         buttons.add(submit, cancel);
-        content.add(title, privateOrTeam, team, buttons);
+        if (operation.compareTo(OperationEnum.DELETE) == 0) {
+            setHeight("200px");
+            content.add(alert, title, privateOrTeam, team, buttons);
+        } else {
+            setHeight("150px");
+            content.add(title, privateOrTeam, team, buttons);
+        }
         add(content);
         workspaceBinder.setBean(workspace);
         workspaceBinder.bindInstanceFields(this);
