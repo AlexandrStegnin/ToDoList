@@ -56,6 +56,11 @@ public class WorkspaceService {
     }
 
     @Transactional
+    public List<Workspace> saveAll(List<Workspace> workspaces) {
+        return workspaceRepository.saveAll(workspaces);
+    }
+
+    @Transactional
     public Workspace update(Workspace workspace) {
         return create(workspace);
     }
