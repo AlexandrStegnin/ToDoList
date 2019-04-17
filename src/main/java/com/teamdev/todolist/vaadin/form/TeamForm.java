@@ -8,10 +8,13 @@ import com.teamdev.todolist.configuration.security.SecurityUtils;
 import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Team;
 import com.teamdev.todolist.entity.User;
+import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.UserService;
+import com.teamdev.todolist.service.WorkspaceService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -20,6 +23,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +33,7 @@ public class TeamForm extends Dialog {
 
     private final UserService userService;
     private final TeamService teamService;
-
+    private final WorkspaceService workspaceService;
     private final TextField title;
 
     private final MultiselectComboBox<User> members;
@@ -44,9 +48,11 @@ public class TeamForm extends Dialog {
     private Button submit;
     private boolean canceled = false;
 
-    public TeamForm(final UserService userService, final TeamService teamService, Team team, OperationEnum operation) {
+    public TeamForm(final UserService userService, final TeamService teamService, final WorkspaceService workspaceService,
+                    Team team, OperationEnum operation) {
         this.userService = userService;
         this.teamService = teamService;
+        this.workspaceService = workspaceService;
         this.teamBinder = new BeanValidationBinder<>(Team.class);
         this.title = new TextField("НАЗВАНИЕ");
         this.members = new MultiselectComboBox<>();
@@ -63,6 +69,12 @@ public class TeamForm extends Dialog {
     }
 
     private void init() {
+        Div alert = new Div();
+        alert.setText("ВНИМАНИЕ! ВСЕ СВЯЗАННЫЕ ЗАДАЧИ БУДУТ ПЕРЕМЕЩЕНЫ НА ВАС!");
+        alert.getStyle()
+                .set("color", "orange")
+                .set("text-align", "center")
+                .set("font-size", "14px");
         prepareSubmitButton();
         stylizeForm();
         members.setItems(getAllUsers());
@@ -71,15 +83,17 @@ public class TeamForm extends Dialog {
         members.setItemLabelGenerator(User::getLogin);
 
         buttons.add(submit, cancel);
-        content.add(title, members, buttons);
+        if (operation.compareTo(OperationEnum.DELETE) == 0) {
+            content.add(alert, title, members, buttons);
+            setHeight("210px");
+        } else {
+            content.add(title, members, buttons);
+            setHeight("150px");
+        }
         add(content);
         team.addMember(currentUser);
         teamBinder.setBean(team);
         teamBinder.bindInstanceFields(this);
-    }
-
-    private String getUserName(User user) {
-        return user.getProfile().getName() + " " + user.getProfile().getSurname();
     }
 
     public boolean isCanceled() {
@@ -108,6 +122,12 @@ public class TeamForm extends Dialog {
     private void executeCommand(Command command, Team team) {
         if (!team.getMembers().contains(currentUser)) team.addMember(currentUser);
         if (command instanceof DeleteTeamCommand) {
+            List<Workspace> wsToEdit = workspaceService.findByTeam(team);
+            wsToEdit.forEach(workspace -> {
+                workspace.setTeam(null);
+                workspace.getTasks().forEach(task -> task.setPerformers(Collections.singleton(currentUser)));
+            });
+            workspaceService.saveAll(wsToEdit);
             command.execute();
             this.close();
         } else if (teamBinder.writeBeanIfValid(team)) {

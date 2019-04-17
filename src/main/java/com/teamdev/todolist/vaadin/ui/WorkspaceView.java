@@ -241,7 +241,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         expiredDateField.setPlaceholder("Фильтр");
 
         authorGrid.addItemClickListener(e -> {
-            enableButtons(e.getItem().getAuthor().getId().equals(currentUser.getId()));
+            enableAuthorButton(e.getItem().getAuthor().getId().equals(currentUser.getId()));
             performerGrid.deselectAll();
         });
 
@@ -323,7 +323,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         expiredDateField.setPlaceholder("Фильтр");
 
         performerGrid.addItemClickListener(e -> {
-            enableButtons(e.getItem().getAuthor().getId().equals(currentUser.getId()));
+            enablePerformerButtons(e.getItem().getAuthor().getId().equals(currentUser.getId()));
             authorGrid.deselectAll();
         });
 
@@ -385,9 +385,13 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         }
     }
 
-    private void enableButtons(final boolean isAuthor) {
-        updatePerformer.setEnabled(true);
+    private void enableAuthorButton(final boolean isAuthor) {
+        updateAuthor.setEnabled(isAuthor);
         delete.setEnabled(isAuthor);
+    }
+
+    private void enablePerformerButtons(final boolean isAuthor) {
+        updatePerformer.setEnabled(isAuthor);
     }
 
     @Override

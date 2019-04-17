@@ -427,7 +427,22 @@ public class ProfileView extends CustomAppLayout {
             String bgColor = "bg-blue";
 
             Div colDiv = new Div();
-
+            Button delete = new Button();
+            Html iDel = new Html("<i class=\"material-icons\" style=\"\n" +
+                    "top: 2px;\n" +
+                    "\">delete_forever</i>");
+            delete.setIcon(iDel);
+            delete.addClassNames("btn", "btn-xs", "bg-red", "waves-effect");
+            delete.addClickListener(event -> showTeamForm(OperationEnum.DELETE, team, true));
+            delete.getStyle()
+                    .set("position", "absolute")
+                    .set("z-index", "1")
+                    .set("right", "0")
+                    .set("bottom", "0")
+                    .set("margin", "0 15px 30px 0")
+                    .set("box-shadow", "none")
+                    .set("border-radius", "0");
+            colDiv.add(delete);
             colDiv.addClassNames("col-lg-3", "col-md-3", "col-sm-6", "col-xs-12");
             Div infoBox = new Div();
             infoBox.addClickListener(onClick ->
@@ -614,7 +629,7 @@ public class ProfileView extends CustomAppLayout {
     }
 
     private void showTeamForm(final OperationEnum operation, final Team team, final boolean allowEdit) {
-        TeamForm teamForm = new TeamForm(userService, teamService, team, operation);
+        TeamForm teamForm = new TeamForm(userService, teamService, workspaceService, team, operation);
         teamForm.allowEditForm(allowEdit);
         this.teamForm = teamForm;
         teamForm.addOpenedChangeListener(event -> reload(!event.isOpened(), !this.teamForm.isCanceled()));

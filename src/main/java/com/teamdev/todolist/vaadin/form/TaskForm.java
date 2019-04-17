@@ -160,7 +160,6 @@ public class TaskForm extends Dialog {
         }
         second.add(left, right);
         content.add(second, buttons);
-        setReadOnlyFields(task.getAuthor().getId().equals(currentUser.getId()));
         add(content);
         prepareForm(task);
     }
@@ -239,6 +238,7 @@ public class TaskForm extends Dialog {
             delegateTask.addClickListener(e -> delegateTask(task));
             buttons.add(delegateTask);
         }
+        setReadOnlyFields(task.getAuthor().getId().equals(currentUser.getId()));
     }
 
     private List<User> getAllUsers() {
