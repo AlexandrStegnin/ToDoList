@@ -44,6 +44,9 @@ public class TaskForm extends Dialog {
     private OperationEnum operation;
     private HorizontalLayout buttons;
     private VerticalLayout content;
+    private HorizontalLayout second;
+    private VerticalLayout left;
+    private VerticalLayout right;
 
     private final TextField title;
     private final TextArea description;
@@ -92,6 +95,9 @@ public class TaskForm extends Dialog {
         this.defaultStatus = taskStatusService.getDefaultStatus();
         this.buttons = new HorizontalLayout();
         this.content = new VerticalLayout();
+        this.second = new HorizontalLayout();
+        this.left = new VerticalLayout();
+        this.right = new VerticalLayout();
         init();
     }
 
@@ -124,7 +130,7 @@ public class TaskForm extends Dialog {
         performers.setItemLabelGenerator(User::getLogin);
         performers.setWidthFull();
         performers.setLabel("ВЫБЕРИТЕ ИСПОЛНИТЕЛЕЙ");
-
+        if (workspace.getTeam() == null) task.setPerformers(Collections.singleton(currentUser));
         tags.setItems(getAllTags());
         tags.setRequired(true);
         tags.setRequiredIndicatorVisible(true);
@@ -141,8 +147,21 @@ public class TaskForm extends Dialog {
         comment.setHeight("100px");
         content.setWidthFull();
         content.setAlignItems(FlexComponent.Alignment.END);
-        add(content);
         task.setWorkspace(workspace);
+        second.setSizeFull();
+        left.add(author, title, creationDate, expirationDate, status);
+
+        if (operation.compareTo(OperationEnum.CREATE) == 0) {
+            description.setHeight("30%");
+            right.add(description, performers, tags, addNewTagBtn);
+        } else {
+            comment.setHeight("30%");
+            right.add(description, performers, tags, addNewTagBtn, comment);
+        }
+        second.add(left, right);
+        content.add(second, buttons);
+        setReadOnlyFields(task.getAuthor().getId().equals(currentUser.getId()));
+        add(content);
         prepareForm(task);
     }
 
@@ -220,23 +239,6 @@ public class TaskForm extends Dialog {
             delegateTask.addClickListener(e -> delegateTask(task));
             buttons.add(delegateTask);
         }
-
-        HorizontalLayout second = new HorizontalLayout();
-        second.setSizeFull();
-        VerticalLayout left = new VerticalLayout();
-        VerticalLayout right = new VerticalLayout();
-        left.add(author, title, creationDate, expirationDate, status);
-
-        if (operation.compareTo(OperationEnum.CREATE) == 0) {
-            description.setHeight("30%");
-            right.add(description, performers, tags, addNewTagBtn);
-        } else {
-            comment.setHeight("30%");
-            right.add(description, performers, tags, addNewTagBtn, comment);
-        }
-        second.add(left, right);
-        content.add(second, buttons);
-        setReadOnlyFields(task.getAuthor().getId().equals(currentUser.getId()));
     }
 
     private List<User> getAllUsers() {
@@ -310,9 +312,14 @@ public class TaskForm extends Dialog {
         newTask.setStatus(defaultStatus);
         newTask.setAuthor(currentUser);
         newTask.setParentTask(task);
+        newTask.setWorkspace(workspace);
         this.operation = OperationEnum.CREATE;
         this.task = newTask;
-        init();
+        submit.setText(operation.name.toUpperCase());
+        buttons.removeAll();
+        buttons.add(submit, cancel);
+        comment.setVisible(false);
+        prepareForm(newTask);
     }
 
     public OperationEnum getOperation() {
