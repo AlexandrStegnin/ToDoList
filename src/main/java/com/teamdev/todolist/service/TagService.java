@@ -4,6 +4,7 @@ import com.teamdev.todolist.entity.Tag;
 import com.teamdev.todolist.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  */
 
 @Service
+@Transactional(readOnly = true)
 public class TagService {
 
     private final TagRepository tagRepository;
@@ -27,11 +29,13 @@ public class TagService {
         return tagRepository.findAll();
     }
 
+    @Transactional
     public Tag create(Tag tag) {
         if (tag.getWorkspace().getTitle() == null) tag.setWorkspace(workspaceService.findById(tag.getWorkspace().getId()));
         return tagRepository.save(tag);
     }
 
+    @Transactional
     public Tag update(Tag tag) {
         return create(tag);
     }
@@ -40,6 +44,7 @@ public class TagService {
         delete(tag.getId());
     }
 
+    @Transactional
     public void delete(Long id) {
         tagRepository.deleteById(id);
     }

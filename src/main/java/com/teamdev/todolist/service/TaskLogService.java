@@ -7,6 +7,7 @@ import com.teamdev.todolist.entity.TaskLog;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.repository.TaskLogRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Transactional(readOnly = true)
 public class TaskLogService {
 
     private final TaskLogRepository taskLogRepository;
@@ -26,6 +28,7 @@ public class TaskLogService {
         this.taskLogRepository = taskLogRepository;
     }
 
+    @Transactional
     public TaskLog create(TaskLog taskLog) {
         return taskLogRepository.save(taskLog);
     }
@@ -34,14 +37,17 @@ public class TaskLogService {
         return taskLogRepository.getOne(id);
     }
 
+    @Transactional
     public TaskLog update(TaskLog taskLog) {
         return taskLogRepository.save(taskLog);
     }
 
+    @Transactional
     public void delete(TaskLog taskLog) {
         taskLogRepository.delete(taskLog);
     }
 
+    @Transactional
     public void delete(Long taskLogId) {
         taskLogRepository.deleteById(taskLogId);
     }

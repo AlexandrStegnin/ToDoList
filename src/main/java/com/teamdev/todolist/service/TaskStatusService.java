@@ -4,6 +4,7 @@ import com.teamdev.todolist.entity.TaskStatus;
 import com.teamdev.todolist.repository.TaskStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  */
 
 @Service
+@Transactional(readOnly = true)
 public class TaskStatusService {
 
     private static final String DEFAULT_TASK_STATUS = "Новая";
@@ -22,6 +24,7 @@ public class TaskStatusService {
         this.taskStatusRepository = taskStatusRepository;
     }
 
+    @Transactional
     public TaskStatus create(TaskStatus taskStatus) {
         return taskStatusRepository.save(taskStatus);
     }
@@ -34,14 +37,17 @@ public class TaskStatusService {
         return taskStatusRepository.findAll();
     }
 
+    @Transactional
     public TaskStatus update(TaskStatus taskStatus) {
         return taskStatusRepository.save(taskStatus);
     }
 
+    @Transactional
     public void delete(Long taskStatusId) {
         taskStatusRepository.deleteById(taskStatusId);
     }
 
+    @Transactional
     public TaskStatus save(TaskStatus taskStatus) {
         return taskStatusRepository.save(taskStatus);
     }

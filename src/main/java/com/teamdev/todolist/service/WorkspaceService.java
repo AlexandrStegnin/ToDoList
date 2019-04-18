@@ -66,7 +66,6 @@ public class WorkspaceService {
         return workspaceRepository.saveAll(workspaces);
     }
 
-    @Transactional
     public Workspace update(Workspace workspace) {
         return create(workspace);
     }
@@ -86,7 +85,6 @@ public class WorkspaceService {
         workspaceRepository.deleteById(workspaceId);
     }
 
-    @Transactional
     public Workspace addTeam(Workspace workspace) {
         Workspace wsToUpdate = findById(workspace.getId());
         Team team = teamService.findOne(workspace.getTeam().getId());
@@ -94,7 +92,6 @@ public class WorkspaceService {
         return update(wsToUpdate);
     }
 
-    @Transactional
     public Workspace removeTeam(Workspace workspace) {
         Workspace wsToUpdate = findById(workspace.getId());
         wsToUpdate.setTeam(null);
