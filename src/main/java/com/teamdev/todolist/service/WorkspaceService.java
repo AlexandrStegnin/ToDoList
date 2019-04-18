@@ -18,9 +18,13 @@ import java.util.List;
 public class WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
+    private final UserService userService;
+    private final TeamService teamService;
 
-    public WorkspaceService(WorkspaceRepository workspaceRepository) {
+    public WorkspaceService(WorkspaceRepository workspaceRepository, UserService userService, TeamService teamService) {
         this.workspaceRepository = workspaceRepository;
+        this.userService = userService;
+        this.teamService = teamService;
     }
 
     public Workspace findById(Long id) {
@@ -52,6 +56,8 @@ public class WorkspaceService {
 
     @Transactional
     public Workspace create(Workspace workspace) {
+        if (workspace.getOwner() != null && workspace.getOwner().getLogin() == null)
+            workspace.setOwner(userService.findOne(workspace.getOwner().getId()));
         return workspaceRepository.save(workspace);
     }
 
@@ -65,4 +71,33 @@ public class WorkspaceService {
         return create(workspace);
     }
 
+    public List<Workspace> findAll() {
+        return workspaceRepository.findAll();
+    }
+
+    public Workspace changeWsTitle(Workspace workspace) {
+        Workspace wsToUpdate = findById(workspace.getId());
+        wsToUpdate.setTitle(workspace.getTitle());
+        return update(wsToUpdate);
+    }
+
+    @Transactional
+    public void delete(Long workspaceId) {
+        workspaceRepository.deleteById(workspaceId);
+    }
+
+    @Transactional
+    public Workspace addTeam(Workspace workspace) {
+        Workspace wsToUpdate = findById(workspace.getId());
+        Team team = teamService.findOne(workspace.getTeam().getId());
+        wsToUpdate.setTeam(team);
+        return update(wsToUpdate);
+    }
+
+    @Transactional
+    public Workspace removeTeam(Workspace workspace) {
+        Workspace wsToUpdate = findById(workspace.getId());
+        wsToUpdate.setTeam(null);
+        return update(wsToUpdate);
+    }
 }

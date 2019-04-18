@@ -44,6 +44,13 @@ public class Constants {
     public static final String API_TEAMS_ADD_MEMBER = "/members/add";
     public static final String API_TEAMS_REMOVE_MEMBER = "/members/remove";
 
+    //    API для работы с Workspace
+    public static final String API_WORKSPACES = "/workspaces";
+    public static final String API_WORKSPACE_ID = "workspaceId";
+    public static final String API_WORKSPACES_WS_ID = "/{workspaceId}";
+    public static final String API_WORKSPACES_ADD_TEAM = "/teams/add";
+    public static final String API_WORKSPACES_REMOVE_TEAM = "/teams/remove";
+
     public static final String API_TASK_PERFORMER_ID = "performerId";
     public static final String API_TASKS_PERFORMER_ID = "/{performerId}";
     public static final String API_TASKS_ADD_PERFORMER = "add-performer" + API_TASKS_TASK_ID + API_TASKS_PERFORMER_ID;
