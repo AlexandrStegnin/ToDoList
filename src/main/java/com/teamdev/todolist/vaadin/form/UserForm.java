@@ -36,6 +36,7 @@ public class UserForm extends Dialog {
     private final TextField login;
     private final TextField name;
     private final TextField surname;
+    private final TextField middlename;
     private final TextField password;
     private final EmailField email;
     private final MultiselectComboBox<Role> roles;
@@ -56,6 +57,7 @@ public class UserForm extends Dialog {
         this.login = new TextField("ИМЯ ПОЛЬЗОВАТЕЛЯ");
         this.name = new TextField("ИМЯ");
         this.surname = new TextField("ФАМИЛИЯ");
+        this.middlename = new TextField("ОТЧЕСТВО");
         this.password = new TextField("ПАРОЛЬ");
         this.email = new EmailField("EMAIL");
         this.roles = new MultiselectComboBox<>();
@@ -79,7 +81,7 @@ public class UserForm extends Dialog {
         roles.setItems(getAllRoles());
         if (operation.compareTo(OperationEnum.CREATE) == 0) accountNonLocked.setVisible(false);
         buttons.add(submit, cancel);
-        content.add(login, name, surname, email, roles, password, accountNonLocked, buttons);
+        content.add(login, surname, name, middlename, email, roles, password, accountNonLocked, buttons);
         add(content);
         userBinder.setBean(user);
         userBinder.bindInstanceFields(this);
@@ -121,8 +123,6 @@ public class UserForm extends Dialog {
     }
 
     private void stylizeForm() {
-        setWidth("400px");
-        setHeight("475px");
         login.setPlaceholder("ИМЯ ПОЛЬЗОВАТЕЛЯ");
         login.setRequiredIndicatorVisible(true);
         login.setWidthFull();
@@ -136,6 +136,9 @@ public class UserForm extends Dialog {
         surname.setRequired(true);
         surname.setRequiredIndicatorVisible(true);
         surname.setWidthFull();
+
+        middlename.setPlaceholder("ОТЧЕСТВО");
+        middlename.setWidthFull();
 
         email.setPlaceholder("EMAIL");
         email.setPreventInvalidInput(true);
@@ -155,6 +158,8 @@ public class UserForm extends Dialog {
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 
         content.setHeightFull();
+        setWidth("400px");
+        setHeightFull();
     }
 
     private List<Role> getAllRoles() {
