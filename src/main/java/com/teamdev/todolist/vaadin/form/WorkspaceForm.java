@@ -12,6 +12,7 @@ import com.teamdev.todolist.entity.Workspace_;
 import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.WorkspaceService;
 import com.teamdev.todolist.vaadin.support.VaadinViewUtils;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
@@ -44,6 +45,7 @@ public class WorkspaceForm extends Dialog {
     private final OperationEnum operation;
     private final HorizontalLayout buttons;
     private final VerticalLayout content;
+    private final Div alert;
     private Button submit;
     private final User owner;
 
@@ -66,6 +68,7 @@ public class WorkspaceForm extends Dialog {
         this.privateOrTeam = new Select<>();
         this.buttons = new HorizontalLayout();
         this.content = new VerticalLayout();
+        this.alert = new Div(new Text("ВНИМАНИЕ! ВСЕ СВЯЗАННЫЕ ЗАДАЧИ БУДУТ БЕЗВОЗВРАТНО УДАЛЕНЫ!"));
         this.cancel = VaadinViewUtils.createButton("ОТМЕНИТЬ", "", "cancel", "8px 10px 21px 8px");
         this.submit = VaadinViewUtils.createButton(
                 operation.name.toUpperCase(), "", "submit", "8px 10px 21px 8px");
@@ -82,7 +85,6 @@ public class WorkspaceForm extends Dialog {
         team.setEmptySelectionAllowed(true);
         team.setEmptySelectionCaption("ВЫБЕРИТЕ КОМАНДУ");
         team.setVisible(workspace.getTeam() != null);
-        stylizeForm();
 
         privateOrTeam.setEmptySelectionAllowed(false);
         privateOrTeam.setItems(PRIVATE_WS, TEAM_WS);
@@ -92,33 +94,25 @@ public class WorkspaceForm extends Dialog {
             if (PRIVATE_WS.equalsIgnoreCase(privateOrTeam.getValue())) {
                 team.setVisible(false);
                 workspace.setTeam(null);
-                setHeight("150px");
             } else {
                 team.setVisible(true);
                 workspaceBinder.forField(team)
                         .withValidator(t -> !team.isVisible() || !Objects.equals(null, t),
                                 "ДЛЯ КОМАНДНОЙ РАБОЧЕЙ ОБЛАСТИ НАДО ВЫБРАТЬ КОМАНДУ")
                         .bind(Workspace_.TEAM);
-                setHeight("220px");
             }
         });
-        Div alert = new Div();
-        alert.setText("ВНИМАНИЕ! ВСЕ СВЯЗАННЫЕ ЗАДАЧИ БУДУТ БЕЗВОЗВРАТНО УДАЛЕНЫ!");
-        alert.getStyle()
-                .set("color", "red")
-                .set("text-align", "center")
-                .set("font-size", "14px");
         buttons.add(submit, cancel);
+        content.add(alert, title, privateOrTeam, team, buttons);
         if (operation.compareTo(OperationEnum.DELETE) == 0) {
-            setHeight("200px");
-            content.add(alert, title, privateOrTeam, team, buttons);
+            alert.setVisible(true);
         } else {
-            setHeight("150px");
-            content.add(title, privateOrTeam, team, buttons);
+            alert.setVisible(false);
         }
         add(content);
         workspaceBinder.setBean(workspace);
         workspaceBinder.bindInstanceFields(this);
+        stylizeForm();
     }
 
     private Set<Team> getMyTeams() {
@@ -145,7 +139,10 @@ public class WorkspaceForm extends Dialog {
 
     private void stylizeForm() {
         setWidth("400px");
-        setHeight(team.isVisible() ? "220px" : "150px");
+        alert.getStyle()
+                .set("color", "red")
+                .set("text-align", "center")
+                .set("font-size", "14px");
         title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
         title.setRequiredIndicatorVisible(true);
         title.setWidthFull();
@@ -158,6 +155,7 @@ public class WorkspaceForm extends Dialog {
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 
         content.setHeightFull();
+        setHeightFull();
     }
 
     private void executeCommand(Command command) {
