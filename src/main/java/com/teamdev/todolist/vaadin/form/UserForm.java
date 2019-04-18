@@ -75,11 +75,9 @@ public class UserForm extends Dialog {
     }
 
     private void init() {
-        accountNonLocked.setVisible(true);
         prepareButtons(operation);
         stylizeForm();
         roles.setItems(getAllRoles());
-        if (operation.compareTo(OperationEnum.CREATE) == 0) accountNonLocked.setVisible(false);
         buttons.add(submit, cancel);
         content.add(login, surname, name, middlename, email, roles, password, accountNonLocked, buttons);
         add(content);
@@ -123,6 +121,8 @@ public class UserForm extends Dialog {
     }
 
     private void stylizeForm() {
+        accountNonLocked.setVisible(operation.compareTo(OperationEnum.UPDATE) == 0);
+
         login.setPlaceholder("ИМЯ ПОЛЬЗОВАТЕЛЯ");
         login.setRequiredIndicatorVisible(true);
         login.setWidthFull();
