@@ -92,6 +92,7 @@ public class TeamForm extends Dialog {
         }
         add(content);
         team.addMember(currentUser);
+        team.setOwner(currentUser);
         teamBinder.setBean(team);
         teamBinder.bindInstanceFields(this);
     }

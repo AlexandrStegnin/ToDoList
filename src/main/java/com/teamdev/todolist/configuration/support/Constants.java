@@ -37,6 +37,13 @@ public class Constants {
     public static final String API_TAG_ID = "tagId";
     public static final String API_TAGS_TAG_ID = "/{tagId}";
 
+    //    API для работы с Team
+    public static final String API_TEAMS = "/teams";
+    public static final String API_TEAM_ID = "teamId";
+    public static final String API_TEAMS_TEAM_ID = "/{teamId}";
+    public static final String API_TEAMS_ADD_MEMBER = "/members/add";
+    public static final String API_TEAMS_REMOVE_MEMBER = "/members/remove";
+
     public static final String API_TASK_PERFORMER_ID = "performerId";
     public static final String API_TASKS_PERFORMER_ID = "/{performerId}";
     public static final String API_TASKS_ADD_PERFORMER = "add-performer" + API_TASKS_TASK_ID + API_TASKS_PERFORMER_ID;
