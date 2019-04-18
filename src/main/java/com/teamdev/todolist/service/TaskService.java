@@ -1,5 +1,7 @@
 package com.teamdev.todolist.service;
 
+import com.teamdev.todolist.configuration.security.SecurityUtils;
+import com.teamdev.todolist.configuration.support.OperationEnum;
 import com.teamdev.todolist.entity.Task;
 import com.teamdev.todolist.entity.User;
 import com.teamdev.todolist.entity.Workspace;
@@ -21,22 +23,18 @@ import java.util.List;
 public class TaskService {
 
     private TaskRepository taskRepository;
+    private TaskLogService taskLogService;
     private UserService userService;
-    private WorkspaceService workspaceService;
 
     @Autowired
-    public void setTaskRepository(TaskRepository taskRepository, UserService userService, WorkspaceService workspaceService) {
-        this.workspaceService = workspaceService;
+    public void setTaskRepository(TaskRepository taskRepository, UserService userService, TaskLogService taskLogService) {
         this.taskRepository = taskRepository;
+        this.taskLogService = taskLogService;
         this.userService = userService;
     }
 
     public List<Task> findAll() {
         return taskRepository.findAll();
-    }
-
-    public List<Task> findAllByAuthor(User author) {
-        return taskRepository.findAllByAuthor(author);
     }
 
     public List<Task> findByAuthorLoginAndWorkspaceId(String login, Long workspaceId) {
@@ -47,15 +45,11 @@ public class TaskService {
         return taskRepository.findAllByPerformersAndWorkspace(Collections.singletonList(performer), workspace);
     }
 
-    public List<Task> findAllByPerformer(User performer) {
-        List<Task> tasks = taskRepository.findDistinctByPerformers(Collections.singletonList(performer));
-        tasks.forEach(task -> Hibernate.initialize(task.getWorkspace().getTasks()));
-        return tasks;
-    }
-
     @Transactional
     public Task create(Task task) {
-        return taskRepository.save(task);
+        Task newTask = taskRepository.save(task);
+        taskLogService.createTaskLog(null, newTask, OperationEnum.CREATE, newTask.getAuthor());
+        return newTask;
     }
 
     public Task findOne(Long taskId) {
@@ -66,31 +60,34 @@ public class TaskService {
 
     @Transactional
     public Task update(Task task) {
+        Task oldTask = taskRepository.getOne(task.getId());
+        taskLogService.createTaskLog(oldTask, task, OperationEnum.UPDATE, userService.findByLogin(SecurityUtils.getUsername()));
         return taskRepository.save(task);
     }
 
     @Transactional
     public void delete(Long taskId) {
+        Task newTask = taskRepository.getOne(taskId);
+        taskLogService.createTaskLog(null, newTask, OperationEnum.DELETE, newTask.getAuthor());
         taskRepository.deleteById(taskId);
     }
 
-    @Transactional
     public Task addPerformer(Long taskId, Long performerId) {
-        Task task = taskRepository.getOne(taskId);
-        User performer = userService.findOne(performerId);
-        task.addPerformer(performer);
-        return taskRepository.save(task);
+        return updateTask(taskId, performerId, true);
     }
 
-    @Transactional
     public Task removePerformer(Long taskId, Long performerId) {
-        Task task = taskRepository.getOne(taskId);
-        User performer = userService.findOne(performerId);
-        task.removePerformer(performer);
-        return taskRepository.save(task);
+        return updateTask(taskId, performerId, false);
     }
 
-    public List<Task> findByWorkspaceId(Long ownerId, Long workspaceId) {
-        return taskRepository.getTasksByOwnerIdAndWorkspaceId(ownerId, workspaceId);
+    private Task updateTask(Long taskId, Long performerId, boolean add) {
+        Task oldTask = taskRepository.getOne(taskId);
+        Task task = taskRepository.getOne(taskId);
+        User performer = userService.findOne(performerId);
+        if (add) task.addPerformer(performer);
+        else task.removePerformer(performer);
+        taskLogService.createTaskLog(oldTask, task, OperationEnum.UPDATE, userService.findByLogin(SecurityUtils.getUsername()));
+        return update(task);
     }
+
 }
