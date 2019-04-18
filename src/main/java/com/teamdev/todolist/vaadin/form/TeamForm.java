@@ -12,6 +12,7 @@ import com.teamdev.todolist.entity.Workspace;
 import com.teamdev.todolist.service.TeamService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.service.WorkspaceService;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
@@ -38,6 +39,7 @@ public class TeamForm extends Dialog {
 
     private final MultiselectComboBox<User> members;
     private final VerticalLayout content;
+    private final Div alert;
 
     private OperationEnum operation;
     private HorizontalLayout buttons;
@@ -57,6 +59,7 @@ public class TeamForm extends Dialog {
         this.title = new TextField("НАЗВАНИЕ");
         this.members = new MultiselectComboBox<>();
         this.content = new VerticalLayout();
+        this.alert = new Div(new Text("ВНИМАНИЕ! ВСЕ СВЯЗАННЫЕ ЗАДАЧИ БУДУТ ПЕРЕМЕЩЕНЫ НА ВАС!"));
         this.team = team;
         this.operation = operation;
         this.currentUser = userService.findByLogin(SecurityUtils.getUsername());
@@ -69,12 +72,6 @@ public class TeamForm extends Dialog {
     }
 
     private void init() {
-        Div alert = new Div();
-        alert.setText("ВНИМАНИЕ! ВСЕ СВЯЗАННЫЕ ЗАДАЧИ БУДУТ ПЕРЕМЕЩЕНЫ НА ВАС!");
-        alert.getStyle()
-                .set("color", "orange")
-                .set("text-align", "center")
-                .set("font-size", "14px");
         prepareSubmitButton();
         stylizeForm();
         members.setItems(getAllUsers());
@@ -83,13 +80,7 @@ public class TeamForm extends Dialog {
         members.setItemLabelGenerator(User::getLogin);
 
         buttons.add(submit, cancel);
-        if (operation.compareTo(OperationEnum.DELETE) == 0) {
-            content.add(alert, title, members, buttons);
-            setHeight("210px");
-        } else {
-            content.add(title, members, buttons);
-            setHeight("150px");
-        }
+        content.add(alert, title, members, buttons);
         add(content);
         team.addMember(currentUser);
         team.setOwner(currentUser);
@@ -138,8 +129,6 @@ public class TeamForm extends Dialog {
     }
 
     private void stylizeForm() {
-        setWidth("400px");
-        setHeight("150px");
         title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
         title.setRequiredIndicatorVisible(true);
         title.setWidthFull();
@@ -157,6 +146,14 @@ public class TeamForm extends Dialog {
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 
         content.setHeightFull();
+
+        alert.getStyle()
+                .set("color", "orange")
+                .set("text-align", "center")
+                .set("font-size", "14px");
+        alert.setVisible(operation.compareTo(OperationEnum.DELETE) == 0);
+        setWidth("400px");
+        setHeightFull();
     }
 
     public void allowEditForm(final boolean allowEdit) {
