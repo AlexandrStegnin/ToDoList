@@ -92,15 +92,15 @@ public class TagForm extends Dialog {
     }
 
     private void stylizeForm() {
-        setWidth("200px");
-        setHeight("100px");
-
         title.setWidthFull();
-
         buttons.setWidthFull();
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.AROUND);
         buttons.getStyle().set("padding", "10px 4px 0 0");
         content.setHeightFull();
+        setWidth("200px");
+        setHeightFull();
+        setCloseOnOutsideClick(false);
+        setCloseOnEsc(false);
     }
 
     public Tag getTag() {

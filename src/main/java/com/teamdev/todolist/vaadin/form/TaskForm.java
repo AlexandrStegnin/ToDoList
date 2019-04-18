@@ -273,7 +273,7 @@ public class TaskForm extends Dialog {
     private void showAddTagForm() {
         TagForm tagForm = new TagForm(tagService, OperationEnum.CREATE, new Tag(workspace));
         tagForm.addOpenedChangeListener(event -> {
-            if (!event.isOpened()) {
+            if (!event.isOpened() && !tagForm.isCanceled()) {
                 refreshTags(tagForm.getTag());
             }
         });
