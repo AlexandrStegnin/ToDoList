@@ -92,8 +92,6 @@ public class TaskStatusForm extends Dialog {
     }
 
     private void stylizeForm() {
-        setWidth("400px");
-        setHeight("200px");
         title.setPlaceholder("ВВЕДИТЕ НАЗВАНИЕ");
         title.setRequiredIndicatorVisible(true);
         title.setWidthFull();
@@ -103,6 +101,8 @@ public class TaskStatusForm extends Dialog {
         buttons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 
         content.setHeightFull();
+        setWidth("400px");
+        setHeightFull();
     }
 
 }
