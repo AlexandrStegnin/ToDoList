@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
  * @author Alexandr Stegnin
  */
 
+
 @Service
 public class TaskLogService {
 

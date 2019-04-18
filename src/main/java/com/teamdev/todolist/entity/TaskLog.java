@@ -41,5 +41,4 @@ public class TaskLog extends AbstractEntity {
     @Column(name = "comment")
     private String comment;
 
-
 }
