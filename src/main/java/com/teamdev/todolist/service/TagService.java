@@ -15,10 +15,12 @@ import java.util.List;
 public class TagService {
 
     private final TagRepository tagRepository;
+    private final WorkspaceService workspaceService;
 
     @Autowired
-    public TagService(TagRepository tagRepository) {
+    public TagService(TagRepository tagRepository, WorkspaceService workspaceService) {
         this.tagRepository = tagRepository;
+        this.workspaceService = workspaceService;
     }
 
     public List<Tag> findAll() {
@@ -26,6 +28,7 @@ public class TagService {
     }
 
     public Tag create(Tag tag) {
+        if (tag.getWorkspace().getTitle() == null) tag.setWorkspace(workspaceService.findById(tag.getWorkspace().getId()));
         return tagRepository.save(tag);
     }
 
@@ -43,6 +46,10 @@ public class TagService {
 
     public Long count() {
         return tagRepository.count();
+    }
+
+    public Tag findOne(Long id) {
+        return tagRepository.getOne(id);
     }
 
 }

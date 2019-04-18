@@ -1,5 +1,6 @@
 package com.teamdev.todolist.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -95,6 +96,7 @@ public class Task extends AbstractEntity {
     private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne
+    @JsonBackReference(value = "task-workspace")
     @JoinColumn(name = "workspace_id")
     @ApiModelProperty(notes = "Task workspace")
     @NotNull(message = "Выбери рабочую область для задачи")

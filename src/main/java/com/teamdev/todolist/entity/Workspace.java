@@ -1,5 +1,6 @@
 package com.teamdev.todolist.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -44,9 +45,11 @@ public class Workspace extends AbstractEntity {
     @ApiModelProperty(notes = "Workspace team")
     private Team team;
 
+    @JsonManagedReference(value = "task-workspace")
     @OneToMany(mappedBy = "workspace", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Task> tasks;
 
+    @JsonManagedReference(value = "workspace")
     @OneToMany(mappedBy = "workspace", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Tag> tags;
 

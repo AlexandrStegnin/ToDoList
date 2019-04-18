@@ -32,6 +32,11 @@ public class Constants {
     public static final String API_TASK_ID = "taskId";
     public static final String API_TASKS_TASK_ID = "/{taskId}";
 
+    //    API для работы с Tag
+    public static final String API_TAGS = "/tags";
+    public static final String API_TAG_ID = "tagId";
+    public static final String API_TAGS_TAG_ID = "/{tagId}";
+
     public static final String API_TASK_PERFORMER_ID = "performerId";
     public static final String API_TASKS_PERFORMER_ID = "/{performerId}";
     public static final String API_TASKS_ADD_PERFORMER = "add-performer" + API_TASKS_TASK_ID + API_TASKS_PERFORMER_ID;

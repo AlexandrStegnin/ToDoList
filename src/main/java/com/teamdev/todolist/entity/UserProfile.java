@@ -64,10 +64,12 @@ public class UserProfile extends AbstractEntity {
     @ApiModelProperty(notes = "The image path user avatar")
     private String avatar;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "owner")
     @ApiModelProperty(notes = "User work spaces")
     private Set<Workspace> workspaces = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "members")
     @ApiModelProperty(notes = "User teams")
     private Set<Team> teams;

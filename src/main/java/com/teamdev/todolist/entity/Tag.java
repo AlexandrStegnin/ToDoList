@@ -1,5 +1,6 @@
 package com.teamdev.todolist.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,6 +36,7 @@ public class Tag extends AbstractEntity {
     @ApiModelProperty(notes = "The tag title")
     private String title;
 
+    @JsonBackReference(value = "workspace")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
