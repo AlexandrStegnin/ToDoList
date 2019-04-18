@@ -323,7 +323,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
         expiredDateField.setPlaceholder("Фильтр");
 
         performerGrid.addItemClickListener(e -> {
-            enablePerformerButtons(e.getItem().getAuthor().getId().equals(currentUser.getId()));
+            enablePerformerButtons(e.getItem().getPerformers().contains(currentUser));
             authorGrid.deselectAll();
         });
 

@@ -248,13 +248,13 @@ public class TaskForm extends Dialog {
     private void prepareButtons() {
         switch (operation) {
             case CREATE:
-                submit.addClickListener(e -> executeCommand(new CreateTaskCommand(taskService, task), task));
+                submit.addClickListener(e -> executeCommand(new CreateTaskCommand(taskService, task)));
                 break;
             case UPDATE:
-                submit.addClickListener(e -> executeCommand(new UpdateTaskCommand(taskService, task), task));
+                submit.addClickListener(e -> executeCommand(new UpdateTaskCommand(taskService, task)));
                 break;
             case DELETE:
-                submit.addClickListener(e -> executeCommand(new DeleteTaskCommand(taskService, task), task));
+                submit.addClickListener(e -> executeCommand(new DeleteTaskCommand(taskService, task)));
                 break;
         }
         cancel.addClickListener(e -> {
@@ -286,7 +286,7 @@ public class TaskForm extends Dialog {
         tags.setValue(selectedTags);
     }
 
-    private void executeCommand(Command command, Task task) {
+    private void executeCommand(Command command) {
         if (command instanceof DeleteTaskCommand) {
             command.execute();
             this.close();
