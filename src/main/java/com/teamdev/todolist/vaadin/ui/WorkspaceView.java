@@ -69,6 +69,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
     private Grid<Task> authorGrid, performerGrid;
     private ListDataProvider<Task> authorDataProvider, performerDataProvider;
     private Predicate<Task> colorPredicate;
+    private TaskForm taskForm;
 
     private final String RED = "red";
 
@@ -150,6 +151,7 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
 
     public void showTaskForm(final OperationEnum operation, final Task task) {
         TaskForm taskForm = new TaskForm(userService, taskService, taskStatusService, tagService, workspace, operation, task);
+        this.taskForm = taskForm;
         taskForm.addOpenedChangeListener(event -> refreshDataProviders(event.isOpened(), taskForm.getOperation(), taskForm.getTask()));
         taskForm.open();
     }
@@ -358,8 +360,9 @@ public class WorkspaceView extends CustomAppLayout implements HasUrlParameter<St
 
     private void refreshDataProviders(final boolean isOpened, final OperationEnum operation, final Task task) {
         if (task.getId() != null) {
-            if (!isOpened) {
-                if (operation.compareTo(OperationEnum.CREATE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
+            if (!isOpened && !taskForm.isCanceled()) {
+                if (operation.compareTo(OperationEnum.CREATE) == 0 &&
+                        task.getAuthor().getId().equals(currentUser.getId())) {
                     authorDataProvider.getItems().add(task);
                 } else if (operation.compareTo(OperationEnum.DELETE) == 0 && task.getAuthor().getId().equals(currentUser.getId())) {
                     authorDataProvider.getItems().remove(task);

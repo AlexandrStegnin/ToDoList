@@ -150,14 +150,8 @@ public class TaskForm extends Dialog {
         task.setWorkspace(workspace);
         second.setSizeFull();
         left.add(author, title, creationDate, expirationDate, status);
+        right.add(description, performers, tags, addNewTagBtn, comment);
 
-        if (operation.compareTo(OperationEnum.CREATE) == 0) {
-            description.setHeight("30%");
-            right.add(description, performers, tags, addNewTagBtn);
-        } else {
-            comment.setHeight("30%");
-            right.add(description, performers, tags, addNewTagBtn, comment);
-        }
         second.add(left, right);
         content.add(second, buttons);
         add(content);
@@ -238,7 +232,16 @@ public class TaskForm extends Dialog {
             delegateTask.addClickListener(e -> delegateTask(task));
             buttons.add(delegateTask);
         }
+        stylizeForm();
         setReadOnlyFields(task.getAuthor().getId().equals(currentUser.getId()));
+    }
+
+    private void stylizeForm() {
+        setCloseOnOutsideClick(false);
+        setCloseOnEsc(false);
+        description.setHeight("30%");
+        comment.setHeight("30%");
+        comment.setVisible(operation.compareTo(OperationEnum.UPDATE) == 0);
     }
 
     private List<User> getAllUsers() {
