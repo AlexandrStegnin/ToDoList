@@ -1,7 +1,6 @@
 package com.teamdev.todolist.vaadin.ui.admin;
 
 import com.teamdev.todolist.service.RoleService;
-import com.teamdev.todolist.service.TagService;
 import com.teamdev.todolist.service.TaskStatusService;
 import com.teamdev.todolist.service.UserService;
 import com.teamdev.todolist.vaadin.custom.CustomAppLayout;
@@ -21,15 +20,12 @@ public class AdminView extends CustomAppLayout {
     private final TaskStatusService taskStatusService;
     private final RoleService roleService;
     private final UserService userService;
-    private final TagService tagService;
 
-    public AdminView(TaskStatusService taskStatusService, RoleService roleService,
-                     UserService userService, TagService tagService) {
+    public AdminView(TaskStatusService taskStatusService, RoleService roleService, UserService userService) {
         super(userService);
         this.taskStatusService = taskStatusService;
         this.roleService = roleService;
         this.userService = userService;
-        this.tagService = tagService;
         init();
     }
 
@@ -53,9 +49,7 @@ public class AdminView extends CustomAppLayout {
         row.add(createDiv("people", "bg-indigo", "ПОЛЬЗОВАТЕЛИ", userService.count().toString(), UserView.class));
         row.add(createDiv("security", "bg-deep-orange", "РОЛИ", roleService.count().toString(), RoleView.class));
         row.add(createDiv("assignment", "bg-green", "СТАТУСЫ ЗАДАЧ", taskStatusService.count().toString(), TaskStatusView.class));
-        row.add(createDiv("label", "bg-amber", "ТЭГИ", tagService.count().toString(), TagView.class));
         container.add(row);
-        /*verified_user*/
         return container;
     }
 
@@ -65,7 +59,7 @@ public class AdminView extends CustomAppLayout {
 
         Div colDiv = new Div();
 
-        colDiv.addClassNames("col-lg-6", "col-md-6", "col-sm-6", "col-xs-12");
+        colDiv.addClassNames("col-lg-4", "col-md-4", "col-sm-4", "col-xs-12");
         Div infoBox = new Div();
         infoBox.addClickListener(onClick -> goToPage(clazz));
         infoBox.getStyle().set("cursor", "pointer");
