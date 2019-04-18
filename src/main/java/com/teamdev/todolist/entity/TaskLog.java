@@ -26,13 +26,11 @@ public class TaskLog extends AbstractEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "task_id")
-    private Task task;
+    @Column(name = "task_id")
+    private Long taskId;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User editor;
+    @Column(name = "user_id")
+    private Long editorId;
 
     @Column(name = "operation")
     @Enumerated(EnumType.STRING)
