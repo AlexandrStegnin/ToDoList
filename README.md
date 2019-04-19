@@ -1,4 +1,5 @@
-# ToDo List (Task manager)
+<img src="https://i.ibb.co/2gLt0g7/logo.jpg" alt="logo">
+
 ## General description
 The system is intended for information support of the tasks execution processes, including:
 - task creation;
